@@ -1105,6 +1105,111 @@ def test_real_pdf_text_metadata_and_pagination(bundle, damage):
         gate.pdf_checks(bundle["root"])
 
 
+@pytest.mark.parametrize("mode,case,valid", [
+    ("anonymous", "no_ack", True), ("camera_ready", "no_ack", True),
+    ("anonymous", "hidden", True), ("anonymous", "clean", False),
+    *[("camera_ready", case, valid) for case, valid in (
+        ("clean", True), ("fourth_page", True), ("next_reference_page", True), ("wrapped", True),
+        ("orphan", False), ("missing_heading", False), ("renamed_heading", False),
+        ("duplicate_heading", False), ("duplicate_source", False),
+        ("unmatched_begin", False), ("unmatched_end", False), ("empty", False), ("macro", False),
+        ("source_after_references", False), ("source_body_after_ack", False),
+        ("source_mismatch", False), ("pdf_mismatch", False), ("missing_body", False),
+        ("fifth_page_body", False), ("fifth_page_number", False), ("sixth_page", False),
+        ("extra_pdf_body", False), ("extra_pdf_number", False), ("references_before_ack", False),
+    )],
+])
+def test_pdf_acknowledgment_requires_matching_source_and_preserves_main_limit(bundle, request, mode, case, valid):
+    if mode == "camera_ready":
+        tex, pages = request.getfixturevalue("camera_ready_bundle")
+    else:
+        tex, pages = (bundle["root"] / "main.tex").read_text(), copy.deepcopy(bundle["pages"])
+    heading = "Acknowledgments and Disclosure of Funding"
+    body = ("Shared research infrastructure (ARES) supported this work under contract 12345. "
+            "OMNI supplied the data. The author has no competing interests.")
+    block = "\\begin{ack}\n" + body + "\n\\end{ack}\n"
+    bibliography = r"\bibliography{references}"
+    tex = tex.replace(bibliography, block + bibliography)
+    ack_lines = [heading, *textwrap.wrap(body, width=85)]
+    pages[4][:0] = ack_lines
+    if case in ("no_ack", "orphan"):
+        tex = tex.replace(block, "")
+    if case in ("no_ack", "hidden"):
+        del pages[4][:len(ack_lines)]
+    elif case == "fourth_page":
+        del pages[4][:len(ack_lines)]
+        pages[3].extend(ack_lines)
+    elif case == "next_reference_page":
+        del pages[4][:len(ack_lines)]
+        pages.insert(4, ack_lines + ["5"])
+        tex = tex.replace(bibliography, r"\clearpage" + bibliography)
+    elif case == "wrapped":
+        continuation = "structure" + body.split("infrastructure", 1)[1]
+        pages[4][:len(ack_lines)] = [heading, "Shared research infra-", *textwrap.wrap(continuation, width=85)]
+    elif case == "missing_heading":
+        pages[4].pop(0)
+    elif case == "renamed_heading":
+        pages[4][0] = "Acknowledgments"
+    elif case == "duplicate_heading":
+        pages[4].insert(0, heading)
+    elif case == "duplicate_source":
+        tex = tex.replace(block, block + block)
+    elif case == "unmatched_begin":
+        tex = tex.replace(r"\end{ack}", "")
+    elif case == "unmatched_end":
+        tex = tex.replace(r"\begin{ack}", "")
+    elif case == "empty":
+        tex = tex.replace(body, "")
+    elif case == "macro":
+        tex = tex.replace("(ARES)", r"(\textbf{ARES})")
+    elif case == "source_after_references":
+        tex = tex.replace(block + bibliography, bibliography + block)
+    elif case == "source_body_after_ack":
+        tex = tex.replace(bibliography, "Extra scientific results.\n" + bibliography)
+    elif case == "source_mismatch":
+        tex = tex.replace("contract 12345", "contract 54321")
+    elif case == "pdf_mismatch":
+        pages[4] = [line.replace("contract 12345", "contract 54321") for line in pages[4]]
+    elif case == "missing_body":
+        del pages[4][1:len(ack_lines)]
+    elif case in ("fifth_page_body", "fifth_page_number"):
+        pages[4].insert(0, "Extra scientific results." if case == "fifth_page_body" else "2026")
+    elif case == "sixth_page":
+        pages.insert(4, ["Extra scientific results."])
+    elif case in ("extra_pdf_body", "extra_pdf_number"):
+        pages[4].insert(len(ack_lines), "Extra scientific results." if case == "extra_pdf_body" else "2026")
+    elif case == "references_before_ack":
+        pages[4] = pages[4][len(ack_lines):] + ack_lines
+    (bundle["root"] / "main.tex").write_text(tex)
+    write_pdf(bundle["root"] / "main.pdf", pages, author=gate.AUTHOR_CAMERA_READY if mode == "camera_ready" else "")
+    if valid:
+        gate.pdf_checks(bundle["root"])
+    else:
+        with pytest.raises(ERRORS, match="acknowledgment|four pages"):
+            gate.pdf_checks(bundle["root"])
+
+
+@pytest.mark.parametrize("mode", ["anonymous", "camera_ready"])
+@pytest.mark.parametrize("uri", [gate.PUBLIC_COMPANION_URL, "file:///home/private/study"])
+def test_pdf_acknowledgment_does_not_exempt_uri_targets(bundle, request, mode, uri):
+    if mode == "camera_ready":
+        tex, pages = request.getfixturevalue("camera_ready_bundle")
+    else:
+        tex, pages = (bundle["root"] / "main.tex").read_text(), copy.deepcopy(bundle["pages"])
+    body = "Shared facilities supported this work. No competing interests are declared."
+    tex = tex.replace(r"\bibliography{references}", "\\begin{ack}\n" + body + "\n\\end{ack}\n"
+                      + r"\bibliography{references}")
+    if mode == "camera_ready":
+        pages[4][:0] = ["Acknowledgments and Disclosure of Funding", body]
+    (bundle["root"] / "main.tex").write_text(tex)
+    write_pdf(bundle["root"] / "main.pdf", pages, author=gate.AUTHOR_CAMERA_READY if mode == "camera_ready" else "", uri=uri)
+    if mode == "camera_ready" and uri == gate.PUBLIC_COMPANION_URL:
+        gate.pdf_checks(bundle["root"])
+    else:
+        with pytest.raises(ERRORS, match="author-identifying|private"):
+            gate.pdf_checks(bundle["root"])
+
+
 @pytest.mark.skipif(not shutil.which("pdftotext") or not shutil.which("pdfinfo"), reason="PDF tools unavailable")
 @pytest.mark.parametrize("mode", ["anonymous", "camera_ready"])
 @pytest.mark.parametrize("case, valid", [

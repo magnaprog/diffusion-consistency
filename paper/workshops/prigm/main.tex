@@ -74,7 +74,7 @@ The conditional mean can lie outside the nonlinear set of possible statistics ev
  =\operatorname{tr}\operatorname{Cov}(\mu\mid Y)-\operatorname{Var}(m\mid Y).
  \label{eq:conditional}
 \end{equation}
-Either sign is possible. Therefore, a residual at a denoiser's mean prediction can reflect conditional uncertainty. Residuals at individual samples test whether those samples obey the identity \citep{bastek2025pidm}.
+Either sign is possible. Thus, a residual at a denoiser's mean prediction can reflect conditional uncertainty. Residuals at individual samples test whether those samples obey the identity \citep{bastek2025pidm}.
 
 \paragraph{Data construction.} The data come from the modified OMNI high resolution product \citep{nasamodifiedomni,king2005solar}. Timestamps estimate arrival at the bow shock nose; propagation and averaging precede masking \citep{papitashvili2020omni}. The task reconstructs records on this time grid; recovery at the spacecraft's original observation times requires a separate experiment. Magnitudes are Euclidean norms of the vector components. Each window spans four hours in 48 bins of five minutes. The central twelve bins are masked without prior imputation, leaving 90 minutes of conditioning data on each side. Complete windows use one spacecraft within one month, retaining 12.77\% of possible training starts.
 
@@ -149,6 +149,10 @@ A stationary hidden Markov model isolates the residual estimator from denoiser f
 The variance identity constrains combinations of magnetic statistics, leaving their conditional distribution to be learned. The penalty's benefit depends on checkpoint choice, even with equal validation and test sampling effort. Most of G5's mean energy score improvement over D comes from greater ensemble spread. G5's coverage is below nominal. For scalar variance, most observations outside its intervals fall below them at two seeds and above them at the third. Because G5 changes both representation and loss, separating their effects requires further experiments. Distributional scores and coverage must accompany constraint checks and explicit checkpoint selection. The evidence covers hours masked in complete records, three seeds and a test period examined earlier. Naturally missing records, later years, other interval lengths and further training seeds require separate evaluation.
 
 \clearpage
+\begin{ack}
+This work extends research carried out at the Jet Propulsion Laboratory, California Institute of Technology, under a contract with the National Aeronautics and Space Administration. Parts of the development and verification used the Autonomous Research and Engineering System (ARES) agentic platform and the ARES CLI, both developed by the author. NASA's Space Physics Data Facility provided the OMNI data used in this study. The author has no competing interests to declare.
+\end{ack}
+
 \bibliography{references}
 \bibliographystyle{unsrtnat}
 \clearpage
@@ -174,7 +178,7 @@ The magnetic inputs are the vector components in geocentric solar ecliptic coord
 
 NASA estimates arrival times and forms weighted averages for each minute before the OMNI record is masked. Neighboring output minutes can share measurements, and the phase front normals used to estimate propagation depend on neighboring magnetic observations. Any contribution of the hidden interval to those earlier estimates remains after masking. NASA retains arrivals whose order changes after propagation and describes the resulting mixing of plasma regions \citep[Sections 3a--3c and Appendix 5]{papitashvili2020omni}. A common spacecraft source within each window prevents source changes, while arrival order can still differ from observation order. Directional cancellation, variance and changes at gap edges can reflect both this processing and solar wind variability.
 
-Data completeness depends on propagation as well as solar wind conditions. Magnetic observations can be excluded when suitable plasma velocities are missing or when no acceptable phase front normal spans a long interval with little variation. Therefore, completeness alone cannot reliably distinguish quiet from disturbed solar wind. NASA selects spacecraft data in segments of three hours using coverage and spatial separation, with a preference for Wind from 2020 onward \citep[Appendix 6]{papitashvili2020omni}. Comparisons between spacecraft groups combine differences in instruments, dates and processing choices. The results use the original OMNI inputs; comparison with NASA's current release remains outstanding.
+Data completeness depends on propagation as well as solar wind conditions. Magnetic observations can be excluded when suitable plasma velocities are missing or when no acceptable phase front normal spans a long interval with little variation. Completeness alone cannot reliably distinguish quiet from disturbed solar wind. NASA selects spacecraft data in segments of three hours using coverage and spatial separation, with a preference for Wind from 2020 onward \citep[Appendix 6]{papitashvili2020omni}. Comparisons between spacecraft groups combine differences in instruments, dates and processing choices. The results use the original OMNI inputs; comparison with NASA's current release remains outstanding.
 
 The training dates contain 4{,}816{,}800 recorded minutes, including 4{,}400{,}682 with valid magnetic vectors. These counts include minutes outside eligible training windows. Among the 4{,}298{,}363 valid magnetic minutes with a known duration between observing times, DBOT, 555{,}719 have negative DBOT, indicating an apparent reversal of observation order at the spacecraft. Of the 300{,}392 distinct eligible bins, 55{,}339 contain at least one such minute. The phase front normal interpolation field gives the percentage of contributions to a magnetic average over one minute whose normal was interpolated \citep{nasamodifiedomni}. This field concerns the propagation normals. These processing measures leave the set of test windows intact.
 
@@ -272,7 +276,7 @@ Writing $\kappa_\alpha=[1+2\sqrt{1+\alpha^2}+2\sqrt{1+4\alpha^2}]/5$, the residu
  =q(1-q)\frac{11/3-\kappa_\alpha^2}{1+2\alpha^2}.
  \label{eq:toymean}
 \end{equation}
-The coefficient is positive for $\alpha=0,1$ and negative for $\alpha=2$. Therefore, a nondegenerate mixture has a nonzero residual in all three geometries, even though each individual state obeys the identity. Squaring the residual assigns a positive penalty to the exact posterior mean whenever both states have positive posterior probability. This magnetic example illustrates the effect of taking expectations through a nonlinear residual discussed by \citet{bastek2025pidm}.
+The coefficient is positive for $\alpha=0,1$ and negative for $\alpha=2$. Hence, a nondegenerate mixture has a nonzero residual in all three geometries, even though each individual state obeys the identity. Squaring the residual assigns a positive penalty to the exact posterior mean whenever both states have positive posterior probability. This magnetic example illustrates the effect of taking expectations through a nonlinear residual discussed by \citet{bastek2025pidm}.
 
 The learned HMM comparison uses 4{,}096 training windows generated at seed 106 by cycling through the nine $(\alpha,p)$ combinations. The U-Net has widths 32/64/64, batches contain 128 windows, and each fit receives 5{,}000 optimizer updates at seed 7. Other optimizer and diffusion settings follow Appendix~\ref{app:protocol}. Evaluation uses 32 paths per switching probability, reusing each path for the three values of $\alpha$. The resulting 288 windows share hidden state sequences across vector geometries.
 
@@ -323,7 +327,7 @@ O-S & 0.005 & 4.2551 & 4.2553 & 0.0094 & 27.4 & 95.9 \\
 \end{tabular}
 \end{table}
 
-The residual estimate used in the training penalty and the final sampler assess different parts of the procedure. With 50 sampling evaluations, O-S avoids the poor score obtained from only two evaluations of the exact denoiser. The calculation with two evaluations tests the approximation used during training; the full sampler tests the resulting predictive distribution. Therefore, a small residual can be a poor indicator of prediction quality even when training with that penalty produces samples with good scores.
+The residual estimate used in the training penalty and the final sampler assess different parts of the procedure. With 50 sampling evaluations, O-S avoids the poor score obtained from only two evaluations of the exact denoiser. The calculation with two evaluations tests the approximation used during training; the full sampler tests the resulting predictive distribution. A small residual can be a poor indicator of prediction quality even when training with that penalty produces samples with good scores.
 
 For exact conditional draws, inclusive intervals cover 100.0\% and 97.49\% of the primary coordinates under the nominal 90\% and 50\% endpoint conventions. Their mean widths are 1.4581 and 1.3485 in standardized coordinates. Ties in this discrete distribution can raise the coverage of inclusive intervals. Therefore, coverage expected for a continuous distribution is insufficient to assess calibration here. The interval calculations use the original random stream and reproduce all 288 original energy scores before computing coverage and width.
 
@@ -727,7 +731,7 @@ Coefficient / seed & Raw & Clipped & $|R|$ & \parbox[c]{19mm}{\centering Bins fa
 \end{tabular}
 \end{table}
 
-Figure~\ref{fig:fixedfinal} shows that the mean residual decreases as the penalty grows, while the mean energy score first improves and then worsens. The strongest penalty gives the smallest residual, while the original coefficient gives the best mean score. At $c_R=0.005$, the score improves over D for seed 42 and worsens for seeds 7 and 13. Therefore, a smaller identity residual can accompany a worse predictive score.
+Figure~\ref{fig:fixedfinal} shows that the mean residual decreases as the penalty grows, while the mean energy score first improves and then worsens. The strongest penalty gives the smallest residual, while the original coefficient gives the best mean score. At $c_R=0.005$, the score improves over D for seed 42 and worsens for seeds 7 and 13. A smaller identity residual can accompany a worse predictive score.
 
 \begin{figure}[t]
  \centering
@@ -737,7 +741,7 @@ Figure~\ref{fig:fixedfinal} shows that the mean residual decreases as the penalt
 \end{figure}
 
 \begin{samepage}
-At the original coefficient, O-S has a lower energy score than D for every seed at the end of training. When validation chooses the model weights, the difference changes sign across seeds. Therefore, the penalty's apparent benefit depends on the stage of training at which predictions are evaluated. Further fits would be needed to establish whether this pattern persists beyond the current exploratory comparison.
+At the original coefficient, O-S has a lower energy score than D for every seed at the end of training. When validation chooses the model weights, the difference changes sign across seeds. The penalty's apparent benefit depends on the stage of training at which predictions are evaluated. Further fits would be needed to establish whether this pattern persists beyond the current exploratory comparison.
 \par
 \end{samepage}
 
