@@ -124,8 +124,21 @@ def test_current_deadline_tables_and_prose_match_source_and_pdf(public_claims):
 
 
 @pytest.mark.parametrize("scope", ["source", "PDF"])
+def test_false_score_role_cannot_hide_before_valid_duplicate(public_claims, scope):
+    tex, rendered, real, evidence = public_claims
+    source = tex if scope == "source" else rendered
+    valid = "The energy score compares predictive distributions:"
+    match = re.search(r"\s+".join(re.escape(word) for word in valid.split()), source)
+    assert match is not None
+    changed = source[:match.start()] + "The energy score compares mean predictions. " + source[match.start():]
+    with pytest.raises((ValueError, ContractMismatch)):
+        gate.deadline_claims(changed if scope == "source" else tex,
+                             changed if scope == "PDF" else rendered, real, evidence)
+
+
+@pytest.mark.parametrize("scope", ["source", "PDF"])
 @pytest.mark.parametrize("before,after", [
-    ('coverage remains below nominal', 'coverage reaches nominal'),
+    ('prediction intervals cover fewer withheld values than intended', 'prediction intervals cover as many withheld values as intended'),
     ('with little change in energy score', 'with a large improvement in energy score'),
     ('The larger decrease in the subtracted term', 'The smaller decrease in the subtracted term'),
     ('0.1254', '0.2254'),
