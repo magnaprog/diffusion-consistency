@@ -3,7 +3,7 @@
 The caller identifies the checkpoint generation and its SHA256 hash. Before
 sampling, the command checks the recorded source, data, normalization,
 training counters, and sampler settings against the declared protocol.
-TEST work additionally requires the recorded model selection and exposure
+TEST work also requires the recorded model selection and exposure
 receipt. A chunk contains at most SAMPLE_CHUNK_WINDOWS consecutive windows,
 with their IDs saved alongside the draws.
 """

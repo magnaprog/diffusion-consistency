@@ -85,7 +85,7 @@ skip reasons for the revision being checked.
 
 ## Reproduction inputs and limits
 
-The public copy includes TEST observations, toy arrays and results, original prediction scores and other numerical analyses, selected Gaussian predictions, and the inputs used to draw the figures. It also includes the later interval-error and checkpoint records when the manuscript uses them. Neural checkpoints, complete neural prediction sets, raw OMNI data, and TRAIN/VAL arrays are not included. The available numerical checks therefore reproduce only part of the experiments.
+The public copy includes TEST observations, toy arrays and results, original prediction scores and other numerical analyses, selected Gaussian predictions, and the inputs used to draw the figures. It also includes the later interval-error and checkpoint records when the manuscript uses them. Neural checkpoints, complete neural prediction sets, raw OMNI data, and TRAIN/VAL arrays are not included. Therefore, the available numerical checks reproduce only part of the experiments.
 
 The [source provenance record](../reproducibility/accepted_source/README.md) explains how eight exact copies of original source files are related to later reviewed code. All 43 current core modules are retained. Preserve the original evidence and its source hashes; results from a new run must remain identifiable as a different execution.
 

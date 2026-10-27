@@ -204,7 +204,7 @@ def selection_decomposition(raw, corrected_at_raw, corrected_selected, months):
     raw-selected checkpoint. The selection term compares corrected predictions
     at the corrected-selected and raw-selected checkpoints. Their sum equals
     the corrected-selected score minus the raw-selected score for each window.
-    The second term therefore includes a change of saved model weights.
+    Therefore, the second term includes a change of saved model weights.
     """
     raw, same, selected = map(followup._finite, (raw, corrected_at_raw, corrected_selected))
     if raw.ndim != 1 or raw.shape != same.shape or raw.shape != selected.shape:
