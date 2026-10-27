@@ -1,0 +1,15 @@
+{
+  "files": {
+    "test/SCORES.json": "6dfe61b8f84de1d51c3916ae2e9f8125c6e062aed507f970c680f6a672f9f491",
+    "test/TEST_STARTED.json": "f88f379dd7b12f27e9916434f55cff289a2e5f4e458ad1de5d7af482e92a7f46",
+    "test/lambda_0.1_rho_0/gen_00000000/COMMIT.json": "7baf1da6aa25123956d7b9589ceeb21c568a8cad4b91b6d735c4dd840e626855"
+  },
+  "fit_select_sha256": "5ce6ea010bcf77b02663b2ef3ce573d35e5ccbf09b19a0b143dd3e859f0b156c",
+  "n_draws": 39,
+  "n_windows": 480,
+  "phase": "TEST_COMPLETED",
+  "schema_version": 1,
+  "selected_union": [
+    "lambda_0.1_rho_0"
+  ]
+}

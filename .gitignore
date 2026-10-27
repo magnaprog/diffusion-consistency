@@ -1,0 +1,17 @@
+__pycache__/
+*.py[cod]
+.pytest_cache/
+*.egg-info/
+.venv/
+data/omni/
+data/event_cache/
+runs/
+dist/
+paper/workshops/prigm/*.aux
+paper/workshops/prigm/*.bbl
+paper/workshops/prigm/*.blg
+paper/workshops/prigm/*.fdb_latexmk
+paper/workshops/prigm/*.fls
+paper/workshops/prigm/*.log
+paper/workshops/prigm/*.out
+paper/workshops/prigm/*.synctex.gz

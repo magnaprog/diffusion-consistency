@@ -1,0 +1,142 @@
+{
+  "schema_version": 1,
+  "figure": "fig_hmm",
+  "source": {
+    "path": "fig_hmm.py",
+    "sha256": "1291b5b8f5126f7a8f4b030d12c41b53e81a87d4a43e73f0d89d93cbfcca5e31"
+  },
+  "style": {
+    "path": "prigm.mplstyle",
+    "sha256": "3ac5d2448a3a022a70705fafabc407937c3db1514128834934a15004b70f0a08"
+  },
+  "inputs": {
+    "hmm": {
+      "path": "hmm-stationary-01.json",
+      "sha256": "6fc53c027cd1c5ded40ef025cc1cdb6930fab8a1a750465d354d82164f2ae93e",
+      "source_hashes": {
+        "oracle.py": "33541743317a64b3eb12a19c720646f428cd4143dc469ee2ce48f469caa9c362",
+        "hmm_diagnostics.py": "34d744592129a12b8183a038130d31a6272202c8082c734f1e165c0466132e82",
+        "toy.py": "620a5567b7a95705a1f74083dfd36503f5f71c3eb1673175ca326c4f7172565d",
+        "toy_windows.py": "127d4aad5a6e6809160c7ffb1c89f586113d81b2a9a538fce0d17b09dfd012c1",
+        "keys.py": "7c105e378ef11a217eafa8ff7da559d67a2e7634d92e70db020a7ddfafd49c87",
+        "schedule.py": "74f01db9176fd365a0e0279dc973e2eb59f534c2585b6c3ee21e24d5e68d1a8e",
+        "scoring.py": "4c0ddfe36fdbe2e558cdcda1e743016fa647ea86432c7477361e15490d9a6eaf",
+        "normalize.py": "50b0b52b37ec2d05c649551eefce1af1ff689275d3bb8909206dc55d7b9338f5",
+        "observation.py": "6cf89074935ddb60204a520faf7d9c10699aefb72ac63501c92ddd4c961232fd",
+        "config.py": "651d668e5a714579c8809b1e49c6a146f0c214b2996b2637bde4eed6fc9f5bff"
+      }
+    },
+    "oracle": {
+      "path": "oracle-stationary-01.json",
+      "sha256": "fee403a2d4f823181ea08a7d726193d2ffcc50e5c85e4ded5810426877397c5f",
+      "source_hashes": {
+        "oracle.py": "33541743317a64b3eb12a19c720646f428cd4143dc469ee2ce48f469caa9c362",
+        "hmm_diagnostics.py": "34d744592129a12b8183a038130d31a6272202c8082c734f1e165c0466132e82",
+        "toy.py": "620a5567b7a95705a1f74083dfd36503f5f71c3eb1673175ca326c4f7172565d",
+        "toy_windows.py": "127d4aad5a6e6809160c7ffb1c89f586113d81b2a9a538fce0d17b09dfd012c1",
+        "keys.py": "7c105e378ef11a217eafa8ff7da559d67a2e7634d92e70db020a7ddfafd49c87",
+        "schedule.py": "74f01db9176fd365a0e0279dc973e2eb59f534c2585b6c3ee21e24d5e68d1a8e",
+        "scoring.py": "4c0ddfe36fdbe2e558cdcda1e743016fa647ea86432c7477361e15490d9a6eaf",
+        "normalize.py": "50b0b52b37ec2d05c649551eefce1af1ff689275d3bb8909206dc55d7b9338f5",
+        "observation.py": "6cf89074935ddb60204a520faf7d9c10699aefb72ac63501c92ddd4c961232fd",
+        "config.py": "651d668e5a714579c8809b1e49c6a146f0c214b2996b2637bde4eed6fc9f5bff"
+      }
+    }
+  },
+  "input_schema_version": 2,
+  "toy_eval_sha256": "dbf80b22d72ddeaf8b609455be797cc7862edf9c585d5b76f7abdc3d6f4dcaf7",
+  "boundary_law": "stationary",
+  "conditioning": "pooled",
+  "verified_common_source_hashes": {
+    "config.py": "651d668e5a714579c8809b1e49c6a146f0c214b2996b2637bde4eed6fc9f5bff",
+    "hmm_diagnostics.py": "34d744592129a12b8183a038130d31a6272202c8082c734f1e165c0466132e82",
+    "keys.py": "7c105e378ef11a217eafa8ff7da559d67a2e7634d92e70db020a7ddfafd49c87",
+    "normalize.py": "50b0b52b37ec2d05c649551eefce1af1ff689275d3bb8909206dc55d7b9338f5",
+    "observation.py": "6cf89074935ddb60204a520faf7d9c10699aefb72ac63501c92ddd4c961232fd",
+    "oracle.py": "33541743317a64b3eb12a19c720646f428cd4143dc469ee2ce48f469caa9c362",
+    "schedule.py": "74f01db9176fd365a0e0279dc973e2eb59f534c2585b6c3ee21e24d5e68d1a8e",
+    "scoring.py": "4c0ddfe36fdbe2e558cdcda1e743016fa647ea86432c7477361e15490d9a6eaf",
+    "toy.py": "620a5567b7a95705a1f74083dfd36503f5f71c3eb1673175ca326c4f7172565d",
+    "toy_windows.py": "127d4aad5a6e6809160c7ffb1c89f586113d81b2a9a538fce0d17b09dfd012c1"
+  },
+  "hmm_n_context": 144,
+  "hmm_n_paths": 128,
+  "plotted_rows": {
+    "panel_a_context": [
+      {
+        "t": 1,
+        "n": 36,
+        "mean_es_vs_ref": 4.176191765114689,
+        "mean_reference_self_energy_mc": 4.175514052475455
+      },
+      {
+        "t": 25,
+        "n": 36,
+        "mean_es_vs_ref": 4.158391778934884,
+        "mean_reference_self_energy_mc": 4.155248907490744
+      },
+      {
+        "t": 50,
+        "n": 36,
+        "mean_es_vs_ref": 4.170159866687982,
+        "mean_reference_self_energy_mc": 4.168301664827317
+      },
+      {
+        "t": 100,
+        "n": 36,
+        "mean_es_vs_ref": 6.9580925414754144,
+        "mean_reference_self_energy_mc": 4.1640299388426705
+      }
+    ],
+    "panel_b_samplers": [
+      {
+        "method": "two_step",
+        "denoiser_evaluations_per_draw": 2,
+        "mean_energy": 7.218268602865084,
+        "n": 288,
+        "n_draws": 39
+      },
+      {
+        "method": "ddim_25",
+        "denoiser_evaluations_per_draw": 25,
+        "mean_energy": 4.259071514959121,
+        "n": 288,
+        "n_draws": 39
+      },
+      {
+        "method": "ddim_50",
+        "denoiser_evaluations_per_draw": 50,
+        "mean_energy": 4.2585629066533635,
+        "n": 288,
+        "n_draws": 39
+      },
+      {
+        "method": "ddim_100",
+        "denoiser_evaluations_per_draw": 100,
+        "mean_energy": 4.256691489131845,
+        "n": 288,
+        "n_draws": 39
+      }
+    ],
+    "panel_b_horizontal_reference": {
+      "method": "exact_reference",
+      "denoiser_evaluations_per_draw": 0,
+      "mean_energy": 4.228732270530632,
+      "n": 288,
+      "n_draws": 39
+    }
+  },
+  "unplotted_context_mean_abs_r_star": {
+    "1": 6.013165948966689e-16,
+    "25": 5.900408923028195e-16,
+    "50": 6.937891848119346e-11,
+    "100": 4.1668080198758247e-05
+  },
+  "score_note": "Panel (a) uses independent context reference draws. Panel (b) uses final samples scored against held-out targets; its line is exact_reference.mean_energy, not reference_self_energy_mc. Monte Carlo comparisons at measured budgets only.",
+  "matplotlib_version": "3.10.9",
+  "backend": "Agg",
+  "output_sha256": {
+    "fig_hmm.pdf": "32803a5c3ac5fea4c1531f057018c7894b627853e427ddeb57621f57abf1ff20",
+    "fig_hmm.png": "23706eacdcdd80ba4b78c2e4914477c467bf34e6f220fbd0601ad7a12d22547a"
+  }
+}

@@ -1,0 +1,514 @@
+{
+  "schema_version": 2,
+  "n_blocks": 97699,
+  "population_n_blocks": 97699,
+  "max_abs_err_vs_raw": 9.094947017729282e-13,
+  "mean_full_moment_loss_nT2": -3.5352499305098946e-17,
+  "mean_abs_full_moment_loss_nT2": 4.9339651450204395e-15,
+  "mean_only_loss_mean_nT2": 0.894299835044371,
+  "mean_only_loss_median_nT2": 0.28381333333333814,
+  "mean_only_loss_max_nT2": 390.42368799999997,
+  "raw_inputs": {
+    "2005": {
+      "path": "omni_min2005.asc",
+      "sha256": "cf42d07894bb83d5546184d862d896a0f8eb3f1325fe11f78c886079e8b76418",
+      "n_minutes": 525600
+    },
+    "2006": {
+      "path": "omni_min2006.asc",
+      "sha256": "8d52249b7f5af3431e2cb9190202c0b0a50772d0dc235065bba00cf09b863a96",
+      "n_minutes": 525600
+    },
+    "2007": {
+      "path": "omni_min2007.asc",
+      "sha256": "0f8188445ecaebdb54f0149d2a2475179ae4d36a80d14aac6089e7ae4bb7c5fc",
+      "n_minutes": 525600
+    },
+    "2008": {
+      "path": "omni_min2008.asc",
+      "sha256": "9205a601d7e3b818c023571ecc6df4771b34316c5e017c3144927aad1b631176",
+      "n_minutes": 527040
+    },
+    "2009": {
+      "path": "omni_min2009.asc",
+      "sha256": "ffd22ee71be66fbdfa62350900c57169203a5ce39ba34b2f1513544ef5898df5",
+      "n_minutes": 525600
+    },
+    "2010": {
+      "path": "omni_min2010.asc",
+      "sha256": "1a29efee6bceb91f921e593fb438538f49b00e886772f4cef0ea6ab1ba93622a",
+      "n_minutes": 525600
+    },
+    "2011": {
+      "path": "omni_min2011.asc",
+      "sha256": "023c1a4792096e8a783100b7e2621dc34179f13459b53ce9fa3b94ae8e2da9b7",
+      "n_minutes": 525600
+    },
+    "2012": {
+      "path": "omni_min2012.asc",
+      "sha256": "3b1f682e9e01965cd4765a4feef0e172304499863f1a633ccea00cceeef1696b",
+      "n_minutes": 527040
+    },
+    "2013": {
+      "path": "omni_min2013.asc",
+      "sha256": "969b967e154b1e338a9cb6078bec20e6aa07788644634ea16f070b278ff8d863",
+      "n_minutes": 525600
+    },
+    "2014": {
+      "path": "omni_min2014.asc",
+      "sha256": "6685acecfdc48b9a38202fe7710db4cf2fbe710e51561a1253869bc9e96ced0c",
+      "n_minutes": 525600
+    },
+    "2015": {
+      "path": "omni_min2015.asc",
+      "sha256": "2663167d2f9387140331ed7dca0dabb5b3b22a7cc77668a4d7afadebedfd83a0",
+      "n_minutes": 525600
+    },
+    "2016": {
+      "path": "omni_min2016.asc",
+      "sha256": "ac6aea936bad17919d72012d99396e5670d47955aed15722029febcc6f05c20a",
+      "n_minutes": 527040
+    },
+    "2017": {
+      "path": "omni_min2017.asc",
+      "sha256": "9cd318016414417b15251f3b39734543b904a59c1c44fb966dd0828ec8c3c026",
+      "n_minutes": 525600
+    },
+    "2018": {
+      "path": "omni_min2018.asc",
+      "sha256": "aa62fc50501a84cd892c59cfe895c78997fb594a3fa779bd6f846a8a8298baa3",
+      "n_minutes": 525600
+    },
+    "2019": {
+      "path": "omni_min2019.asc",
+      "sha256": "2dd363e1329cabd4306110ff27b894ef37ccd256af976eef6a95243090794de4",
+      "n_minutes": 525600
+    },
+    "2020": {
+      "path": "omni_min2020.asc",
+      "sha256": "2979bfe552c5d2ff523ce76e78a7f8cf7a0e3ffef4cd4a83266eb1833da08684",
+      "n_minutes": 527040
+    },
+    "2021": {
+      "path": "omni_min2021.asc",
+      "sha256": "39064276ee6b4e205df7a5bb086fc2e7324d4251eb8060f7dc835181f0984b63",
+      "n_minutes": 525600
+    },
+    "2022": {
+      "path": "omni_min2022.asc",
+      "sha256": "f74e39fdf2d4bee2a4f5b7ea4edfa0cd790387247d403f070296aec88b622c41",
+      "n_minutes": 525600
+    },
+    "2023": {
+      "path": "omni_min2023.asc",
+      "sha256": "985a49f50d68e44d5644b226f00912af2e1d0bbf2974c9ef6ab7aa6d5be3986b",
+      "n_minutes": 525600
+    },
+    "2024": {
+      "path": "omni_min2024.asc",
+      "sha256": "e09f98fdf543a853a8c9b62dcb6bd6c29872905d5907d84451d0aa4a9de082ce",
+      "n_minutes": 527040
+    }
+  },
+  "population_by_year": {
+    "2005": {
+      "train_bins": 43463,
+      "train_runs": 1722,
+      "eligible_train_runs": 234,
+      "eligible_train_bins": 22338,
+      "eligible_train_starts": 11340,
+      "eligible_blocks": 7291,
+      "source_block_counts": {
+        "52": 2132,
+        "71": 5159
+      }
+    },
+    "2006": {
+      "train_bins": 41917,
+      "train_runs": 1998,
+      "eligible_train_runs": 208,
+      "eligible_train_bins": 17983,
+      "eligible_train_starts": 8207,
+      "eligible_blocks": 5855,
+      "source_block_counts": {
+        "52": 1957,
+        "71": 3898
+      }
+    },
+    "2007": {
+      "train_bins": 43072,
+      "train_runs": 2023,
+      "eligible_train_runs": 229,
+      "eligible_train_bins": 19004,
+      "eligible_train_starts": 8241,
+      "eligible_blocks": 6195,
+      "source_block_counts": {
+        "52": 2313,
+        "71": 3882
+      }
+    },
+    "2008": {
+      "train_bins": 43852,
+      "train_runs": 1926,
+      "eligible_train_runs": 251,
+      "eligible_train_bins": 20294,
+      "eligible_train_starts": 8497,
+      "eligible_blocks": 6606,
+      "source_block_counts": {
+        "52": 1944,
+        "71": 4662
+      }
+    },
+    "2009": {
+      "train_bins": 41775,
+      "train_runs": 2249,
+      "eligible_train_runs": 204,
+      "eligible_train_bins": 15383,
+      "eligible_train_starts": 5795,
+      "eligible_blocks": 4995,
+      "source_block_counts": {
+        "52": 2934,
+        "71": 2061
+      }
+    },
+    "2010": {
+      "train_bins": 38431,
+      "train_runs": 2124,
+      "eligible_train_runs": 168,
+      "eligible_train_bins": 13325,
+      "eligible_train_starts": 5429,
+      "eligible_blocks": 4336,
+      "source_block_counts": {
+        "52": 2272,
+        "71": 2064
+      }
+    },
+    "2011": {
+      "train_bins": 39340,
+      "train_runs": 2472,
+      "eligible_train_runs": 161,
+      "eligible_train_bins": 10758,
+      "eligible_train_starts": 3191,
+      "eligible_blocks": 3480,
+      "source_block_counts": {
+        "52": 2961,
+        "71": 519
+      }
+    },
+    "2012": {
+      "train_bins": 41507,
+      "train_runs": 2659,
+      "eligible_train_runs": 160,
+      "eligible_train_bins": 11544,
+      "eligible_train_starts": 4024,
+      "eligible_blocks": 3740,
+      "source_block_counts": {
+        "52": 2852,
+        "71": 888
+      }
+    },
+    "2013": {
+      "train_bins": 40264,
+      "train_runs": 2643,
+      "eligible_train_runs": 143,
+      "eligible_train_bins": 9756,
+      "eligible_train_starts": 3035,
+      "eligible_blocks": 3156,
+      "source_block_counts": {
+        "52": 1764,
+        "71": 1392
+      }
+    },
+    "2014": {
+      "train_bins": 39116,
+      "train_runs": 2813,
+      "eligible_train_runs": 126,
+      "eligible_train_bins": 8490,
+      "eligible_train_starts": 2568,
+      "eligible_blocks": 2749,
+      "source_block_counts": {
+        "52": 1521,
+        "71": 1228
+      }
+    },
+    "2015": {
+      "train_bins": 38717,
+      "train_runs": 2653,
+      "eligible_train_runs": 155,
+      "eligible_train_bins": 10707,
+      "eligible_train_starts": 3422,
+      "eligible_blocks": 3463,
+      "source_block_counts": {
+        "52": 1873,
+        "71": 1590
+      }
+    },
+    "2016": {
+      "train_bins": 40510,
+      "train_runs": 2487,
+      "eligible_train_runs": 177,
+      "eligible_train_bins": 13466,
+      "eligible_train_starts": 5147,
+      "eligible_blocks": 4376,
+      "source_block_counts": {
+        "52": 3187,
+        "71": 1189
+      }
+    },
+    "2017": {
+      "train_bins": 41505,
+      "train_runs": 2066,
+      "eligible_train_runs": 209,
+      "eligible_train_bins": 17058,
+      "eligible_train_starts": 7235,
+      "eligible_blocks": 5565,
+      "source_block_counts": {
+        "52": 3715,
+        "71": 1850
+      }
+    },
+    "2018": {
+      "train_bins": 42383,
+      "train_runs": 2142,
+      "eligible_train_runs": 210,
+      "eligible_train_bins": 17509,
+      "eligible_train_starts": 7639,
+      "eligible_blocks": 5710,
+      "source_block_counts": {
+        "52": 5056,
+        "71": 654
+      }
+    },
+    "2019": {
+      "train_bins": 41552,
+      "train_runs": 2253,
+      "eligible_train_runs": 195,
+      "eligible_train_bins": 15837,
+      "eligible_train_starts": 6672,
+      "eligible_blocks": 5153,
+      "source_block_counts": {
+        "52": 4479,
+        "71": 674
+      }
+    },
+    "2020": {
+      "train_bins": 42119,
+      "train_runs": 2395,
+      "eligible_train_runs": 176,
+      "eligible_train_bins": 14828,
+      "eligible_train_starts": 6556,
+      "eligible_blocks": 4830,
+      "source_block_counts": {
+        "52": 4199,
+        "71": 631
+      }
+    },
+    "2021": {
+      "train_bins": 42207,
+      "train_runs": 2159,
+      "eligible_train_runs": 203,
+      "eligible_train_bins": 16659,
+      "eligible_train_starts": 7118,
+      "eligible_blocks": 5425,
+      "source_block_counts": {
+        "52": 5222,
+        "71": 203
+      }
+    },
+    "2022": {
+      "train_bins": 43028,
+      "train_runs": 2244,
+      "eligible_train_runs": 206,
+      "eligible_train_bins": 16378,
+      "eligible_train_starts": 6696,
+      "eligible_blocks": 5319,
+      "source_block_counts": {
+        "52": 5319
+      }
+    },
+    "2023": {
+      "train_bins": 41213,
+      "train_runs": 2203,
+      "eligible_train_runs": 190,
+      "eligible_train_bins": 15453,
+      "eligible_train_starts": 6523,
+      "eligible_blocks": 5033,
+      "source_block_counts": {
+        "52": 5033
+      }
+    },
+    "2024": {
+      "train_bins": 39561,
+      "train_runs": 2213,
+      "eligible_train_runs": 184,
+      "eligible_train_bins": 13622,
+      "eligible_train_starts": 4974,
+      "eligible_blocks": 4422,
+      "source_block_counts": {
+        "52": 4422
+      }
+    }
+  },
+  "population_source_block_counts": {
+    "52": 65155,
+    "71": 32544
+  },
+  "population_blocks_sha256": "172bbfcab6a2e3453c4c4c8333fee7b3433be68fcb97755676a945abe5084db4",
+  "selection": {
+    "method": "all",
+    "max_blocks": null,
+    "index_rule": "floor((j+0.5)*N/q), j=0..q-1; q=min(N,max_blocks) when capped",
+    "weighting": "equal block weight",
+    "by_year": {
+      "2005": {
+        "n_blocks": 7291,
+        "source_block_counts": {
+          "52": 2132,
+          "71": 5159
+        }
+      },
+      "2006": {
+        "n_blocks": 5855,
+        "source_block_counts": {
+          "52": 1957,
+          "71": 3898
+        }
+      },
+      "2007": {
+        "n_blocks": 6195,
+        "source_block_counts": {
+          "52": 2313,
+          "71": 3882
+        }
+      },
+      "2008": {
+        "n_blocks": 6606,
+        "source_block_counts": {
+          "52": 1944,
+          "71": 4662
+        }
+      },
+      "2009": {
+        "n_blocks": 4995,
+        "source_block_counts": {
+          "52": 2934,
+          "71": 2061
+        }
+      },
+      "2010": {
+        "n_blocks": 4336,
+        "source_block_counts": {
+          "52": 2272,
+          "71": 2064
+        }
+      },
+      "2011": {
+        "n_blocks": 3480,
+        "source_block_counts": {
+          "52": 2961,
+          "71": 519
+        }
+      },
+      "2012": {
+        "n_blocks": 3740,
+        "source_block_counts": {
+          "52": 2852,
+          "71": 888
+        }
+      },
+      "2013": {
+        "n_blocks": 3156,
+        "source_block_counts": {
+          "52": 1764,
+          "71": 1392
+        }
+      },
+      "2014": {
+        "n_blocks": 2749,
+        "source_block_counts": {
+          "52": 1521,
+          "71": 1228
+        }
+      },
+      "2015": {
+        "n_blocks": 3463,
+        "source_block_counts": {
+          "52": 1873,
+          "71": 1590
+        }
+      },
+      "2016": {
+        "n_blocks": 4376,
+        "source_block_counts": {
+          "52": 3187,
+          "71": 1189
+        }
+      },
+      "2017": {
+        "n_blocks": 5565,
+        "source_block_counts": {
+          "52": 3715,
+          "71": 1850
+        }
+      },
+      "2018": {
+        "n_blocks": 5710,
+        "source_block_counts": {
+          "52": 5056,
+          "71": 654
+        }
+      },
+      "2019": {
+        "n_blocks": 5153,
+        "source_block_counts": {
+          "52": 4479,
+          "71": 674
+        }
+      },
+      "2020": {
+        "n_blocks": 4830,
+        "source_block_counts": {
+          "52": 4199,
+          "71": 631
+        }
+      },
+      "2021": {
+        "n_blocks": 5425,
+        "source_block_counts": {
+          "52": 5222,
+          "71": 203
+        }
+      },
+      "2022": {
+        "n_blocks": 5319,
+        "source_block_counts": {
+          "52": 5319
+        }
+      },
+      "2023": {
+        "n_blocks": 5033,
+        "source_block_counts": {
+          "52": 5033
+        }
+      },
+      "2024": {
+        "n_blocks": 4422,
+        "source_block_counts": {
+          "52": 4422
+        }
+      }
+    },
+    "blocks_sha256": "172bbfcab6a2e3453c4c4c8333fee7b3433be68fcb97755676a945abe5084db4",
+    "first_left": "2005-01-15T00:00",
+    "last_left": "2024-06-30T05:15"
+  },
+  "definitions": {
+    "population": "Complete same-source UTC 15-minute blocks; all three bins in the stride-one four-hour training-window union, with no month/role/source/gap crossing.",
+    "raw_Q15": "mean over the original 15 vectors of bx^2+by^2+bz^2, nT^2",
+    "full_Q15": "mean over three bins of ||mu||^2+v_v, nT^2",
+    "mean_only_Q15": "mean over three bins of ||mu||^2, nT^2",
+    "loss": "raw_Q15 minus the stated summary reconstruction, nT^2",
+    "block_digest": "SHA256 of ordered ASCII records UTC-left,source followed by newline"
+  },
+  "note": "Read-only aggregation check, not an instrument-quality or learned-resolution-transfer test. Cap selection uses the full all-year training population, never model outputs."
+}

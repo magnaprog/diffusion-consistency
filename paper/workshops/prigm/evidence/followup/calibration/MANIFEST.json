@@ -1,0 +1,16 @@
+{
+  "files": {
+    "PROTOCOL.json": "00f15fae93bbb01846ec53ab726815464a28c7708d9ee79109ead0e7363899b5",
+    "per_window.npz": "d8f738012e3c8d2e977e21c77d404c5e7a76c2f996202127be02011c57ee65d4",
+    "summary.json": "ad86c8344ee3c84d8423d0818a1d06ab7b0964ef70a7289bcc6ffcd32461873d"
+  },
+  "original_summary_sha256": "c108030cdaf5d93b98c913ea85040516c742c60dbe06df37fac3356ad659caca",
+  "producer_sha256": "7f3a048fa80305f41f9a382f64424b98df123ac4a60897bdc8d7522650f233e2",
+  "protocol_sha256": "00f15fae93bbb01846ec53ab726815464a28c7708d9ee79109ead0e7363899b5",
+  "schema_version": 1,
+  "source": {
+    "path": "export_prigm_calibration.py",
+    "sha256": "7e396edf6d84345c2915b02d2f0b0a87fbfdcfab318301981a0c321d54ce92a2"
+  },
+  "transformation": "Only summary.input_sha256 keys: replace the original-study root prefix with original-study/ and the accepted-evidence root prefix with accepted-evidence/. All other parsed summary content is unchanged. per_window.npz and PROTOCOL.json are byte-identical copies."
+}

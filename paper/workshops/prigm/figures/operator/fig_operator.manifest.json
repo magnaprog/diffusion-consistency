@@ -1,0 +1,109 @@
+{
+  "schema_version": 1,
+  "figure": "fig_operator",
+  "protocol_sha256": "25d0cdefdd5dbb160c32c7b5f4a6053bab99e4a9f64832d9eb6502232bf24e6b",
+  "source": {
+    "path": "fig_operator.py",
+    "sha256": "0c1b0528ab1e26ab2f3b4eefbb620296d68783eb3c1155940961c82b3b4a2ce0"
+  },
+  "style": {
+    "path": "prigm.mplstyle",
+    "sha256": "3ac5d2448a3a022a70705fafabc407937c3db1514128834934a15004b70f0a08"
+  },
+  "inputs": {
+    "operator": {
+      "path": "operator-mechanism.json",
+      "sha256": "9b68a8fa5a61a24bdd537080ac62b44c6b56e47b63119430eb7f7dfa30b45008"
+    }
+  },
+  "plotted_rows": [
+    {
+      "method": "D",
+      "label": "D",
+      "movement": 0.12540389955155665,
+      "seed_movement": [
+        0.1670098929649153,
+        0.08231153327737409,
+        0.12689027241238052
+      ],
+      "delta_target": -0.003499772384956334,
+      "negative_delta_dispersion": -0.0028652709444050464,
+      "delta_energy": -0.006365043329361379,
+      "violation_fraction": 0.5041636989553656,
+      "mean_window_p90_m_deficit": 0.025219920678237473
+    },
+    {
+      "method": "I-S",
+      "label": "I-S",
+      "movement": 0.09972775868487573,
+      "seed_movement": [
+        0.062066258049344736,
+        0.14016924669205405,
+        0.0969477713132284
+      ],
+      "delta_target": -0.0042729977557054285,
+      "negative_delta_dispersion": -0.0011929103096461062,
+      "delta_energy": -0.005465908065351538,
+      "violation_fraction": 0.3778964862298196,
+      "mean_window_p90_m_deficit": 0.020432993547520695
+    },
+    {
+      "method": "O-S",
+      "label": "O-S",
+      "movement": 0.15205403376643467,
+      "seed_movement": [
+        0.3104648810421443,
+        0.07821951611189565,
+        0.06747770414526402
+      ],
+      "delta_target": -0.019523264008392934,
+      "negative_delta_dispersion": 0.0007978246643914772,
+      "delta_energy": -0.01872543934400146,
+      "violation_fraction": 0.5569859924026591,
+      "mean_window_p90_m_deficit": 0.027902401526925635
+    },
+    {
+      "method": "G5",
+      "label": "G5",
+      "movement": 0.1055089102553816,
+      "seed_movement": [
+        0.07350925950167414,
+        0.09362603715054041,
+        0.14939143411393024
+      ],
+      "delta_target": 3.0305192261166045e-05,
+      "negative_delta_dispersion": -0.00038484848513133086,
+      "delta_energy": -0.0003545432928701685,
+      "violation_fraction": 0.4878264482431149,
+      "mean_window_p90_m_deficit": 0.016481247463817073
+    },
+    {
+      "method": "gaussian",
+      "label": "Gaussian\ninterpolation",
+      "movement": 2.1402510089623403,
+      "seed_movement": [
+        2.1402510089623403
+      ],
+      "delta_target": -0.32055721385938235,
+      "negative_delta_dispersion": 0.4247768218487609,
+      "delta_energy": 0.10421960798937854,
+      "violation_fraction": 0.7769186253561254,
+      "mean_window_p90_m_deficit": 0.3440706616783061
+    }
+  ],
+  "D_selection": {
+    "fixed_checkpoint_correction": -0.006365043329361379,
+    "selection_effect": -0.011832782570737376,
+    "total_change": -0.018197825900098757
+  },
+  "scope": "Same raw-selected weights and draws in both panels. Three fixed seeds, not uncertainty intervals. D_selection supplies the distinct selection effect for the caption, not a plotted postprocessing effect.",
+  "axes": {
+    "a": "logarithmic x; 60-dimensional TRAIN-standardized Euclidean movement",
+    "b": "symmetric-log x, linear within +/-0.005; energy = target - dispersion"
+  },
+  "matplotlib_version": "3.10.9",
+  "output_sha256": {
+    "fig_operator.pdf": "6c4bf5045d2ea76a88cee74e1216427b42405f71ca9d87990940c0705c632c9f",
+    "fig_operator.png": "89d9b9b1cca7a29add91c242ca0e0bcb447094ffb87eedb8c8b5041898ae2739"
+  }
+}

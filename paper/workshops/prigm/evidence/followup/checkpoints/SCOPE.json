@@ -1,0 +1,79 @@
+{
+  "TEST": {
+    "authenticated_reuse_jobs": 10,
+    "chunk_windows": 8,
+    "eval_seed": 7,
+    "jobs": 30,
+    "n_draws": 39,
+    "n_eval": 50,
+    "n_windows": 480,
+    "new_jobs": 20
+  },
+  "VAL": {
+    "chunk_windows": 8,
+    "eval_seed": 7,
+    "jobs": 30,
+    "n_draws": 39,
+    "n_eval": 50,
+    "n_windows": 319
+  },
+  "accepted_Table1_unchanged": true,
+  "arms": [
+    "D",
+    "O-S"
+  ],
+  "bootstrap": {
+    "generator": "PCG64",
+    "replicates": 10000,
+    "scope": "fixed_models_noise_and_policies_not_training_or_selection_uncertainty",
+    "seed": 20261001,
+    "unit": "paired_calendar_year_occurrences_with_month_multiplicity"
+  },
+  "coefficients": {
+    "D": 0.0,
+    "O-S": 0.0005
+  },
+  "created_utc": "2026-10-01T15:11:52.370143+00:00",
+  "exposure": "historical_test_exposed",
+  "extension_root": "fixed-final-study",
+  "extension_summary_sha256": "be795841a48d9ef1864c7adcbeb52e499e25a3bd6cc8a60909c5fbd557884b34",
+  "gpu_admission": "none_until_main_reviews_runner_and_releases_devices_from_Beauvoir",
+  "milestones": [
+    2868,
+    9560,
+    16252,
+    22944,
+    29636
+  ],
+  "no_training": true,
+  "original_protocol_sha256": "25d0cdefdd5dbb160c32c7b5f4a6053bab99e4a9f64832d9eb6502232bf24e6b",
+  "original_root": "original-study",
+  "original_selection_sha256": "b2fa1d9233b94c9db22472e644de1fc84f217baaa3d7385faaab2208e0a9c351",
+  "policies": {
+    "F": "update_29636",
+    "P25": "original_raw_VAL25_selection",
+    "P50": "minimum_complete_VAL50_month_balanced_ES_earlier_exact_tie"
+  },
+  "primary_contrasts": [
+    "O-S_minus_D_P25",
+    "O-S_minus_D_P50",
+    "O-S_minus_D_F",
+    "P50_minus_P25_contrast",
+    "F_minus_P25_contrast"
+  ],
+  "report": "all_checkpoints_all_seeds_all_three_policies_no_TEST_selection",
+  "schema_version": 1,
+  "scoring": "raw_only_60_primary_coordinates_month_then_seed_equal_weight",
+  "secondary_contrasts": [
+    "O-S_minus_D_at_each_common_update",
+    "final_minus_P25_each_arm_seed",
+    "final_minus_P50_each_arm_seed"
+  ],
+  "study": "retrospective_checkpoint_dependence",
+  "test_gate": "all_30_hashes_and_P25_P50_F_frozen_after_complete_VAL50_before_new_TEST_sampling_or_score_inspection",
+  "training_seeds": [
+    7,
+    13,
+    42
+  ]
+}

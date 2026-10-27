@@ -1,0 +1,154 @@
+{
+  "schema_version": 1,
+  "figure": "fig_fixed_final",
+  "source": {
+    "path": "fig_fixed_final.py",
+    "sha256": "6832c356b2930f2b1407dfa80270e1a61c65172c3ed3a79d3cb2d08c75c76371"
+  },
+  "style": {
+    "path": "prigm.mplstyle",
+    "sha256": "3ac5d2448a3a022a70705fafabc407937c3db1514128834934a15004b70f0a08"
+  },
+  "inputs": {
+    "fixed_final": {
+      "path": "evidence/deadline/fixed-final.json",
+      "sha256": "c740c4cacf19b38623d565e34ae0c7a7aa2111e870d82d4a7911b4029c94c078"
+    }
+  },
+  "plotted_rows": [
+    {
+      "coefficient": 0.0,
+      "seed": 7,
+      "energy": 1.9786974038367084,
+      "residual": 3.515189037625943
+    },
+    {
+      "coefficient": 0.0,
+      "seed": 13,
+      "energy": 1.9778484702792234,
+      "residual": 3.109209152493198
+    },
+    {
+      "coefficient": 0.0,
+      "seed": 42,
+      "energy": 1.9900482586723123,
+      "residual": 4.206424502437579
+    },
+    {
+      "coefficient": 5e-05,
+      "seed": 7,
+      "energy": 2.0411770118593777,
+      "residual": 3.5543723409596866
+    },
+    {
+      "coefficient": 5e-05,
+      "seed": 13,
+      "energy": 1.8735197546902675,
+      "residual": 2.8987666795786025
+    },
+    {
+      "coefficient": 5e-05,
+      "seed": 42,
+      "energy": 1.9756588489594407,
+      "residual": 3.8648403305124917
+    },
+    {
+      "coefficient": 0.0005,
+      "seed": 7,
+      "energy": 1.9557614175708047,
+      "residual": 2.8244651859153307
+    },
+    {
+      "coefficient": 0.0005,
+      "seed": 13,
+      "energy": 1.8933815569209664,
+      "residual": 2.381199043596542
+    },
+    {
+      "coefficient": 0.0005,
+      "seed": 42,
+      "energy": 1.931177471594993,
+      "residual": 3.1843124974293593
+    },
+    {
+      "coefficient": 0.005,
+      "seed": 7,
+      "energy": 2.022398988493967,
+      "residual": 1.506849329275038
+    },
+    {
+      "coefficient": 0.005,
+      "seed": 13,
+      "energy": 2.0200844952316324,
+      "residual": 1.7024083015364233
+    },
+    {
+      "coefficient": 0.005,
+      "seed": 42,
+      "energy": 1.8118789850154673,
+      "residual": 1.1243081536311093
+    }
+  ],
+  "mean_rows": [
+    {
+      "coefficient": 0.0,
+      "energy": 1.982198044262748,
+      "residual": 3.61027423085224
+    },
+    {
+      "coefficient": 5e-05,
+      "energy": 1.9634518718363618,
+      "residual": 3.4393264503502605
+    },
+    {
+      "coefficient": 0.0005,
+      "energy": 1.9267734820289213,
+      "residual": 2.796658908980411
+    },
+    {
+      "coefficient": 0.005,
+      "energy": 1.9514541562470225,
+      "residual": 1.4445219281475234
+    }
+  ],
+  "scope": "Raw month-balanced TEST metrics at the predetermined final update 29636. Historical TEST exposure; descriptive coefficient response, no coefficient selection. Three fixed seed traces and their arithmetic mean, not uncertainty intervals. Straight segments connect observed seed values; no fitted curve, uncertainty bands, corrected results, or VAL-selected results.",
+  "axes": {
+    "x": {
+      "scale": "categorical",
+      "positions": [
+        0,
+        1,
+        2,
+        3
+      ],
+      "coefficient_labels": [
+        "0",
+        "0.00005",
+        "0.0005",
+        "0.005"
+      ],
+      "coefficients": [
+        0.0,
+        5e-05,
+        0.0005,
+        0.005
+      ]
+    },
+    "a": {
+      "y_scale": "linear",
+      "metric": "results.raw.summary.es5.month_balanced",
+      "units": "TRAIN-standardized"
+    },
+    "b": {
+      "y_scale": "linear",
+      "metric": "results.raw.summary.r_obs_mean.month_balanced",
+      "units": "nT^2",
+      "quantity": "mean absolute observation residual"
+    }
+  },
+  "matplotlib_version": "3.10.9",
+  "output_sha256": {
+    "fig_fixed_final.pdf": "c7c2dc47b990ee8182b4ceaaea07df72fc5f6a28a55a01e608ccb3297178c875",
+    "fig_fixed_final.png": "92b2c3e485880701532280e709e295434dab6437b315d42f93c51fdae2c18faa"
+  }
+}

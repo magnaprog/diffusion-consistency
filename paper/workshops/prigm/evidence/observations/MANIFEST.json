@@ -1,0 +1,16 @@
+{
+  "schema_version": 1,
+  "scope": "The complete fixed, historically exposed TEST observation array and its TRAIN-fitted affine transform. This is not a model ensemble, a new test population, or raw spacecraft data.",
+  "source_protocol_sha256": "25d0cdefdd5dbb160c32c7b5f4a6053bab99e4a9f64832d9eb6502232bf24e6b",
+  "transformation": "None. test.npz is byte-identical to the original protocol-pinned array. Its seven fields are numerical arrays, ordered observation IDs, and the split label; no execution paths are present.",
+  "validation": "Loaded with allow_pickle=False and checked by the existing array-identity validator. The complete 480-window array permits independent calculation of observation-rounding baselines and TEST stratum features; it does not reproduce training or model sampling.",
+  "records": {
+    "test.npz": {
+      "source_record": "artifacts/inventory/test.npz",
+      "source_sha256": "2cbe75399a190d1522379701cced5c74718aaced251bdf4179f246b72b46c1c7"
+    }
+  },
+  "files": {
+    "test.npz": "2cbe75399a190d1522379701cced5c74718aaced251bdf4179f246b72b46c1c7"
+  }
+}

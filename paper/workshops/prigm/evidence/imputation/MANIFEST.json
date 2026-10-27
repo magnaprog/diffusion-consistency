@@ -1,0 +1,265 @@
+{
+  "analysis": "frozen_raw_imputation_examples",
+  "arrays": {
+    "ids_sha256": "959f350174ad87972f98d4ff27777ea385e01b5c095a0a2b24371ceebbabccc6",
+    "n_windows": 480,
+    "normalization_sha256": "2e1479739e82cc6cd4764fedbb4d7bb856b2c8f8ed7b28efe6f69fe3c135d364",
+    "sha256": "2cbe75399a190d1522379701cced5c74718aaced251bdf4179f246b72b46c1c7",
+    "split": "TEST"
+  },
+  "case_ids": [
+    "2010-08-2010-08-03T12:00-s71",
+    "2020-08-2020-08-04T17:00-s52"
+  ],
+  "channels": [
+    "mu_x",
+    "mu_y",
+    "mu_z",
+    "m",
+    "v_s"
+  ],
+  "energy_absolute_tolerance": 1e-12,
+  "energy_coordinates": "training-standardized hidden primary channels; all 39 raw draws",
+  "files": {
+    "sample-excerpt.npz": "f3b270d52ea52088fa84414fcb77b6954624913ed474618be245de417034a1cc"
+  },
+  "input_sha256": {
+    "artifacts/test/D_s7-g9560/ensemble/gen_00000000/COMMIT.json": "5257b150cbfb26ab19efc440699ff793e2632ba4aeede01c556be763e2850e6c",
+    "artifacts/test/D_s7-g9560/ensemble/gen_00000000/ensemble.npz": "251e9b966fce47c150eb0930fce9c8622ff4f5baeb379c63090d5e15c46ca5a6",
+    "artifacts/test/G5_s7-g29636/ensemble/gen_00000000/COMMIT.json": "7d6067328aaa842349fa0697898992128e8c4c9219663f8ed494af7a382f1ed1",
+    "artifacts/test/G5_s7-g29636/ensemble/gen_00000000/ensemble.npz": "8fa96a3626895f796754c002a9b05e0709a70cec561c40f660b3ad012b985fb3",
+    "artifacts/test/O-S_s7-g29636/ensemble/gen_00000000/COMMIT.json": "765456d9ab0253c7005d3e9872779c4a3582d0f1a78e2e69c2b233f7857ad62a",
+    "artifacts/test/O-S_s7-g29636/ensemble/gen_00000000/ensemble.npz": "538b1df94d024ecca1a185474c0796f8e7ec6a10ed39ad6995a4717c69aea455",
+    "evidence/deadline/MANIFEST.json": "e0599acfbdf3541cd7d3004e364ef43ae11c395b776c0fc519ddc7e839ea1756",
+    "evidence/deadline/gaussian/test/SCORES.json": "6dfe61b8f84de1d51c3916ae2e9f8125c6e062aed507f970c680f6a672f9f491",
+    "evidence/deadline/gaussian/test/lambda_0.1_rho_0/gen_00000000/COMMIT.json": "7baf1da6aa25123956d7b9589ceeb21c568a8cad4b91b6d735c4dd840e626855",
+    "evidence/deadline/gaussian/test/lambda_0.1_rho_0/gen_00000000/ensemble.npz": "b2298486f615c685debd3c59026ca7ee2d6c6ed235442fc9726e9fa8d1afada4",
+    "evidence/observations/test.npz": "2cbe75399a190d1522379701cced5c74718aaced251bdf4179f246b72b46c1c7",
+    "evidence/real/MANIFEST.json": "17ac806ec1d3af99764fd4ce23bce0d0502cd49fd89719504f0e2926389967c0",
+    "evidence/real/comparison.json": "aa220ec83025abab5169c148e83c0d515eeea661d81a2bf282aede7c0430bf48",
+    "evidence/real/scores.json": "ff122211127a6bd5f45debcb976f06be18e7b57d9454f942750643b221f79235"
+  },
+  "method_order": [
+    "D",
+    "O-S",
+    "G5",
+    "full_flank_gaussian"
+  ],
+  "methods": {
+    "D": {
+      "arrays": {
+        "ids_sha256": "959f350174ad87972f98d4ff27777ea385e01b5c095a0a2b24371ceebbabccc6",
+        "n_windows": 480,
+        "normalization_sha256": "2e1479739e82cc6cd4764fedbb4d7bb856b2c8f8ed7b28efe6f69fe3c135d364",
+        "sha256": "2cbe75399a190d1522379701cced5c74718aaced251bdf4179f246b72b46c1c7",
+        "split": "TEST"
+      },
+      "checkpoint_sha256": "ed815ec4db1ca60d2eefde03f605932c7a39b1b6dea12f86548ae4f08e5336be",
+      "ensemble_commit_sha256": "5257b150cbfb26ab19efc440699ff793e2632ba4aeede01c556be763e2850e6c",
+      "ensemble_npz_sha256": "251e9b966fce47c150eb0930fce9c8622ff4f5baeb379c63090d5e15c46ca5a6",
+      "n_draws": 39,
+      "n_eval": 50,
+      "n_generated": 6,
+      "protocol_sha256": "25d0cdefdd5dbb160c32c7b5f4a6053bab99e4a9f64832d9eb6502232bf24e6b",
+      "seed": 7,
+      "selection": "raw",
+      "source": "artifacts/test/D_s7-g9560/ensemble",
+      "step": 9560
+    },
+    "G5": {
+      "arrays": {
+        "ids_sha256": "959f350174ad87972f98d4ff27777ea385e01b5c095a0a2b24371ceebbabccc6",
+        "n_windows": 480,
+        "normalization_sha256": "2e1479739e82cc6cd4764fedbb4d7bb856b2c8f8ed7b28efe6f69fe3c135d364",
+        "sha256": "2cbe75399a190d1522379701cced5c74718aaced251bdf4179f246b72b46c1c7",
+        "split": "TEST"
+      },
+      "checkpoint_sha256": "687ffc93c80462d89476a6b7cfe6670c735f1d330559557c9fd79a1f4a23cf85",
+      "ensemble_commit_sha256": "7d6067328aaa842349fa0697898992128e8c4c9219663f8ed494af7a382f1ed1",
+      "ensemble_npz_sha256": "8fa96a3626895f796754c002a9b05e0709a70cec561c40f660b3ad012b985fb3",
+      "n_draws": 39,
+      "n_eval": 50,
+      "n_generated": 5,
+      "protocol_sha256": "25d0cdefdd5dbb160c32c7b5f4a6053bab99e4a9f64832d9eb6502232bf24e6b",
+      "seed": 7,
+      "selection": "raw",
+      "source": "artifacts/test/G5_s7-g29636/ensemble",
+      "step": 29636
+    },
+    "O-S": {
+      "arrays": {
+        "ids_sha256": "959f350174ad87972f98d4ff27777ea385e01b5c095a0a2b24371ceebbabccc6",
+        "n_windows": 480,
+        "normalization_sha256": "2e1479739e82cc6cd4764fedbb4d7bb856b2c8f8ed7b28efe6f69fe3c135d364",
+        "sha256": "2cbe75399a190d1522379701cced5c74718aaced251bdf4179f246b72b46c1c7",
+        "split": "TEST"
+      },
+      "checkpoint_sha256": "fb605a5c11aae6ffcccd09b21b66b98608e3ebe3850c5b81eccdae77b6084439",
+      "ensemble_commit_sha256": "765456d9ab0253c7005d3e9872779c4a3582d0f1a78e2e69c2b233f7857ad62a",
+      "ensemble_npz_sha256": "538b1df94d024ecca1a185474c0796f8e7ec6a10ed39ad6995a4717c69aea455",
+      "n_draws": 39,
+      "n_eval": 50,
+      "n_generated": 6,
+      "protocol_sha256": "25d0cdefdd5dbb160c32c7b5f4a6053bab99e4a9f64832d9eb6502232bf24e6b",
+      "seed": 7,
+      "selection": "raw",
+      "source": "artifacts/test/O-S_s7-g29636/ensemble",
+      "step": 29636
+    },
+    "full_flank_gaussian": {
+      "arrays": {
+        "ids_sha256": "959f350174ad87972f98d4ff27777ea385e01b5c095a0a2b24371ceebbabccc6",
+        "n_windows": 480,
+        "normalization_sha256": "2e1479739e82cc6cd4764fedbb4d7bb856b2c8f8ed7b28efe6f69fe3c135d364",
+        "sha256": "2cbe75399a190d1522379701cced5c74718aaced251bdf4179f246b72b46c1c7",
+        "split": "TEST"
+      },
+      "control": {
+        "family": "full_flank_linear_gaussian",
+        "jitter": 1e-06,
+        "joint_gaussian_channels": 5,
+        "lambda": 0.1,
+        "rho": 0.0
+      },
+      "control_fit_sha256": "53e7b28d0fecc03c1fcf37d13179c8a438fbfa3e3b3a6dd9da88c5d8c6600487",
+      "ensemble_commit_sha256": "7baf1da6aa25123956d7b9589ceeb21c568a8cad4b91b6d735c4dd840e626855",
+      "ensemble_npz_sha256": "b2298486f615c685debd3c59026ca7ee2d6c6ed235442fc9726e9fa8d1afada4",
+      "fit_select_sha256": "5ce6ea010bcf77b02663b2ef3ce573d35e5ccbf09b19a0b143dd3e859f0b156c",
+      "n_draws": 39,
+      "n_generated": 6,
+      "protocol_sha256": "8456fdae42a086fa9cb11dbc4bc4da9d54d5a3fe233aff6ed6d4bb30d25d0090",
+      "seed": 13,
+      "selection": "raw",
+      "source": "evidence/deadline/gaussian/test/lambda_0.1_rho_0",
+      "step": null
+    }
+  },
+  "per_case_primary_energy": {
+    "D": [
+      {
+        "case_id": "2010-08-2010-08-03T12:00-s71",
+        "published": 1.2363393408477896,
+        "recomputed": 1.2363393408477896,
+        "zero_based_index": 120
+      },
+      {
+        "case_id": "2020-08-2020-08-04T17:00-s52",
+        "published": 1.7881094912285609,
+        "recomputed": 1.7881094912285609,
+        "zero_based_index": 360
+      }
+    ],
+    "G5": [
+      {
+        "case_id": "2010-08-2010-08-03T12:00-s71",
+        "published": 1.146870123868791,
+        "recomputed": 1.146870123868791,
+        "zero_based_index": 120
+      },
+      {
+        "case_id": "2020-08-2020-08-04T17:00-s52",
+        "published": 1.2813243024798797,
+        "recomputed": 1.2813243024798797,
+        "zero_based_index": 360
+      }
+    ],
+    "O-S": [
+      {
+        "case_id": "2010-08-2010-08-03T12:00-s71",
+        "published": 1.087624807029975,
+        "recomputed": 1.087624807029975,
+        "zero_based_index": 120
+      },
+      {
+        "case_id": "2020-08-2020-08-04T17:00-s52",
+        "published": 1.9990581892901165,
+        "recomputed": 1.9990581892901165,
+        "zero_based_index": 360
+      }
+    ],
+    "full_flank_gaussian": [
+      {
+        "case_id": "2010-08-2010-08-03T12:00-s71",
+        "published": 1.2913492881146822,
+        "recomputed": 1.2913492881146822,
+        "zero_based_index": 120
+      },
+      {
+        "case_id": "2020-08-2020-08-04T17:00-s52",
+        "published": 1.4674587396928627,
+        "recomputed": 1.4674587396928627,
+        "zero_based_index": 360
+      }
+    ]
+  },
+  "schema_version": 1,
+  "selection": {
+    "after_test_exposure": true,
+    "displayed_draws": [
+      0,
+      1,
+      2
+    ],
+    "neural_seed": 7,
+    "original_window_count": 480,
+    "rule": "midpoints_of_two_equal_ordered_TEST_partitions",
+    "zero_based_indices": [
+      120,
+      360
+    ]
+  },
+  "source_sha256": {
+    "analysis/export_prigm_sample_excerpt.py": "70c387532ce384e749696b36c97b32e654d6d3ee4d0f96991077f8755978578a",
+    "prigm/__init__.py": "b05df87b01a21f498a577b609ee291b0c6895894da41161571112bc751c43931",
+    "prigm/arrays.py": "1a368b258ad3edbdb2259086c430abb98ef6e947241c984115e6631f146a1562",
+    "prigm/artifacts.py": "aadea01326f02c39d55c31b219ffbf51686b11672d0011f4e8a20ec30c308549",
+    "prigm/barrier.py": "095845114b5ea955d4c1b0784c31b2ced8d860b12df7ccd1b07b4b002b22041b",
+    "prigm/build_inventory.py": "8838c7b32eb77171b76ffba3b4cf0575458e7f221ad3261ec40c0630cdc31417",
+    "prigm/calendar.py": "0177b73cf06495668cdbebf22830f75f4db9db6ca5ed176dcea16528092d1d68",
+    "prigm/checkpoint.py": "998109aec1a85acc30002cd3f8f895ee0ba26e14b4165d9610d227558b74a358",
+    "prigm/config.py": "651d668e5a714579c8809b1e49c6a146f0c214b2996b2637bde4eed6fc9f5bff",
+    "prigm/controls.py": "b75f588ef49b8cce59f701fbc86c3f076e635ddb9a95f48879607c6e3ef32536",
+    "prigm/data.py": "f04401f850b7847090ffb5e14e987546c9c418a145869e080315571e206c2dde",
+    "prigm/hmm_diagnostics.py": "34d744592129a12b8183a038130d31a6272202c8082c734f1e165c0466132e82",
+    "prigm/keys.py": "7c105e378ef11a217eafa8ff7da559d67a2e7634d92e70db020a7ddfafd49c87",
+    "prigm/loop.py": "51f4bbfb1199cc7457dde6fd3de39c5547b9d810ed4c95f4b2abd605f3ea4d25",
+    "prigm/loss.py": "44de0c6d43faed1ef6b7278b6d338bf74142c9ce80f85be288a4ac9cf02e73c9",
+    "prigm/model.py": "2987039d7db96fb729dc0daf0dc756490f299e4ec4a0e7c6533ae47480ad9524",
+    "prigm/normalize.py": "50b0b52b37ec2d05c649551eefce1af1ff689275d3bb8909206dc55d7b9338f5",
+    "prigm/observation.py": "6cf89074935ddb60204a520faf7d9c10699aefb72ac63501c92ddd4c961232fd",
+    "prigm/oracle.py": "33541743317a64b3eb12a19c720646f428cd4143dc469ee2ce48f469caa9c362",
+    "prigm/precision.py": "3d39d6b7ead07153bdedd6d61424ac5b2677a49691457bb63b4e0929adef83be",
+    "prigm/prepare_arrays.py": "3be1515f16200261d2d348804b0ec08280ea2182a5a4a4d76633d082b30317c4",
+    "prigm/q15.py": "bb084f49851895b89e2ac2256baf32f72337bf8706226a746c61562c3203e111",
+    "prigm/quality.py": "801e3c87ef108c773fa2d5fc321df15941bea65ebd27a094a8816c607e878c98",
+    "prigm/recovery.py": "f8854cf2bcaad074666d334014386978b86ebf169f52f7bf937b28a759f4e83b",
+    "prigm/run_bootstrap.py": "e9fe43d212fab66d1cd5c07fb2ead782b0235d123f57b1be8fa9ee2e94e6e7d7",
+    "prigm/run_controls.py": "7a67cf16d79729e8587dff7a64cb827c11608c2f3140baa7d23204b7401f01a0",
+    "prigm/run_cuda_restart.py": "fb9bc9e2edb34a5a2a170752a6a4115ae8aaf3035450107c6c11dd450afb3466",
+    "prigm/run_cycle.py": "b5908d279ed1c7f2acadd8ac9b15859629686695cc7864540a4326505867eb63",
+    "prigm/run_deep_diagnostics.py": "0e3f46b183960c1ee6ee073713bd97e6b9540376d7453370abbf40ab21d4292d",
+    "prigm/run_eval.py": "7e06b63a9e5b1a0160c0ff13cd1f1b1a8575a020363b1e752fbef5c213f13d44",
+    "prigm/run_fit.py": "e9ddbe8eaed45340a4c931183d5716cf7bc193780c0405e07c6810f108a91337",
+    "prigm/run_gradient_probe.py": "bab99bd63fde29d9437c9e6f660c652c1b309390cfeb08b83c90acd1a02996a6",
+    "prigm/run_persistence.py": "2f4dbe4b8ff82ec5c9840c30156b940691dbcf3d2d24e553694462262f7f7104",
+    "prigm/run_score.py": "8adfbc7be8d8dfcb45635c635f01f5f7775b040079c7a7c3c5048893d625087f",
+    "prigm/run_secondaries.py": "4e8e9238e8b23ed2c8b6ef29a0b8c6f7a1bd644ebba769d25eaf6f4ce7d91e86",
+    "prigm/run_strata.py": "dbe41f0239e284f3260a8cfc849101880386e11a83a6b84c324439016f617ded",
+    "prigm/sampler.py": "c13380e28ddaf5a9e917a11b3d6aaa569d467171fb893f14072cb6d48e7e54ed",
+    "prigm/schedule.py": "74f01db9176fd365a0e0279dc973e2eb59f534c2585b6c3ee21e24d5e68d1a8e",
+    "prigm/scoring.py": "4c0ddfe36fdbe2e558cdcda1e743016fa647ea86432c7477361e15490d9a6eaf",
+    "prigm/select.py": "b50f8f8f08e795a35505954621122686e7e7830668ed14388d87f04149d89b9b",
+    "prigm/toy.py": "620a5567b7a95705a1f74083dfd36503f5f71c3eb1673175ca326c4f7172565d",
+    "prigm/toy_eval.py": "04d7a9cba1ed6aee2a9f1a28601efedeac6ba0dce471cf1127297ee3d9d3068d",
+    "prigm/toy_windows.py": "127d4aad5a6e6809160c7ffb1c89f586113d81b2a9a538fce0d17b09dfd012c1",
+    "prigm/train.py": "fffbb4b456be88c7c9d947d05580ba3bb0e22b3920c02ba13a443679a6763b33"
+  },
+  "truth_source": "physical observations, not stored ensemble flanks",
+  "units": [
+    "nT",
+    "nT",
+    "nT",
+    "nT",
+    "nT^2"
+  ]
+}

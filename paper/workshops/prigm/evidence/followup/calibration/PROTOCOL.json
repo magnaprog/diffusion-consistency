@@ -1,0 +1,56 @@
+{
+  "schema_version": 1,
+  "created_utc": "2026-10-01T15:16:08.939281+00:00",
+  "question": "Does marginal undercoverage reflect symmetric misses or directional discrepancies by coordinate?",
+  "source_revision": "3e75e96c3db031d8ea94f65c062adbafc9e2644c",
+  "new_analysis_sha256": "7f3a048fa80305f41f9a382f64424b98df123ac4a60897bdc8d7522650f233e2",
+  "plan_sha256": "cd80661775ab1fbe52b555df9de5c2f9ca5de041173c88808d53b245863ed6ee",
+  "methods": [
+    "D",
+    "I-S",
+    "O-S",
+    "G5",
+    "gaussian",
+    "full_flank_gaussian"
+  ],
+  "fixed_training_seeds": [
+    7,
+    13,
+    42
+  ],
+  "population": "All original 480 TEST windows; 12 hidden positions; first five physical coordinates",
+  "ensembles": "Original raw-selected ensembles, 39 draws; controls one frozen realization each; no pooling across neural seeds",
+  "interval_order_statistics": [
+    2,
+    38
+  ],
+  "metrics": [
+    "strictly_below",
+    "inclusive_inside",
+    "strictly_above",
+    "paired_below_minus_above"
+  ],
+  "aggregation": "Positions within windows, windows within months, then equal month and equal fixed-model means",
+  "bootstrap": {
+    "seed": 7003,
+    "replicates": 10000,
+    "schemes": [
+      "year",
+      "adjacent_nonoverlapping_two_year_blocks"
+    ],
+    "scope": "Pointwise conditional on frozen models, selected checkpoints and draws; no multiplicity adjustment"
+  },
+  "input_manifests": {
+    "real/MANIFEST.json": "17ac806ec1d3af99764fd4ce23bce0d0502cd49fd89719504f0e2926389967c0",
+    "deadline/MANIFEST.json": "e0599acfbdf3541cd7d3004e364ef43ae11c395b776c0fc519ddc7e839ea1756"
+  },
+  "restrictions": [
+    "No refitting",
+    "No ensemble redraw",
+    "No TEST selection",
+    "Retrospective analysis only",
+    "Preserve frozen evidence"
+  ],
+  "amended_utc": "2026-10-01T15:20:50.683137+00:00",
+  "amendment": "Before viewing tail values, add paired below-minus-above contrasts within each temporal bootstrap replicate."
+}

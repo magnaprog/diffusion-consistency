@@ -1,0 +1,43 @@
+# Figure text uses DejaVu Serif, as requested by the author.
+# This plotting style does not change the workshop manuscript template.
+font.family: DejaVu Serif
+font.serif: DejaVu Serif
+font.size: 8
+mathtext.fontset: dejavuserif
+axes.labelsize: 8
+axes.titlesize: 8
+axes.titleweight: normal
+axes.titlepad: 7
+xtick.labelsize: 7
+ytick.labelsize: 7
+legend.fontsize: 7
+figure.titlesize: 8
+figure.labelsize: 8
+axes.unicode_minus: False
+text.usetex: False
+pdf.fonttype: 42
+ps.fonttype: 42
+axes.linewidth: 0.6
+axes.edgecolor: 0.25
+axes.labelcolor: 0.15
+text.color: 0.15
+xtick.color: 0.25
+ytick.color: 0.25
+grid.color: 0.85
+grid.linewidth: 0.5
+grid.alpha: 1
+axes.spines.top: False
+axes.spines.right: False
+xtick.major.size: 2.5
+ytick.major.size: 2.5
+xtick.major.width: 0.6
+ytick.major.width: 0.6
+lines.linewidth: 1
+lines.markersize: 3.5
+hatch.linewidth: 0.4
+figure.facecolor: white
+axes.facecolor: white
+savefig.facecolor: white
+# Okabe-Ito subset: D blue, O-S vermilion, G5 green, Gaussian purple.
+# Shapes, line patterns, hatches and panel labels carry identity without color.
+axes.prop_cycle: cycler('color', ['0072B2', 'D55E00', '009E73', 'CC79A7'])

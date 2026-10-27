@@ -1,0 +1,36 @@
+{
+  "schema_version": 1,
+  "source_protocol_sha256": "25d0cdefdd5dbb160c32c7b5f4a6053bab99e4a9f64832d9eb6502232bf24e6b",
+  "files": {
+    "gaussian/EXTENSION.json": "8456fdae42a086fa9cb11dbc4bc4da9d54d5a3fe233aff6ed6d4bb30d25d0090",
+    "gaussian/FIT.json": "9bec3b01505c590ef0c722612e74dba9ac6f278d4e040dc68e221bf84255664b",
+    "gaussian/FIT.npz": "53e7b28d0fecc03c1fcf37d13179c8a438fbfa3e3b3a6dd9da88c5d8c6600487",
+    "gaussian/FIT_SELECT.json": "5ce6ea010bcf77b02663b2ef3ce573d35e5ccbf09b19a0b143dd3e859f0b156c",
+    "gaussian/SELECTION.json": "8d74709e109015a272acb6bd217216ac0145ff6a6edb8e6ea3a5dd8843df3353",
+    "gaussian/VALIDATION.json": "d625ceb29b2cf38b4dc0714bfb4655fd9c1c51069693bdc6c365431c5c16bef4",
+    "gaussian/test/COMPLETED.json": "be80c63c8979ac7380528d93eb0e11814efd7b6bed9035fb264776da573a18c6",
+    "gaussian/test/SCORES.json": "6dfe61b8f84de1d51c3916ae2e9f8125c6e062aed507f970c680f6a672f9f491",
+    "gaussian/test/TEST_STARTED.json": "f88f379dd7b12f27e9916434f55cff289a2e5f4e458ad1de5d7af482e92a7f46",
+    "gaussian/test/lambda_0.1_rho_0/gen_00000000/COMMIT.json": "7baf1da6aa25123956d7b9589ceeb21c568a8cad4b91b6d735c4dd840e626855",
+    "gaussian/test/lambda_0.1_rho_0/gen_00000000/ensemble.npz": "b2298486f615c685debd3c59026ca7ee2d6c6ed235442fc9726e9fa8d1afada4",
+    "operator-mechanism.json": "9b68a8fa5a61a24bdd537080ac62b44c6b56e47b63119430eb7f7dfa30b45008",
+    "fixed-final.json": "c740c4cacf19b38623d565e34ae0c7a7aa2111e870d82d4a7911b4029c94c078"
+  },
+  "original_sha256": {
+    "operator-mechanism.json": "9b68a8fa5a61a24bdd537080ac62b44c6b56e47b63119430eb7f7dfa30b45008",
+    "gaussian/FIT_SELECT.json": "5ce6ea010bcf77b02663b2ef3ce573d35e5ccbf09b19a0b143dd3e859f0b156c",
+    "fixed-final.json": "be795841a48d9ef1864c7adcbeb52e499e25a3bd6cc8a60909c5fbd557884b34"
+  },
+  "producers": {
+    "analysis/prigm_followup_summary.py": "0c402344af55c7f796bfbdea745229b02ac275cb4efc3035a854b2e71ba18e2b",
+    "analysis/prigm_operator_mechanism.py": "009c809d5be8486baa191c08a32f67f9af1c77148e4c79662a9d05fe303588aa",
+    "analysis/prigm_full_flank_gaussian.py": "8df68e33b9f0cc3d797be4531195a1a6c192c6f00cb3bf9c5edc5c77c67a333b",
+    "experiments/run_prigm_fixed_final_sensitivity.py": "b731d1a5ccf962e048b15255eab17554ee8cebcf30b677cff8655a5defe1618a",
+    "experiments/run_prigm_repair.py": "e0a9665a1c957e864fb6069087dca233fed2785b7cc48ce9508a9d175396e2ac"
+  },
+  "transformations": {
+    "operator-mechanism.json": "byte-identical",
+    "gaussian": "byte-identical selected evidence; execution locks and LATEST omitted",
+    "fixed-final.json": "host paths replaced by original-study/ or extension-study/ prefixes; no numerical changes"
+  }
+}

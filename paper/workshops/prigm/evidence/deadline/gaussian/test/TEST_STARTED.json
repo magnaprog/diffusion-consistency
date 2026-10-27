@@ -1,0 +1,20 @@
+{
+  "arrays": {
+    "ids_sha256": "959f350174ad87972f98d4ff27777ea385e01b5c095a0a2b24371ceebbabccc6",
+    "n_windows": 480,
+    "normalization_sha256": "2e1479739e82cc6cd4764fedbb4d7bb856b2c8f8ed7b28efe6f69fe3c135d364",
+    "sha256": "2cbe75399a190d1522379701cced5c74718aaced251bdf4179f246b72b46c1c7",
+    "split": "TEST"
+  },
+  "extension_protocol_sha256": "8456fdae42a086fa9cb11dbc4bc4da9d54d5a3fe233aff6ed6d4bb30d25d0090",
+  "fit_payload_sha256": "53e7b28d0fecc03c1fcf37d13179c8a438fbfa3e3b3a6dd9da88c5d8c6600487",
+  "fit_select_sha256": "5ce6ea010bcf77b02663b2ef3ce573d35e5ccbf09b19a0b143dd3e859f0b156c",
+  "phase": "TEST_STARTED",
+  "previous_test_exposure": true,
+  "schema_version": 1,
+  "selected_union": [
+    "lambda_0.1_rho_0"
+  ],
+  "selection_sha256": "8d74709e109015a272acb6bd217216ac0145ff6a6edb8e6ea3a5dd8843df3353",
+  "source_protocol_sha256": "25d0cdefdd5dbb160c32c7b5f4a6053bab99e4a9f64832d9eb6502232bf24e6b"
+}

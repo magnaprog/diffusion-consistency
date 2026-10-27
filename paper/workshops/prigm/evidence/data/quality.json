@@ -1,0 +1,193 @@
+{
+  "train_role_minutes": 4816800,
+  "train_valid_magnetic_minutes": 4400682,
+  "eligible_bins_scanned": 300392,
+  "distinct_potential_target_bins": 163988,
+  "dbot_known_minutes": 4298363,
+  "dbot_negative_minutes": 555719,
+  "dbot_negative_minute_frac": 0.12928619569822278,
+  "bins_with_any_negative_dbot": 55339,
+  "bins_with_any_negative_dbot_frac": 0.1842226157820448,
+  "pfn_known_minutes": 4400682,
+  "pfn_missing_minutes": 0,
+  "pfn_positive_minutes": 2757051,
+  "pfn_positive_frac_of_valid": 0.6265053916642921,
+  "pfn_positive_frac_of_known": 0.6265053916642921,
+  "one_point_minutes": 506050,
+  "one_point_frac_of_valid": 0.11499353963771979,
+  "vector_magnitude_median_nT": 4.626622288875593,
+  "vector_magnitude_p999_nT": 29.66683857439299,
+  "increment_p999_nT": 8.369307313252564,
+  "source_bin_counts": {
+    "52": 200321,
+    "71": 100071
+  },
+  "train_starts_by_year": {
+    "2005": 11340,
+    "2006": 8207,
+    "2007": 8241,
+    "2008": 8497,
+    "2009": 5795,
+    "2010": 5429,
+    "2011": 3191,
+    "2012": 4024,
+    "2013": 3035,
+    "2014": 2568,
+    "2015": 3422,
+    "2016": 5147,
+    "2017": 7235,
+    "2018": 7639,
+    "2019": 6672,
+    "2020": 6556,
+    "2021": 7118,
+    "2022": 6696,
+    "2023": 6523,
+    "2024": 4974
+  },
+  "candidate_train_grid_starts_by_year": {
+    "2005": 47814,
+    "2006": 47814,
+    "2007": 47814,
+    "2008": 48102,
+    "2009": 47814,
+    "2010": 47814,
+    "2011": 47814,
+    "2012": 48102,
+    "2013": 47814,
+    "2014": 47814,
+    "2015": 47814,
+    "2016": 48102,
+    "2017": 47814,
+    "2018": 47814,
+    "2019": 47814,
+    "2020": 48102,
+    "2021": 47814,
+    "2022": 47814,
+    "2023": 47814,
+    "2024": 48102
+  },
+  "candidate_train_grid_starts": 957720,
+  "eligible_train_starts": 122309,
+  "eligible_start_frac_of_candidate_grid": 0.1277085160589734,
+  "vector_magnitude_sample_count": 300392,
+  "increment_sample_count": 1201568,
+  "raw_inputs": {
+    "2005": {
+      "path": "omni_min2005.asc",
+      "sha256": "cf42d07894bb83d5546184d862d896a0f8eb3f1325fe11f78c886079e8b76418",
+      "n_minutes": 525600
+    },
+    "2006": {
+      "path": "omni_min2006.asc",
+      "sha256": "8d52249b7f5af3431e2cb9190202c0b0a50772d0dc235065bba00cf09b863a96",
+      "n_minutes": 525600
+    },
+    "2007": {
+      "path": "omni_min2007.asc",
+      "sha256": "0f8188445ecaebdb54f0149d2a2475179ae4d36a80d14aac6089e7ae4bb7c5fc",
+      "n_minutes": 525600
+    },
+    "2008": {
+      "path": "omni_min2008.asc",
+      "sha256": "9205a601d7e3b818c023571ecc6df4771b34316c5e017c3144927aad1b631176",
+      "n_minutes": 527040
+    },
+    "2009": {
+      "path": "omni_min2009.asc",
+      "sha256": "ffd22ee71be66fbdfa62350900c57169203a5ce39ba34b2f1513544ef5898df5",
+      "n_minutes": 525600
+    },
+    "2010": {
+      "path": "omni_min2010.asc",
+      "sha256": "1a29efee6bceb91f921e593fb438538f49b00e886772f4cef0ea6ab1ba93622a",
+      "n_minutes": 525600
+    },
+    "2011": {
+      "path": "omni_min2011.asc",
+      "sha256": "023c1a4792096e8a783100b7e2621dc34179f13459b53ce9fa3b94ae8e2da9b7",
+      "n_minutes": 525600
+    },
+    "2012": {
+      "path": "omni_min2012.asc",
+      "sha256": "3b1f682e9e01965cd4765a4feef0e172304499863f1a633ccea00cceeef1696b",
+      "n_minutes": 527040
+    },
+    "2013": {
+      "path": "omni_min2013.asc",
+      "sha256": "969b967e154b1e338a9cb6078bec20e6aa07788644634ea16f070b278ff8d863",
+      "n_minutes": 525600
+    },
+    "2014": {
+      "path": "omni_min2014.asc",
+      "sha256": "6685acecfdc48b9a38202fe7710db4cf2fbe710e51561a1253869bc9e96ced0c",
+      "n_minutes": 525600
+    },
+    "2015": {
+      "path": "omni_min2015.asc",
+      "sha256": "2663167d2f9387140331ed7dca0dabb5b3b22a7cc77668a4d7afadebedfd83a0",
+      "n_minutes": 525600
+    },
+    "2016": {
+      "path": "omni_min2016.asc",
+      "sha256": "ac6aea936bad17919d72012d99396e5670d47955aed15722029febcc6f05c20a",
+      "n_minutes": 527040
+    },
+    "2017": {
+      "path": "omni_min2017.asc",
+      "sha256": "9cd318016414417b15251f3b39734543b904a59c1c44fb966dd0828ec8c3c026",
+      "n_minutes": 525600
+    },
+    "2018": {
+      "path": "omni_min2018.asc",
+      "sha256": "aa62fc50501a84cd892c59cfe895c78997fb594a3fa779bd6f846a8a8298baa3",
+      "n_minutes": 525600
+    },
+    "2019": {
+      "path": "omni_min2019.asc",
+      "sha256": "2dd363e1329cabd4306110ff27b894ef37ccd256af976eef6a95243090794de4",
+      "n_minutes": 525600
+    },
+    "2020": {
+      "path": "omni_min2020.asc",
+      "sha256": "2979bfe552c5d2ff523ce76e78a7f8cf7a0e3ffef4cd4a83266eb1833da08684",
+      "n_minutes": 527040
+    },
+    "2021": {
+      "path": "omni_min2021.asc",
+      "sha256": "39064276ee6b4e205df7a5bb086fc2e7324d4251eb8060f7dc835181f0984b63",
+      "n_minutes": 525600
+    },
+    "2022": {
+      "path": "omni_min2022.asc",
+      "sha256": "f74e39fdf2d4bee2a4f5b7ea4edfa0cd790387247d403f070296aec88b622c41",
+      "n_minutes": 525600
+    },
+    "2023": {
+      "path": "omni_min2023.asc",
+      "sha256": "985a49f50d68e44d5644b226f00912af2e1d0bbf2974c9ef6ab7aa6d5be3986b",
+      "n_minutes": 525600
+    },
+    "2024": {
+      "path": "omni_min2024.asc",
+      "sha256": "e09f98fdf543a853a8c9b62dcb6bd6c29872905d5907d84451d0aa4a9de082ce",
+      "n_minutes": 527040
+    }
+  },
+  "population_definitions": {
+    "train_role_minutes": "Observed records assigned TRAIN by calendar date, before magnetic validity; not the eligible-window union or a complete calendar grid.",
+    "train_valid_magnetic_minutes": "Training-role records with documented non-fill source and finite non-fill vector components; no amplitude cut.",
+    "minute_metadata": "DBOT, PFN and point-count minute statistics use all valid training-role magnetic records, not only the eligible-window union.",
+    "eligible_bins_scanned": "Distinct five-minute bins in the union of eligible stride-one four-hour training windows.",
+    "distinct_potential_target_bins": "Distinct bins appearing at hidden positions in at least one eligible training window; not all eligible bins.",
+    "dbot_negative_minute_frac": "dbot_negative_minutes / dbot_known_minutes; exact fills 999999 and 9999999 and nonfinite DBOT are missing.",
+    "bins_with_any_negative_dbot_frac": "bins_with_any_negative_dbot / eligible_bins_scanned, including bins with missing DBOT in the denominator.",
+    "pfn_positive_frac_of_valid": "pfn_positive_minutes / train_valid_magnetic_minutes, including missing PFN in the denominator; PFN fill 999 and nonfinite values never count as positive.",
+    "pfn_positive_frac_of_known": "pfn_positive_minutes / pfn_known_minutes, excluding PFN fill 999 and nonfinite values.",
+    "one_point_frac_of_valid": "Finite point counts <=1 / train_valid_magnetic_minutes; the existing counter includes zero, not only exactly one.",
+    "vector_magnitude": "Quantiles of per-bin mean minute-vector magnitude over distinct eligible bins, one value per bin; not pooled minute magnitudes.",
+    "increment": "Quantile of four consecutive one-minute vector increments within each eligible five-minute bin; excludes between-bin increments.",
+    "candidate_train_grid_starts": "All UTC five-minute starts whose complete four hours lie in one TRAIN calendar month, before magnetic validity, missing-record or source checks.",
+    "eligible_start_frac_of_candidate_grid": "eligible_train_starts / candidate_train_grid_starts; overlapping starts, not independent trajectories."
+  },
+  "note": "Read-only metadata scan. Metadata does not alter eligibility. DBOT/PFN are processing flags, not denoiser inputs or proof of invalid vectors."
+}

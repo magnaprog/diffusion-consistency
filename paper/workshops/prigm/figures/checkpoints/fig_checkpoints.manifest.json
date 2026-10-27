@@ -1,0 +1,215 @@
+{
+  "caption": "Raw month-balanced energy score at all five saved updates, for D and O-S. D uses open markers; O-S uses filled markers. Circles/solid, squares/dashed, triangles/dotted identify seeds 7, 13, 42. Black hollow rings mark P25 and black crosses P50; F marks the final update. TEST displays the policies frozen from VAL, with no TEST selection. Lines connect observed checkpoints and are not fitted curves or uncertainty intervals. VAL and TEST contain different windows; their score levels are not a paired population contrast.",
+  "curves": {
+    "TEST50": {
+      "D_s13": [
+        2.5032359071918275,
+        1.829731165770156,
+        1.9685043347042028,
+        2.108794609721638,
+        1.9778484702792234
+      ],
+      "D_s42": [
+        2.591914889967589,
+        2.2020388586863264,
+        1.8758054397314914,
+        1.9533237386138835,
+        1.9900482586723123
+      ],
+      "D_s7": [
+        2.4284764482057497,
+        1.9575229938859366,
+        2.0444652300026025,
+        2.0811842774364697,
+        1.9786974038367084
+      ],
+      "O-S_s13": [
+        2.385172741302945,
+        1.971584216517746,
+        1.9732800881757093,
+        1.8979213487556899,
+        1.8933815569209664
+      ],
+      "O-S_s42": [
+        2.2954831903413906,
+        2.210076092092907,
+        1.805561062218883,
+        1.9495124909062747,
+        1.931177471594993
+      ],
+      "O-S_s7": [
+        2.4716328055445733,
+        1.9546823427112805,
+        1.969074954022561,
+        1.997839904807893,
+        1.9557614175708047
+      ]
+    },
+    "VAL25": {
+      "D_s13": [
+        2.1804589403425907,
+        1.5925232276351666,
+        1.7312595767811367,
+        1.8803733344684566,
+        1.7293627436379144
+      ],
+      "D_s42": [
+        2.2746658026404627,
+        1.93504390233431,
+        1.6267037977181622,
+        1.7117897107431417,
+        1.7541904226044251
+      ],
+      "D_s7": [
+        2.0993499394046182,
+        1.7170802163650276,
+        1.8110954136946007,
+        1.8461961098882234,
+        1.7244258707439115
+      ],
+      "O-S_s13": [
+        2.0539113815945846,
+        1.753147884514864,
+        1.745507640830123,
+        1.6724325246336853,
+        1.6598635366353314
+      ],
+      "O-S_s42": [
+        1.9566449578807585,
+        1.9403717506243061,
+        1.583617733418031,
+        1.7046330583600273,
+        1.701179613052321
+      ],
+      "O-S_s7": [
+        2.1317382727293195,
+        1.7470272795257586,
+        1.7439850802462395,
+        1.7735550169760301,
+        1.6942118178709102
+      ]
+    },
+    "VAL50": {
+      "D_s13": [
+        2.232173257655008,
+        1.599653430000409,
+        1.7576550615604816,
+        1.938699544347982,
+        1.7466754543572058
+      ],
+      "D_s42": [
+        2.3583526245446174,
+        1.9694873948387701,
+        1.6394311005756954,
+        1.729431012299696,
+        1.7803086945880786
+      ],
+      "D_s7": [
+        2.1297938727282983,
+        1.7316152029312204,
+        1.8552964421865141,
+        1.8775731998721787,
+        1.7471679387330767
+      ],
+      "O-S_s13": [
+        2.094527323584643,
+        1.7623279987726594,
+        1.7701725011057772,
+        1.692756218770309,
+        1.6766444575762836
+      ],
+      "O-S_s42": [
+        2.004821694479072,
+        1.9637598484681071,
+        1.595825231540926,
+        1.7214495328077248,
+        1.7230472850617686
+      ],
+      "O-S_s7": [
+        2.177499890938491,
+        1.7746428822655247,
+        1.7784004151690052,
+        1.7973263318332109,
+        1.7150174421687971
+      ]
+    }
+  },
+  "evidence_source": {
+    "path": "fig_checkpoints.py",
+    "sha256": "ec574515f3738141a6efeaa84cb63ccaeccc72fbdf07770ffea091741cf8fc9d"
+  },
+  "figure": "fig_checkpoints",
+  "inputs": {
+    "MANIFEST.json": {
+      "path": "evidence/followup/checkpoints/MANIFEST.json",
+      "sha256": "385b7048217cddfaed2c6bb48a1706928ddca1c4b35fd71e533065a518c5d036"
+    },
+    "PROTOCOL.json": {
+      "path": "evidence/followup/checkpoints/PROTOCOL.json",
+      "sha256": "af4d29ba91a088725669115a9f35d89dda2be7be4da764d3fe992ef5f4ecc670"
+    },
+    "SAVED_VAL25.json": {
+      "path": "evidence/followup/checkpoints/SAVED_VAL25.json",
+      "sha256": "b8252f106557590cd1c055c6c07d22fe8a6449a7c167b5b55e1626ca2ac8445f"
+    },
+    "SCOPE.json": {
+      "path": "evidence/followup/checkpoints/SCOPE.json",
+      "sha256": "49627ce438c813ae41c7a3220a1c9a08bb018d0f3bb224efa90fd302ca5a4426"
+    },
+    "SELECTION.json": {
+      "path": "evidence/followup/checkpoints/SELECTION.json",
+      "sha256": "cec06beb2a6313d049526620a43856c9973a4caa11dac91ab68beba229c5cd2f"
+    },
+    "SUMMARY.json": {
+      "path": "evidence/followup/checkpoints/SUMMARY.json",
+      "sha256": "abbf1b9e629c3ae61dd99c4c78d59fa0a78d5807ef51b83067e165c0fb7dd4fa"
+    }
+  },
+  "matplotlib_version": "3.10.9",
+  "output_sha256": {
+    "fig_checkpoints.pdf": "a29b81061fd89f6569ba0af145173da2e3cdd45b93a1827f5bc72fa8ecd9b8e3",
+    "fig_checkpoints.png": "ba9ce7b2cce65d143c607ed018951732e50107da1ca2142e097456400696a5a6"
+  },
+  "policies": {
+    "D_s13": {
+      "F": 29636,
+      "P25": 9560,
+      "P50": 9560
+    },
+    "D_s42": {
+      "F": 29636,
+      "P25": 16252,
+      "P50": 16252
+    },
+    "D_s7": {
+      "F": 29636,
+      "P25": 9560,
+      "P50": 9560
+    },
+    "O-S_s13": {
+      "F": 29636,
+      "P25": 29636,
+      "P50": 29636
+    },
+    "O-S_s42": {
+      "F": 29636,
+      "P25": 16252,
+      "P50": 16252
+    },
+    "O-S_s7": {
+      "F": 29636,
+      "P25": 29636,
+      "P50": 29636
+    }
+  },
+  "protocol_sha256": "eeca7c2e14d982f0b3e972256cc9acf7a5aaa8dc03da6a9299a708c78a7b5946",
+  "schema_version": 1,
+  "source": {
+    "path": "fig_checkpoints.py",
+    "sha256": "44e26d777dd8cc2e9846798e02db21c6fffba2a3a551394291cf3bb6a1d14f0a"
+  },
+  "style": {
+    "path": "prigm.mplstyle",
+    "sha256": "3ac5d2448a3a022a70705fafabc407937c3db1514128834934a15004b70f0a08"
+  }
+}
