@@ -1830,10 +1830,10 @@ def deadline_claims(tex, rendered, real, evidence):
     # Tables retain the numerical results omitted from the conceptual abstract.
     difference = real[0]["arm_means"]["D_raw"] - real[0]["arm_means"]["O-S_raw"]
     require(difference > 0, "selected penalty improvement direction changed")
-    bind("When validation selects the model", "When validation selects the model, penalizing the identity residual gives little mean improvement over unpenalized diffusion.")
+    bind("The energy score compares", "The energy score compares predictive distributions: a penalty on the identity residual gives little mean improvement over diffusion alone when validation chooses the model.")
     require(real[1]['methods']['G5_raw']['metrics']['cov90_mean']['month_balanced'] < .9,
             "G5 coverage no longer falls below nominal")
-    bind("Generating the quantities needed", "Generating the quantities needed for algebraic completion gives the lowest mean score on those quantities. Both representation and training loss change, and coverage remains below nominal.")
+    bind("Generating the quantities needed", "Generating the quantities needed to derive the remaining statistic gives the lowest mean score on those quantities. Both representation and training loss change, and prediction intervals cover fewer withheld values than intended.")
     g5, boundary = (operator["methods"][name]["metrics"] for name in ("G5", "gaussian"))
     data_only = operator["methods"]["D"]["metrics"]
     target_reduction = data_only["raw_target_term"]["month_balanced"] - g5["raw_target_term"]["month_balanced"]
