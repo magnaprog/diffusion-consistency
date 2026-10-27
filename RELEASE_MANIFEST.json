@@ -1,5 +1,5 @@
 {
-  "base_commit": "bbe157097f016675dda06ffe70061b5916c8c67b",
+  "base_commit": "300b4b8365a8408104ff2a8b3ed62ff1d616edbe",
   "excluded": [
     "Git history",
     "private handoffs and execution receipts",
@@ -112,8 +112,8 @@
       "sha256": "9fcb2a7064d057af0ced88c4b329d9c677033e71f9b2d59a77a6179c863029fe"
     },
     "experiments/verify_prigm_paper.py": {
-      "bytes": 186546,
-      "sha256": "f2ba57ed383f1a45d1c59ec3e48250cb424b7cceefec182a6f09f7b7cf212694"
+      "bytes": 189268,
+      "sha256": "b8e7875a0237e9fc87ca0b084b8dec70fcdeade605a58d86e2971f0e8183ecac"
     },
     "paper/workshops/prigm/evidence/data/MANIFEST.json": {
       "bytes": 1548,
@@ -424,12 +424,12 @@
       "sha256": "89d9b9b1cca7a29add91c242ca0e0bcb447094ffb87eedb8c8b5041898ae2739"
     },
     "paper/workshops/prigm/main.pdf": {
-      "bytes": 524471,
-      "sha256": "93b7ebdcefd92107d2f7b6f5330b7810fa49456d94d07c3d8cf166e81aa94732"
+      "bytes": 525089,
+      "sha256": "7a1688ac55954f1b22bd5abb82227d8654bb1f59c54acf8572381753da39293b"
     },
     "paper/workshops/prigm/main.tex": {
-      "bytes": 92392,
-      "sha256": "c6dc10cf5c9b9a398b73215b659f188bd38187fa92233549e786139a38fcd0f0"
+      "bytes": 92838,
+      "sha256": "1939ecbbd1c33c9cd403b35387f3373aad88cb1204c651ce2a300305cbc2647c"
     },
     "paper/workshops/prigm/neurips_2025.sty": {
       "bytes": 13023,
@@ -996,8 +996,8 @@
       "sha256": "189e637446d3f302cb5ebe0a2d70d27f3b54cba1031977732d0b89b914e03e9c"
     },
     "tests/test_prigm_paper.py": {
-      "bytes": 140431,
-      "sha256": "2e2629fd091d7f3028dd59e00d01c3537d48a4280945894de3573722f3f1bc6f"
+      "bytes": 146022,
+      "sha256": "67d1a56ece968034687c50a14c08354eebd6f26f34948af8a001334b18743598"
     },
     "tests/test_prigm_paper_evidence.py": {
       "bytes": 49129,

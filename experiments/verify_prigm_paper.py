@@ -2471,6 +2471,51 @@ def pdf_without_line_numbers(text):
                   "", text.replace("\f", "\f\n"))
 
 
+def acknowledgment_start(tex, pages, references, mode):
+    """Exclude one matched plain-text camera-ready acknowledgment from main pages."""
+    heading = "Acknowledgments and Disclosure of Funding"
+    headings = [(i, j) for i, page in enumerate(pages) for j, line in enumerate(page.splitlines())
+                if line.strip() == heading]
+    markers = list(re.finditer(r"\\(begin|end)\s*\{\s*ack\s*\}", tex))
+    if not markers:
+        require(not headings, "orphan PDF acknowledgment heading")
+        return None
+    require([m[1] for m in markers] == ["begin", "end"],
+            "missing, duplicate or unmatched source acknowledgment")
+    begin, end = markers
+    body = tex[begin.end():end.start()].strip()
+    require(body and not re.search(r"[\\{}$]", body), "acknowledgment must contain plain text")
+    bibliography = list(re.finditer(r"\\bibliography\s*\{references\}", tex))
+    require(len(bibliography) == 1 and 0 <= tex.find(r"\begin{document}") < begin.start()
+            and end.end() <= bibliography[0].start(), "acknowledgment must precede references")
+    require(re.fullmatch(r"(?:\s|\\(?:clearpage|newpage)\b)*",
+                         tex[end.end():bibliography[0].start()]) is not None,
+            "body content follows source acknowledgment")
+    if mode != "camera_ready":
+        require(not headings, "anonymous PDF must not show acknowledgments")
+        return None
+    require(len(headings) == 1, "missing or duplicate PDF acknowledgment heading")
+    start = headings[0]
+    require(start < references, "PDF acknowledgment must precede references")
+    lines = []
+    for index in range(start[0], references[0] + 1):
+        page_lines = pages[index].splitlines()
+        while page_lines and not page_lines[-1].strip():
+            page_lines.pop()
+        # Remove only the terminal page footer, never arbitrary numeric body lines.
+        if page_lines and page_lines[-1].strip() == str(index + 1):
+            page_lines.pop()
+        first = start[1] + 1 if index == start[0] else 0
+        last = references[1] if index == references[0] else len(page_lines)
+        lines.extend(page_lines[first:last])
+    rendered_body = re.sub(r"([A-Za-z])-\s*\n\s*([A-Za-z])", "\\1\u00ad\\2", "\n".join(lines))
+    rendered_body = " ".join(table_text(rendered_body).replace("’", "'").split())
+    expected = " ".join(table_text(body).replace("’", "'").split())
+    require(re.fullmatch(clause_pattern(expected), rendered_body) is not None,
+            "source/PDF acknowledgment body differs")
+    return start
+
+
 def pdf_checks(paper_dir):
     pdf = local(paper_dir, "main.pdf")
     require(pdf.is_file() and shutil.which("pdftotext") and shutil.which("pdfinfo"), "requires main.pdf, pdftotext and pdfinfo")
@@ -2542,8 +2587,10 @@ def pdf_checks(paper_dir):
     headings = [(i, j) for i, page in enumerate(pages) for j, line in enumerate(page.splitlines())
                 if re.fullmatch(r"\s*References\s*", line)]
     require(len(headings) == 1, "missing or ambiguous PDF References heading")
-    index, line = headings[0]
-    before = [s.strip() for s in pages[index].splitlines()[:line] if s.strip() and not s.strip().isdigit()]
+    acknowledgment = acknowledgment_start(tex, pages, headings[0], mode)
+    index, line = acknowledgment if acknowledgment is not None else headings[0]
+    before = [s.strip() for s in pages[index].splitlines()[:line]
+              if s.strip() and (acknowledgment is not None or not s.strip().isdigit())]
     require(index + bool(before) <= 4, "main text exceeds four pages")
     appendix_source = re.split(r"\\appendix\b", tex)
     require(len(appendix_source) == 2, "missing or ambiguous source appendix")
