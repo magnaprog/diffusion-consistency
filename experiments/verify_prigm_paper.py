@@ -1968,7 +1968,7 @@ def learned_toy_claims(tex, rendered, evidence):
     expected = (f"For exact conditional draws, inclusive intervals cover {100 * secondary['cov90_mean']['mean']:.1f}\\% "
                 f"and {100 * secondary['cov50_mean']['mean']:.2f}\\% of the primary coordinates under the nominal 90\\% and 50\\% endpoint conventions. "
                 f"Their mean widths are {secondary['width90_mean']['mean']:.4f} and {secondary['width50_mean']['mean']:.4f} in standardized coordinates. "
-                "Ties in this discrete distribution can raise the coverage of inclusive intervals. Coverage expected for a continuous distribution is therefore insufficient to assess calibration here. "
+                "Ties in this discrete distribution can raise the coverage of inclusive intervals. Therefore, coverage expected for a continuous distribution is insufficient to assess calibration here. "
                 "The interval calculations use the original random stream and reproduce all 288 original energy scores before computing coverage and width.")
     paragraphs = [p for p in re.split(r"\n\s*\n", scopes[0]) if p.startswith("For exact conditional draws")]
     require(len(paragraphs) == 1, "missing unique adjacent reference paragraph")
@@ -2032,7 +2032,7 @@ def residual_weight_claims(paper_dir, tex, rendered):
     bind_clause(scopes, "The absolute TRAIN", "The absolute TRAIN residual-gradient norms at $t=100$ are "
                 + bounds("TRAIN", 100, "physics_gradient_norm", scientific=True)
                 + ", much smaller than the " + bounds("TRAIN", 1, "physics_gradient_norm") + " range at $t=1$.")
-    bind_clause(scopes, "Thus the large ratio at high noise", "Thus the large ratio at high noise accompanies a small absolute gradient.")
+    bind_clause(scopes, "The large ratio at high noise", "The large ratio at high noise accompanies a small absolute gradient.")
     bind_clause(scopes, "These measurements", "These measurements precede clipping of the total gradient, and optimizer updates combine noise levels. The residual term's contribution to prediction quality remains unresolved.")
 
 

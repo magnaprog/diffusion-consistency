@@ -1,5 +1,5 @@
 {
-  "base_commit": "35b104a3bf1e1a8c3332bb13d7be27f75f01566d",
+  "base_commit": "bbe157097f016675dda06ffe70061b5916c8c67b",
   "excluded": [
     "Git history",
     "private handoffs and execution receipts",
@@ -56,8 +56,8 @@
       "sha256": "8f3ae17782b3bb15160a7b7f0662aad3e3afa8707060b9722276486ceca2e7d2"
     },
     "analysis/prigm_operator_mechanism.py": {
-      "bytes": 25690,
-      "sha256": "835c23621a7a753e3239de8b5cf1f7c459e1ee1cfaf329d520c79065c0010d5b"
+      "bytes": 25691,
+      "sha256": "00c8a89039b4eca299784a61a8192e6d933b62d64f82e142e4ba9a56fd9d3a5b"
     },
     "analysis/prigm_tail_calibration.py": {
       "bytes": 10125,
@@ -68,8 +68,8 @@
       "sha256": "06106e59d81c340fd582815346d208054200ee70bc15228c44d623ce7f9595b9"
     },
     "docs/prigm_release.md": {
-      "bytes": 14763,
-      "sha256": "f5e8cb19f3d6f789f5d50c6a922e05beeeb4d3392700e4118e6e4ed3f33bf859"
+      "bytes": 14764,
+      "sha256": "1e7c7805a778309571efb9e2580de4c52fd43bad3dceb75740263fe47e06adc5"
     },
     "environment.yml": {
       "bytes": 128,
@@ -93,7 +93,7 @@
     },
     "experiments/_prigm_documentation.py": {
       "bytes": 4983,
-      "sha256": "97ed29cea1bca7c90806a24d18b02fd7a0b6acce1ed208a59e24971be9787d02"
+      "sha256": "2a6f87488590c568ee29430486dc5e38b2635891cecbf91c2edc78fd79180d83"
     },
     "experiments/_prigm_illustrations.py": {
       "bytes": 24385,
@@ -112,8 +112,8 @@
       "sha256": "9fcb2a7064d057af0ced88c4b329d9c677033e71f9b2d59a77a6179c863029fe"
     },
     "experiments/verify_prigm_paper.py": {
-      "bytes": 186555,
-      "sha256": "8694bcf01fca4e96e7c8d7f8d6b5baa331ccd6207a380049e5acf3ca2a70a3a8"
+      "bytes": 186546,
+      "sha256": "f2ba57ed383f1a45d1c59ec3e48250cb424b7cceefec182a6f09f7b7cf212694"
     },
     "paper/workshops/prigm/evidence/data/MANIFEST.json": {
       "bytes": 1548,
@@ -424,12 +424,12 @@
       "sha256": "89d9b9b1cca7a29add91c242ca0e0bcb447094ffb87eedb8c8b5041898ae2739"
     },
     "paper/workshops/prigm/main.pdf": {
-      "bytes": 524514,
-      "sha256": "9c9fed76fc0ee07a9bebad752042f8d8ced00a48d1914162b03193f9284dbf66"
+      "bytes": 524471,
+      "sha256": "93b7ebdcefd92107d2f7b6f5330b7810fa49456d94d07c3d8cf166e81aa94732"
     },
     "paper/workshops/prigm/main.tex": {
-      "bytes": 92405,
-      "sha256": "8102d53054b24ea15ad800ed37b97a620a3f851edeef390dd7b7dc31da46ef63"
+      "bytes": 92392,
+      "sha256": "c6dc10cf5c9b9a398b73215b659f188bd38187fa92233549e786139a38fcd0f0"
     },
     "paper/workshops/prigm/neurips_2025.sty": {
       "bytes": 13023,
@@ -556,8 +556,8 @@
       "sha256": "32558b4b2d7372c9279491e3d3c9b4d788a76e2a57cfc5f72f83e9e469b746e0"
     },
     "prigm/run_eval.py": {
-      "bytes": 7762,
-      "sha256": "9c5cb77404d9724920b6788e17ba3b1dc6fc7da26c23801d20dd0dc61b77915d"
+      "bytes": 7754,
+      "sha256": "6bb83e73a1f4044982361291bc11c12bb925c3513f8192dac86561d7155c3791"
     },
     "prigm/run_fit.py": {
       "bytes": 12071,
@@ -661,7 +661,7 @@
     },
     "reproducibility/documentation_source/MANIFEST.json": {
       "bytes": 10014,
-      "sha256": "23eb964249aa1c96a004e3fa05e1252b619bc1428dd1fc01ad95b497d608a559"
+      "sha256": "119e5a6fa807b0d56184533d0d5755e93d3f635cb4979d7f3e7cbc3b23eab046"
     },
     "reproducibility/documentation_source/README.md": {
       "bytes": 2333,
@@ -996,8 +996,8 @@
       "sha256": "189e637446d3f302cb5ebe0a2d70d27f3b54cba1031977732d0b89b914e03e9c"
     },
     "tests/test_prigm_paper.py": {
-      "bytes": 140455,
-      "sha256": "746c415ca10842e3fa8dddd3b89039434558cc3050ed81aa7304bafae9c33605"
+      "bytes": 140431,
+      "sha256": "2e2629fd091d7f3028dd59e00d01c3537d48a4280945894de3573722f3f1bc6f"
     },
     "tests/test_prigm_paper_evidence.py": {
       "bytes": 49129,

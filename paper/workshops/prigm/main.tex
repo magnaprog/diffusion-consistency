@@ -74,7 +74,7 @@ The conditional mean can lie outside the nonlinear set of possible statistics ev
  =\operatorname{tr}\operatorname{Cov}(\mu\mid Y)-\operatorname{Var}(m\mid Y).
  \label{eq:conditional}
 \end{equation}
-Either sign is possible. A residual at a denoiser's mean prediction can therefore reflect conditional uncertainty. Residuals at individual samples test whether those samples obey the identity \citep{bastek2025pidm}.
+Either sign is possible. Therefore, a residual at a denoiser's mean prediction can reflect conditional uncertainty. Residuals at individual samples test whether those samples obey the identity \citep{bastek2025pidm}.
 
 \paragraph{Data construction.} The data come from the modified OMNI high resolution product \citep{nasamodifiedomni,king2005solar}. Timestamps estimate arrival at the bow shock nose; propagation and averaging precede masking \citep{papitashvili2020omni}. The task reconstructs records on this time grid; recovery at the spacecraft's original observation times requires a separate experiment. Magnitudes are Euclidean norms of the vector components. Each window spans four hours in 48 bins of five minutes. The central twelve bins are masked without prior imputation, leaving 90 minutes of conditioning data on each side. Complete windows use one spacecraft within one month, retaining 12.77\% of possible training starts.
 
@@ -131,7 +131,7 @@ Clipping moves G5 draws in the standardized primary coordinates with little chan
 \par
 \end{samepage}
 
-At the final training step, the original O-S coefficient gives a lower mean raw energy score than D and improves all three seeds. Model selection thus changes the D/O-S comparison. Doubling validation DDIM evaluations from 25 to 50 preserves all six raw D/O-S checkpoint choices (Appendix~\ref{app:checkpoints}). Table~\ref{tab:fixedfinal} gives the sensitivity results at the same final training step.
+At the final training step, the original O-S coefficient gives a lower mean raw energy score than D and improves all three seeds. Model selection changes the D/O-S comparison. Doubling validation DDIM evaluations from 25 to 50 preserves all six raw D/O-S checkpoint choices (Appendix~\ref{app:checkpoints}). Table~\ref{tab:fixedfinal} gives the sensitivity results at the same final training step.
 
 \subsection{An exact denoiser example}
 
@@ -157,9 +157,9 @@ The variance identity constrains combinations of magnetic statistics, leaving th
 \section{Physically possible magnetic statistics and energy}
 \label{app:support}
 
-The realizability conditions follow from the possible sums of five vectors. Let $a_j=\|B_j\|$, so $\sum_j a_j=5m$. Vectors with these lengths can sum to a vector of length $5r$ precisely when $\max(0,2\max_j a_j-5m)\le5r\le5m$. Thus each $a_j$ must be at most $5(m+r)/2$. With the total length fixed, the sum of squared lengths is largest when two lengths are $5(m+r)/2$ and $5(m-r)/2$ and the other three are zero. Hence $m^2+v_s\le5(m^2+r^2)/2$, which gives the upper bound in Equation~\ref{eq:support}.
+The realizability conditions follow from the possible sums of five vectors. Let $a_j=\|B_j\|$, so $\sum_j a_j=5m$. Vectors with these lengths can sum to a vector of length $5r$ precisely when $\max(0,2\max_j a_j-5m)\le5r\le5m$. Thus, each $a_j$ must be at most $5(m+r)/2$. With the total length fixed, the sum of squared lengths is largest when two lengths are $5(m+r)/2$ and $5(m-r)/2$ and the other three are zero. Hence, $m^2+v_s\le5(m^2+r^2)/2$, which gives the upper bound in Equation~\ref{eq:support}.
 
-Equal lengths attain the lower bound $v_s=0$. The nonnegative lengths have a fixed sum and a common upper bound, so their feasible set is convex and contains both extremes. Continuity of the sum of squared lengths then gives every intermediate value. Rotating a nonzero vector sum gives the mean the direction of $\mu$; a zero sum already has the required mean. The conditions are therefore both necessary and sufficient, including when all five vectors vanish.
+Equal lengths attain the lower bound $v_s=0$. The nonnegative lengths have a fixed sum and a common upper bound, so their feasible set is convex and contains both extremes. Continuity of the sum of squared lengths then gives every intermediate value. Rotating a nonzero vector sum gives the mean the direction of $\mu$; a zero sum already has the required mean. Therefore, the conditions are both necessary and sufficient, including when all five vectors vanish.
 
 The quantity $Q=m^2+v_s=\|\mu\|^2+v_v$ is the mean squared magnitude of the five vectors, each already averaged over one minute. Multiplying by $10^{-18}/(2\mu_0)$ converts nT$^2$ to the magnetic energy density represented by those averages. This estimate excludes fluctuations lost in the original minute averages.
 
@@ -174,7 +174,7 @@ The magnetic inputs are the vector components in geocentric solar ecliptic coord
 
 NASA estimates arrival times and forms weighted averages for each minute before the OMNI record is masked. Neighboring output minutes can share measurements, and the phase front normals used to estimate propagation depend on neighboring magnetic observations. Any contribution of the hidden interval to those earlier estimates remains after masking. NASA retains arrivals whose order changes after propagation and describes the resulting mixing of plasma regions \citep[Sections 3a--3c and Appendix 5]{papitashvili2020omni}. A common spacecraft source within each window prevents source changes, while arrival order can still differ from observation order. Directional cancellation, variance and changes at gap edges can reflect both this processing and solar wind variability.
 
-Data completeness depends on propagation as well as solar wind conditions. Magnetic observations can be excluded when suitable plasma velocities are missing or when no acceptable phase front normal spans a long interval with little variation. Completeness alone therefore cannot reliably distinguish quiet from disturbed solar wind. NASA selects spacecraft data in segments of three hours using coverage and spatial separation, with a preference for Wind from 2020 onward \citep[Appendix 6]{papitashvili2020omni}. Comparisons between spacecraft groups consequently combine differences in instruments, dates and processing choices. The results use the original OMNI inputs; comparison with NASA's current release remains outstanding.
+Data completeness depends on propagation as well as solar wind conditions. Magnetic observations can be excluded when suitable plasma velocities are missing or when no acceptable phase front normal spans a long interval with little variation. Therefore, completeness alone cannot reliably distinguish quiet from disturbed solar wind. NASA selects spacecraft data in segments of three hours using coverage and spatial separation, with a preference for Wind from 2020 onward \citep[Appendix 6]{papitashvili2020omni}. Comparisons between spacecraft groups combine differences in instruments, dates and processing choices. The results use the original OMNI inputs; comparison with NASA's current release remains outstanding.
 
 The training dates contain 4{,}816{,}800 recorded minutes, including 4{,}400{,}682 with valid magnetic vectors. These counts include minutes outside eligible training windows. Among the 4{,}298{,}363 valid magnetic minutes with a known duration between observing times, DBOT, 555{,}719 have negative DBOT, indicating an apparent reversal of observation order at the spacecraft. Of the 300{,}392 distinct eligible bins, 55{,}339 contain at least one such minute. The phase front normal interpolation field gives the percentage of contributions to a magnetic average over one minute whose normal was interpolated \citep{nasamodifiedomni}. This field concerns the propagation normals. These processing measures leave the set of test windows intact.
 
@@ -209,7 +209,7 @@ Gradients of the two loss terms are evaluated on the same batches. For each O-S 
 
 The relative weight of the residual penalty varies with the diffusion timestep, even at $c_R=0.0005$. With $\lambda_t=c_R/(2\Sigma_t)$, the ratios $\lambda_t/w_t$ at $t=1,25,50,100$ are 0.1239, 0.004183, 0.008642, and 1030.7. At the final noise level, the Min-SNR data weight is only $2.429\times10^{-7}$. These ratios compare loss coefficients; the corresponding gradient ratios also depend on the derivatives of the two terms.
 
-At the final O-S checkpoints, the norm of the residual gradient divided by the norm of the data gradient ranges from 315 to 1799 on TRAIN and 214 to 1266 on VAL at $t=100$. At $t=25$, the ranges are 0.0081 to 0.0267 and 0.0103 to 0.0465. Each range spans three seeds, with one calculation on eight windows per seed. The absolute TRAIN residual-gradient norms at $t=100$ are $7.379\times10^{-5}$ to $4.401\times10^{-4}$, much smaller than the 0.1396 to 0.4587 range at $t=1$. Thus the large ratio at high noise accompanies a small absolute gradient. These measurements precede clipping of the total gradient, and optimizer updates combine noise levels. The residual term's contribution to prediction quality remains unresolved.
+At the final O-S checkpoints, the norm of the residual gradient divided by the norm of the data gradient ranges from 315 to 1799 on TRAIN and 214 to 1266 on VAL at $t=100$. At $t=25$, the ranges are 0.0081 to 0.0267 and 0.0103 to 0.0465. Each range spans three seeds, with one calculation on eight windows per seed. The absolute TRAIN residual-gradient norms at $t=100$ are $7.379\times10^{-5}$ to $4.401\times10^{-4}$, much smaller than the 0.1396 to 0.4587 range at $t=1$. The large ratio at high noise accompanies a small absolute gradient. These measurements precede clipping of the total gradient, and optimizer updates combine noise levels. The residual term's contribution to prediction quality remains unresolved.
 
 \subsection{Choosing checkpoints and prior use of test data}
 
@@ -272,9 +272,9 @@ Writing $\kappa_\alpha=[1+2\sqrt{1+\alpha^2}+2\sqrt{1+4\alpha^2}]/5$, the residu
  =q(1-q)\frac{11/3-\kappa_\alpha^2}{1+2\alpha^2}.
  \label{eq:toymean}
 \end{equation}
-The coefficient is positive for $\alpha=0,1$ and negative for $\alpha=2$. Thus a nondegenerate mixture has a nonzero residual in all three geometries, even though each individual state obeys the identity. Squaring the residual assigns a positive penalty to the exact posterior mean whenever both states have positive posterior probability. This magnetic example illustrates the effect of taking expectations through a nonlinear residual discussed by \citet{bastek2025pidm}.
+The coefficient is positive for $\alpha=0,1$ and negative for $\alpha=2$. Therefore, a nondegenerate mixture has a nonzero residual in all three geometries, even though each individual state obeys the identity. Squaring the residual assigns a positive penalty to the exact posterior mean whenever both states have positive posterior probability. This magnetic example illustrates the effect of taking expectations through a nonlinear residual discussed by \citet{bastek2025pidm}.
 
-The learned HMM comparison uses 4{,}096 training windows generated at seed 106 by cycling through the nine $(\alpha,p)$ combinations. The U-Net has widths 32/64/64, batches contain 128 windows, and each fit receives 5{,}000 optimizer updates at seed 7. Other optimizer and diffusion settings follow Appendix~\ref{app:protocol}. Evaluation uses 32 paths per switching probability, reusing each path for the three values of $\alpha$. The resulting 288 windows thus share hidden state sequences across vector geometries.
+The learned HMM comparison uses 4{,}096 training windows generated at seed 106 by cycling through the nine $(\alpha,p)$ combinations. The U-Net has widths 32/64/64, batches contain 128 windows, and each fit receives 5{,}000 optimizer updates at seed 7. Other optimizer and diffusion settings follow Appendix~\ref{app:protocol}. Evaluation uses 32 paths per switching probability, reusing each path for the three values of $\alpha$. The resulting 288 windows share hidden state sequences across vector geometries.
 
 Table~\ref{tab:oracle} compares methods on the same 288 windows with stationary endpoint states, the same available information and 39 draws per method. The approximate samplers share their initial noise. The first row compares independent draws from the exact conditional distribution with the hidden values. It estimates the minimum expected score under that law, subject to Monte Carlo error. A finite estimate can lie above or below this expectation. Earlier windows with independent endpoint states are part of a separate sensitivity analysis and are excluded here.
 
@@ -323,9 +323,9 @@ O-S & 0.005 & 4.2551 & 4.2553 & 0.0094 & 27.4 & 95.9 \\
 \end{tabular}
 \end{table}
 
-The residual estimate used in the training penalty and the final sampler assess different parts of the procedure. With 50 sampling evaluations, O-S avoids the poor score obtained from only two evaluations of the exact denoiser. The calculation with two evaluations tests the approximation used during training; the full sampler tests the resulting predictive distribution. A small residual can therefore be a poor indicator of prediction quality even when training with that penalty produces samples with good scores.
+The residual estimate used in the training penalty and the final sampler assess different parts of the procedure. With 50 sampling evaluations, O-S avoids the poor score obtained from only two evaluations of the exact denoiser. The calculation with two evaluations tests the approximation used during training; the full sampler tests the resulting predictive distribution. Therefore, a small residual can be a poor indicator of prediction quality even when training with that penalty produces samples with good scores.
 
-For exact conditional draws, inclusive intervals cover 100.0\% and 97.49\% of the primary coordinates under the nominal 90\% and 50\% endpoint conventions. Their mean widths are 1.4581 and 1.3485 in standardized coordinates. Ties in this discrete distribution can raise the coverage of inclusive intervals. Coverage expected for a continuous distribution is therefore insufficient to assess calibration here. The interval calculations use the original random stream and reproduce all 288 original energy scores before computing coverage and width.
+For exact conditional draws, inclusive intervals cover 100.0\% and 97.49\% of the primary coordinates under the nominal 90\% and 50\% endpoint conventions. Their mean widths are 1.4581 and 1.3485 in standardized coordinates. Ties in this discrete distribution can raise the coverage of inclusive intervals. Therefore, coverage expected for a continuous distribution is insufficient to assess calibration here. The interval calculations use the original random stream and reproduce all 288 original energy scores before computing coverage and width.
 
 \section{Variation across seeds, interval coverage, and alternative scores}
 \label{app:details}
@@ -727,7 +727,7 @@ Coefficient / seed & Raw & Clipped & $|R|$ & \parbox[c]{19mm}{\centering Bins fa
 \end{tabular}
 \end{table}
 
-Figure~\ref{fig:fixedfinal} shows that the mean residual decreases as the penalty grows, while the mean energy score first improves and then worsens. The strongest penalty gives the smallest residual, while the original coefficient gives the best mean score. At $c_R=0.005$, the score improves over D for seed 42 and worsens for seeds 7 and 13. A smaller identity residual can therefore accompany a worse predictive score.
+Figure~\ref{fig:fixedfinal} shows that the mean residual decreases as the penalty grows, while the mean energy score first improves and then worsens. The strongest penalty gives the smallest residual, while the original coefficient gives the best mean score. At $c_R=0.005$, the score improves over D for seed 42 and worsens for seeds 7 and 13. Therefore, a smaller identity residual can accompany a worse predictive score.
 
 \begin{figure}[t]
  \centering
@@ -737,7 +737,7 @@ Figure~\ref{fig:fixedfinal} shows that the mean residual decreases as the penalt
 \end{figure}
 
 \begin{samepage}
-At the original coefficient, O-S has a lower energy score than D for every seed at the end of training. When validation chooses the model weights, the difference changes sign across seeds. The penalty's apparent benefit therefore depends on the stage of training at which predictions are evaluated. Further fits would be needed to establish whether this pattern persists beyond the current exploratory comparison.
+At the original coefficient, O-S has a lower energy score than D for every seed at the end of training. When validation chooses the model weights, the difference changes sign across seeds. Therefore, the penalty's apparent benefit depends on the stage of training at which predictions are evaluated. Further fits would be needed to establish whether this pattern persists beyond the current exploratory comparison.
 \par
 \end{samepage}
 

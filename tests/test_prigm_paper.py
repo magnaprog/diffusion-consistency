@@ -380,7 +380,7 @@ def followup_prose(learned, reference, gradients, strata):
     toy_prose += (f"\nFor exact conditional draws, inclusive intervals cover {ref['cov90_mean']['mean'] * 100:.1f}\\% and "
                   f"{ref['cov50_mean']['mean'] * 100:.2f}\\% of the primary coordinates under the nominal 90\\% and 50\\% endpoint conventions. "
                   f"Their mean widths are {ref['width90_mean']['mean']:.4f} and {ref['width50_mean']['mean']:.4f} in standardized coordinates. "
-                  "Ties in this discrete distribution can raise the coverage of inclusive intervals. Coverage expected for a continuous distribution is therefore insufficient to assess calibration here. "
+                  "Ties in this discrete distribution can raise the coverage of inclusive intervals. Therefore, coverage expected for a continuous distribution is insufficient to assess calibration here. "
                   "The interval calculations use the original random stream and reproduce all 288 original energy scores before computing coverage and width.")
     final = gradients["grids"]["29636"]
     values = final["reports"]["O-S_s7-train.json"]["schedule"]["probe_values"]
@@ -407,7 +407,7 @@ def followup_prose(learned, reference, gradients, strata):
               + "Each range spans three seeds, with one calculation on eight windows per seed. "
               + "The absolute TRAIN residual-gradient norms at $t=100$ are " + span("train", 100, "physics_gradient_norm", True)
               + ", much smaller than the " + span("train", 1, "physics_gradient_norm") + " range at $t=1$. "
-              + "Thus the large ratio at high noise accompanies a small absolute gradient. "
+              + "The large ratio at high noise accompanies a small absolute gradient. "
               + "These measurements precede clipping of the total gradient, and optimizer updates combine noise levels. The residual term's contribution to prediction quality remains unresolved.")
     cutoffs, groups = strata["cutoffs"], strata["groups"]
     ch, cr, th, tr = [groups[k] for k in ("context_high", "context_rest", "target_high", "target_rest")]
@@ -2066,7 +2066,7 @@ def test_every_followup_prose_number_is_clause_bound_in_source_and_pdf(bundle_te
     (FOLLOWUP_TITLES[0], "failing a physical inequality beyond rounding tolerance", "fail the equality by any amount"),
     (FOLLOWUP_TITLES[0], "five primary coordinates", "six generated coordinates"),
     (FOLLOWUP_TITLES[0], "Ties in this discrete distribution", "The exact conditional distribution is continuous and has no ties"),
-    (FOLLOWUP_TITLES[0], "is therefore insufficient to assess calibration here", "is therefore sufficient to assess calibration here"),
+    (FOLLOWUP_TITLES[0], "is insufficient to assess calibration here", "is sufficient to assess calibration here"),
     (FOLLOWUP_TITLES[0], "original random stream", "independent random stream for that distribution"),
     (FOLLOWUP_TITLES[1], "ratios compare loss coefficients", "ratios of gradient norms"),
     (FOLLOWUP_TITLES[1], "three seeds, with one calculation on eight windows per seed", "three seeds, with eight individual window gradients per seed"),
