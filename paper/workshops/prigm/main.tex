@@ -18,14 +18,14 @@
 \usepackage{microtype}
 \usepackage{graphicx}
 \usepackage{orcidlink}
-\hypersetup{hidelinks,pdfauthor={Kevin Lee},pdftitle={Residual Penalties Versus Algebraic Completion In Conditional Diffusion},pdfsubject={},pdfkeywords={}}
+\hypersetup{colorlinks=false,pdfborder={0 0 1},linkbordercolor={1 0 0},citebordercolor={0 1 0},urlbordercolor={0 1 1},pdfauthor={Kevin Lee},pdftitle={Residual Penalties Versus Algebraic Completion In Conditional Diffusion},pdfsubject={},pdfkeywords={}}
 
 \title{Residual Penalties Versus Algebraic Completion In Conditional Diffusion}
 \author{%
- Kevin Lee\orcidlink{0009-0004-0388-9260}$^{1,2}$ \\
+ Kevin Lee{\hypersetup{hidelinks}\orcidlink{0009-0004-0388-9260}} \\
  [4pt]
- $^1$University of California at Los Angeles \\
- $^2$NASA Jet Propulsion Laboratory \\
+ University of California at Los Angeles \\
+ NASA Jet Propulsion Laboratory \\
  [2pt]
  \texttt{kevinlee69720@g.ucla.edu}
 }
@@ -39,7 +39,7 @@ In solar wind imputation, a variance identity restricts possible combinations of
 
 \section{Introduction}
 
-Missing solar wind measurements complicate estimates of magnetic turbulence \citep{wrench2022statistics}. Changes in field direction can produce a small mean vector despite large individual magnitudes. Interpolating the mean alone leaves the magnetic fluctuations undetermined. The models infer the joint distribution of six magnetic statistics over a missing hour from measurements before and after it.\footnote{Code and numerical evidence: \nolinkurl{https://github.com/magnaprog/diffusion-consistency}}
+Missing solar wind measurements complicate estimates of magnetic turbulence \citep{wrench2022statistics}. Changes in field direction can produce a small mean vector despite large individual magnitudes. Interpolating the mean alone leaves the magnetic fluctuations undetermined. The models infer the joint distribution of six magnetic statistics over a missing hour from measurements before and after it.\footnote{Available at: \url{https://github.com/magnaprog/diffusion-consistency}}
 
 A variance identity determines one statistic from the other five, restricting their possible combinations while leaving their conditional probabilities to be learned. It holds for arbitrary vectors, including noise, and is independent of plasma dynamics. The models use conditional diffusion \citep{tashiro2021csdi} with the residual objective and estimator of Physics-Informed Diffusion Models \citep{bastek2025pidm}. Earlier work compares residual minimization with distribution matching \citep{baldan2025physics} and enforces algebraic constraints through output construction \citep{beucler2021constraints}. Comparing a residual penalty with algebraic completion and clipping tests whether satisfying the constraints improves prediction. The penalty's apparent benefit depends on which model state is selected from training.
 

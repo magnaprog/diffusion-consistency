@@ -13,6 +13,7 @@ import textwrap
 from pathlib import Path
 
 import numpy as np
+import pikepdf
 import pytest
 
 from experiments import verify_prigm_paper as gate
@@ -2268,7 +2269,7 @@ def test_companion_url_remains_private_in_anonymous_source_pdf_and_evidence(bund
 
 @pytest.mark.parametrize("camera_ready", [False, True])
 @pytest.mark.parametrize("target,valid", [
-    (COMPANION_URL, False), ("https://example.org/public", True),
+    (COMPANION_URL, True), ("https://example.org/public", True),
     ("https://github.com/magnaprog/conditional-diffusion-consistency", False),
     (COMPANION_URL + ".evil", False), (COMPANION_URL + "/private", False),
     (COMPANION_URL + "?private=1", False), (COMPANION_URL + "#private", False),
@@ -2277,9 +2278,14 @@ def test_companion_url_remains_private_in_anonymous_source_pdf_and_evidence(bund
     ("https://github.com/skykev1928/private", False), ("file:///home/private/study", False),
     (COMPANION_URL + "\n/private", False), (COMPANION_URL + "\n.evil", False),
     (COMPANION_URL + "\r/private", False), (COMPANION_URL + "\t/private", False),
+    *[(COMPANION_URL + suffix, False) for suffix in (
+        "/", ".git", "%2Fprivate", "@evil.example", " ", "\n", "\r", "\t", "\x00",
+    )],
+    ("\n" + COMPANION_URL, False),
+    (COMPANION_URL.replace("magnaprog", "MAGNAPROG"), False),
     ("https://evil.example/?next=\n   1  Annotation    " + COMPANION_URL, False),
 ])
-def test_companion_url_uri_annotations_have_no_exception(bundle, request, camera_ready, target, valid):
+def test_companion_url_uri_annotations_allow_only_exact_camera_ready_target(bundle, request, camera_ready, target, valid):
     if camera_ready:
         _, pages = request.getfixturevalue("camera_ready_bundle")
         author = gate.AUTHOR_CAMERA_READY
@@ -2289,7 +2295,32 @@ def test_companion_url_uri_annotations_have_no_exception(bundle, request, camera
     # The label contains no identity: only the real PDF URI target can reject this leak.
     pages[0].append("Companion code")
     write_pdf(bundle["root"] / "main.pdf", pages, author=author, uri=target)
-    if valid:
+    if valid and (camera_ready or target != COMPANION_URL):
+        gate.pdf_checks(bundle["root"])
+    else:
+        with pytest.raises(ERRORS, match="author-identifying|private"):
+            gate.pdf_checks(bundle["root"])
+
+
+@pytest.mark.parametrize("extra_uri", [
+    None, COMPANION_URL + ".evil", COMPANION_URL + "\n/private", "file:///home/private/study",
+])
+def test_companion_url_structured_uri_objects_check_every_link(bundle, camera_ready_bundle, extra_uri):
+    _, pages = camera_ready_bundle
+    path = bundle["root"] / "main.pdf"
+    write_pdf(path, pages, author=gate.AUTHOR_CAMERA_READY, uri=COMPANION_URL)
+    with pikepdf.open(path, allow_overwriting_input=True) as document:
+        annotation = document.pages[0].Annots[0]
+        annotation.A = document.make_indirect(annotation.A)
+        if extra_uri is not None:
+            # A second page's target must still be checked beside the allowed URI.
+            document.pages[1].Annots = pikepdf.Array([pikepdf.Dictionary(
+                Type=pikepdf.Name.Annot, Subtype=pikepdf.Name.Link,
+                Rect=pikepdf.Array([30, 900, 850, 920]),
+                A=pikepdf.Dictionary(S=pikepdf.Name.URI, URI=pikepdf.String(extra_uri)),
+            )])
+        document.save(object_stream_mode=pikepdf.ObjectStreamMode.generate)
+    if extra_uri is None:
         gate.pdf_checks(bundle["root"])
     else:
         with pytest.raises(ERRORS, match="author-identifying|private"):
@@ -2298,9 +2329,79 @@ def test_companion_url_uri_annotations_have_no_exception(bundle, request, camera
 
 def test_companion_url_does_not_exempt_pdf_metadata(bundle, camera_ready_bundle):
     _, pages = camera_ready_bundle
-    write_pdf(bundle["root"] / "main.pdf", pages, author=gate.AUTHOR_CAMERA_READY, subject=COMPANION_URL)
+    write_pdf(bundle["root"] / "main.pdf", pages, author=gate.AUTHOR_CAMERA_READY,
+              subject=COMPANION_URL, uri=COMPANION_URL)
     with pytest.raises(ERRORS, match="author-identifying"):
         gate.pdf_checks(bundle["root"])
+
+
+@pytest.mark.parametrize("camera_ready", [False, True])
+@pytest.mark.parametrize("base,target,valid", [
+    (None, "README.html", True), ("", "README.html", True),
+    ("https://example.org/public/", "README.html", True),
+    ("https://example.org/public/", COMPANION_URL, True),
+    ("https://github.com/magnaprog/private/", "README.html", False),
+    ("file:///home/private/study/", "README.html", False),
+    (COMPANION_URL, "README.html", False),
+    (COMPANION_URL, None, False),
+    ("https://github.com/magnaprog/private/", COMPANION_URL, False),
+    ("file:///home/private/study/", None, False),
+    (COMPANION_URL + "\n/private", "README.html", False),
+    ("https://example.org/public/", COMPANION_URL + "\n", False),
+    ("file:///", "home/private", False),
+    ("file:///", "Users/private", False),
+    ("file:///", "tmp/private", False),
+    ("file:///", "public/README.html", True),
+    ("file:///", "ho\nme/private", False),
+    ("https://example.org/public/", COMPANION_URL.replace("magnaprog", "mag\nnaprog"), False),
+])
+def test_pdf_uri_base_has_no_companion_exception(bundle, request, camera_ready, base, target, valid):
+    if camera_ready:
+        _, pages = request.getfixturevalue("camera_ready_bundle")
+        author = gate.AUTHOR_CAMERA_READY
+    else:
+        pages, author = copy.deepcopy(bundle["pages"]), ""
+    path = bundle["root"] / "main.pdf"
+    write_pdf(path, pages, author=author, uri=target)
+    with pikepdf.open(path, allow_overwriting_input=True) as document:
+        document.Root.URI = pikepdf.Dictionary()
+        if base is not None:
+            document.Root.URI.Base = pikepdf.String(base)
+        document.save()
+    if valid and (camera_ready or target != COMPANION_URL):
+        gate.pdf_checks(bundle["root"])
+    else:
+        with pytest.raises(ERRORS, match="author-identifying|private"):
+            gate.pdf_checks(bundle["root"])
+
+
+@pytest.mark.parametrize("field,value", [
+    ("URI", "https://example.org/"), ("URI", 42), ("URI", pikepdf.Array()),
+    ("Base", 42), ("Base", pikepdf.Name.Invalid),
+    ("Base", pikepdf.Array()), ("Base", pikepdf.Dictionary()),
+])
+def test_pdf_uri_base_rejects_malformed_values(bundle, field, value):
+    path = bundle["root"] / "main.pdf"
+    with pikepdf.open(path, allow_overwriting_input=True) as document:
+        document.Root.URI = value if field == "URI" else pikepdf.Dictionary(Base=value)
+        document.save()
+    with pytest.raises(ERRORS, match="PDF catalog URI must be a dictionary|PDF URI base must be a string"):
+        gate.pdf_checks(bundle["root"])
+
+
+@pytest.mark.parametrize("email,valid", [(gate.EMAIL_CAMERA_READY, True), ("other@example.org", False)])
+def test_pdf_uri_base_checks_camera_ready_email(bundle, camera_ready_bundle, email, valid):
+    _, pages = camera_ready_bundle
+    path = bundle["root"] / "main.pdf"
+    write_pdf(path, pages, author=gate.AUTHOR_CAMERA_READY, uri=COMPANION_URL)
+    with pikepdf.open(path, allow_overwriting_input=True) as document:
+        document.Root.URI = pikepdf.Dictionary(Base=pikepdf.String("mailto:" + email))
+        document.save()
+    if valid:
+        gate.pdf_checks(bundle["root"])
+    else:
+        with pytest.raises(ERRORS, match="undeclared email"):
+            gate.pdf_checks(bundle["root"])
 
 
 @pytest.mark.parametrize("scope", ["source", "PDF"])

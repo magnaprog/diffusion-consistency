@@ -36,7 +36,16 @@ from PyTorch's installation instructions. The legacy shell wrapper is excluded
 from the public export because it defaults to a private environment location.
 Invoke the Python coordinators directly in your chosen environment.
 
-PDF verification needs Poppler's `pdftotext` and `pdfinfo`. Manuscript builds
+PDF verification needs Poppler's `pdftotext` and `pdfinfo`, plus `pikepdf`
+(included in both installation paths above) to read complete PDF annotation URI
+strings. In camera-ready mode, only the exact public companion URI
+`https://github.com/magnaprog/diffusion-consistency` is exempt from the
+author-identity restriction on links; suffixes, queries and embedded newlines
+receive no exception. Anonymous manuscripts, PDF metadata and private paths
+retain their restrictions. The catalog URI base is checked as metadata without
+this exception, including when no relative links use it. Both raw annotation
+URIs and targets resolved against the base are checked; resolution cannot grant
+the exception to an annotation whose raw URI differs. Manuscript builds
 need pdfLaTeX, BibTeX, and the LaTeX packages loaded by
 [main.tex](../paper/workshops/prigm/main.tex), including `orcidlink`. Install
 CM-Super with its T1 font mapping to avoid bitmap typewriter fonts. The arXiv

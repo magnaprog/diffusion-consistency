@@ -19,6 +19,7 @@ import subprocess
 import sys
 from zipfile import BadZipFile
 from pathlib import Path
+from urllib.parse import urljoin
 
 # Including trusted validators must not create bytecode in a supplied bundle.
 sys.dont_write_bytecode = True
@@ -26,6 +27,7 @@ REPO = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(REPO))
 
 import numpy as np
+import pikepdf
 
 from analysis import export_prigm_paper_evidence as exporter
 from analysis import prigm_followup_summary as diagnostics
@@ -99,7 +101,7 @@ class Report:
         try:
             value = function()
         except (ContractMismatch, PublicationError, OSError, ValueError, KeyError, TypeError, AttributeError, IndexError,
-                ArithmeticError, BadZipFile, subprocess.SubprocessError) as exc:
+                ArithmeticError, BadZipFile, pikepdf.PdfError, subprocess.SubprocessError) as exc:
             self.add(name, False, str(exc))
             return None
         self.add(name, True)
@@ -2476,7 +2478,28 @@ def pdf_checks(paper_dir):
         return subprocess.run(command, capture_output=True, text=True, check=True, timeout=30).stdout
     rendered = run(["pdftotext", "-layout", str(pdf), "-"])
     info = run(["pdfinfo", str(pdf)])
-    links = run(["pdfinfo", "-url", str(pdf)])
+    # Read complete PDF strings: pdfinfo -url prints embedded newlines as rows.
+    uris = []
+    uri_base = ""
+    with pikepdf.open(pdf) as document:
+        if "/URI" in document.Root:
+            settings = document.Root["/URI"]
+            require(isinstance(settings, pikepdf.Dictionary), "PDF catalog URI must be a dictionary")
+            if "/Base" in settings:
+                base = settings["/Base"]
+                require(isinstance(base, pikepdf.String), "PDF URI base must be a string")
+                uri_base = str(base)
+        for page in document.pages:
+            for annotation in page.get("/Annots", []):
+                action = annotation.get("/A", {})
+                if action.get("/S") == "/URI":
+                    uri = action.get("/URI")
+                    require(isinstance(uri, pikepdf.String), "PDF URI target must be a string")
+                    uris.append(str(uri))
+    effective_uris = [urljoin(uri_base, uri) for uri in uris]
+    links = "\n".join((*uris, *effective_uris))
+    # Relative links inherit this base; even an unused base has no identity exception.
+    metadata = info + "\n" + uri_base + "\n"
     tex = strip_comments(local(paper_dir, "main.tex").read_text())
     mode = manuscript_mode(tex)
     notice = mode_notice(mode)
@@ -2486,11 +2509,12 @@ def pdf_checks(paper_dir):
     if mode == "camera_ready":
         # PDF text must contain the complete literal URL. Metadata stays unexempted.
         identity_text = re.sub(r"(?<!\S)" + re.escape(PUBLIC_COMPANION_URL) + r"(?!\S)", "", rendered)
-    # URI output has no exception: even the exact clickable companion is refused.
-    # pdfinfo prints embedded URI newlines verbatim, so rows cannot prove exact targets.
-    require(not any(s.lower() in (identity_text + info + links).lower() for s in forbidden),
+    identity_links = "\n".join(
+        target for uri, effective in zip(uris, effective_uris) for target in (uri, effective)
+        if not (mode == "camera_ready" and uri == PUBLIC_COMPANION_URL and target == PUBLIC_COMPANION_URL))
+    require(not any(s.lower() in (identity_text + metadata + identity_links).lower() for s in forbidden),
             "author-identifying PDF text/metadata/link")
-    require(not re.search(r"/(?:home|Users|tmp)/|[A-Za-z]:\\Users\\", rendered + info + links), "private PDF path")
+    require(not re.search(r"/(?:home|Users|tmp)/|[A-Za-z]:\\Users\\", rendered + metadata + links), "private PDF path")
     author = re.search(r"^Author:[ \t]*(.*)$", info, re.M)
     if mode == "anonymous":
         require(author is None or author[1].strip() in ("", "Anonymous"), "nonanonymous PDF author metadata")
@@ -2499,7 +2523,7 @@ def pdf_checks(paper_dir):
                 "camera-ready PDF author metadata must be Kevin Lee")
         require(AUTHOR_CAMERA_READY in rendered and EMAIL_CAMERA_READY in rendered,
                 "camera-ready PDF missing author or correspondence email")
-        require({email.casefold() for email in EMAIL_ADDRESS.findall(rendered + info + links)} == {EMAIL_CAMERA_READY},
+        require({email.casefold() for email in EMAIL_ADDRESS.findall(rendered + metadata + links)} == {EMAIL_CAMERA_READY},
                 "camera-ready PDF contains an undeclared email")
         require(all(marker in rendered for marker in AFFILIATION_MARKERS),
                 "camera-ready PDF missing affiliations")
