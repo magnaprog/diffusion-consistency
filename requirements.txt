@@ -1,4 +1,5 @@
 # Runtime and evidence verification. Test runner: python -m pip install pytest
 numpy
 matplotlib
+pikepdf
 torch>=2.0.0
