@@ -1,5 +1,5 @@
 {
-  "base_commit": "d61e5a248a3d4a89538c9e95ca288c9c312b2441",
+  "base_commit": "c6847a7344e2b0f40dbc4d213e392de11743038e",
   "excluded": [
     "Git history",
     "private handoffs and execution receipts",
@@ -24,8 +24,8 @@
       "sha256": "f6ca35eed9a14abeed6f8e18204a08086214b76254604449b2533f700aba4196"
     },
     "README.md": {
-      "bytes": 2152,
-      "sha256": "f41f63527bab9e6ff0730ddea0b5bfedf1f86dfe85a66079b7ef762e193e064d"
+      "bytes": 2154,
+      "sha256": "f295a1bf9cf76f1db3c1533370953a56138b59e713020a315ffd9ca957f96c0f"
     },
     "analysis/__init__.py": {
       "bytes": 0,
@@ -68,8 +68,8 @@
       "sha256": "06106e59d81c340fd582815346d208054200ee70bc15228c44d623ce7f9595b9"
     },
     "docs/prigm_release.md": {
-      "bytes": 14764,
-      "sha256": "1e7c7805a778309571efb9e2580de4c52fd43bad3dceb75740263fe47e06adc5"
+      "bytes": 14762,
+      "sha256": "f718dbdb6bcccc336c35264f3c48bc6c25cc3fa1997f32b91844f16dba87c15b"
     },
     "environment.yml": {
       "bytes": 128,
@@ -84,8 +84,8 @@
       "sha256": "746de9e2eca9adc92c24a9fc8337f59f3e537dd5c9c61d09dd9af88bb0094ecb"
     },
     "experiments/_prigm_camera_ready.py": {
-      "bytes": 23077,
-      "sha256": "4918d594fe40dc87c4e083c98f0b0f5b18f5c3e27ef0361e0e773f2701027d80"
+      "bytes": 23107,
+      "sha256": "87e46935c77883007a2f4ad14dd0348ca630eac9da118ab6ff563eafd2184304"
     },
     "experiments/_prigm_checkpoint_evidence.py": {
       "bytes": 27138,
@@ -112,8 +112,8 @@
       "sha256": "9fcb2a7064d057af0ced88c4b329d9c677033e71f9b2d59a77a6179c863029fe"
     },
     "experiments/verify_prigm_paper.py": {
-      "bytes": 190101,
-      "sha256": "fc7d655b353061a1a9068356065ee015871d8a0db2b49704860748919f0a67e9"
+      "bytes": 190268,
+      "sha256": "6cc01932c72a181037b79d3830fe9a4f4a1d3707b8eb5544956e93dbe77deaf5"
     },
     "paper/workshops/prigm/evidence/data/MANIFEST.json": {
       "bytes": 1548,
@@ -424,12 +424,12 @@
       "sha256": "89d9b9b1cca7a29add91c242ca0e0bcb447094ffb87eedb8c8b5041898ae2739"
     },
     "paper/workshops/prigm/main.pdf": {
-      "bytes": 524245,
-      "sha256": "d72398b000cbaca94d46c0fb11f30b7add7ee3b957c05084051adf39cbf1043f"
+      "bytes": 524428,
+      "sha256": "12b6f2dae0b4b40a823ea79e9485f65de2a23c7aa58ce5aeea555b97b6bbe123"
     },
     "paper/workshops/prigm/main.tex": {
-      "bytes": 93520,
-      "sha256": "d75a09becdf3062c838a174d3b91760a8f2f001af365bd534413f6d2829ae1c4"
+      "bytes": 93813,
+      "sha256": "6d775442bf5b600a3d4819b0ddde48881c72631a772caf8956df525520f618e5"
     },
     "paper/workshops/prigm/neurips_2025.sty": {
       "bytes": 13023,
@@ -852,8 +852,8 @@
       "sha256": "7037d234c601423f77c2fd2366f87edd72e82d8742efddb70e80100484bc47e7"
     },
     "scripts/export_prigm_release.py": {
-      "bytes": 13535,
-      "sha256": "dcc995a92111ee5ab158f894a1071c59788119b6d634a3a3c51dcb2a1f51b524"
+      "bytes": 13537,
+      "sha256": "1798eb0ef9dc7cc165a5cb5c0941af2ad2b2d1e1f0765b047bb15942f8c8c087"
     },
     "scripts/package_prigm_arxiv.py": {
       "bytes": 10649,
@@ -896,12 +896,12 @@
       "sha256": "bd9d6e3c4c4caebee0393df28aa9387aa3693742bd57e4bed9a33c52ca1c6712"
     },
     "tests/test_prigm_camera_ready.py": {
-      "bytes": 20296,
-      "sha256": "22f961255c35014a0cf7cd2502ceca307014d02f8a36d7c3944854c1e5deca79"
+      "bytes": 20311,
+      "sha256": "7e49bd326e6d33d53faf978c10e07de006d0f8af8b0c0d6ac5da82809bf8629c"
     },
     "tests/test_prigm_checkpoint_evidence.py": {
-      "bytes": 21005,
-      "sha256": "beea3268cf0cf498cf88dc06cadfab4394a8c19633ed6c83132ce13904b11b8b"
+      "bytes": 21010,
+      "sha256": "3d3d3d5137d5447ed985ea5812a6214ab5c1ab76d7d9eabc18f7a2f65f08c198"
     },
     "tests/test_prigm_checkpoint_followup.py": {
       "bytes": 24217,
@@ -928,8 +928,8 @@
       "sha256": "d5031f6ba34466915b28616c464abd45a24960ef0bc75f87c53697fd84620b69"
     },
     "tests/test_prigm_deadline_paper.py": {
-      "bytes": 50564,
-      "sha256": "47fa045b6908cbafa3cd8d0ccaccb76bfe9b5ca6ca472a24ac26654be8ce5af0"
+      "bytes": 52902,
+      "sha256": "7b7b7f378a049934860b6c59f3e98e479b517b9346c1044b2308e5d20f01ac09"
     },
     "tests/test_prigm_documentation_source.py": {
       "bytes": 4136,
@@ -964,8 +964,8 @@
       "sha256": "7d0a0de9c886cbbcc7d2741d5a03e81f2db39a53406147ca52e8a442347da0e3"
     },
     "tests/test_prigm_illustration_publication.py": {
-      "bytes": 9210,
-      "sha256": "5d168127f7341c562830871614bfdc89de557c6a17b0f09216696217e029aac8"
+      "bytes": 9166,
+      "sha256": "b184e68961e2c8c866ba8686538749b9613a785058400d4c2440de55a6bb88e9"
     },
     "tests/test_prigm_imputation_figure.py": {
       "bytes": 23241,
@@ -996,8 +996,8 @@
       "sha256": "189e637446d3f302cb5ebe0a2d70d27f3b54cba1031977732d0b89b914e03e9c"
     },
     "tests/test_prigm_paper.py": {
-      "bytes": 147331,
-      "sha256": "93c1b664e1a88d238ba981891b746dcd0127d10ce5b5b2d1013843d5ddc0c096"
+      "bytes": 147716,
+      "sha256": "f7469c76787479cbf118c544476d584fe879279cab78832c1ffc264f0148759f"
     },
     "tests/test_prigm_paper_evidence.py": {
       "bytes": 49129,

@@ -1376,7 +1376,7 @@ def toy_claims(tex, rendered, evidence):
         (r"For \d+ replicate contexts", "For 36 replicate contexts at $t=100$, two denoiser evaluations give mean absolute $R_{\\mathrm{obs}}="
          + residual + f"$ in HMM units and energy score {context['mean_es_vs_ref']:.3f}, compared with "
          + f"{context['mean_reference_self_energy_mc']:.3f} for independent draws from the exact conditional distribution."),
-        ("On a separate set", "On a separate set of 288 HMM windows, two denoiser evaluations again score worse than exact conditional draws; DDIM with 25, 50, and 100 evaluations gives scores much closer to that reference"),
+        ("On a separate set", "On a separate set of 288 HMM windows, scores from two denoiser evaluations are again worse than those from exact conditional draws. On these windows, DDIM with 25, 50, and 100 evaluations gives scores much closer to that reference"),
         ("These Monte Carlo comparisons", "These Monte Carlo comparisons have finite sampling error."),
     )
     for anchor, expected in clauses:
@@ -1819,7 +1819,7 @@ def deadline_claims(tex, rendered, real, evidence):
     for anchor, expected_clause in (
         ("Each percentile is calculated", "Each percentile is calculated from the draws and hidden bins of one window, then averaged over months and seeds. This differs from a percentile of all samples pooled together."),
         ("Minimum displacement", "Minimum displacement is not established for this map."),
-        ("Relative to Gaussian interpolation, regression", "Relative to Gaussian interpolation, regression changes the conditional mean fit and the finite noise realization as well as using more available measurements. Its score difference cannot isolate the benefit of the additional context alone."),
+        ("Compared with Gaussian interpolation, regression", "Compared with Gaussian interpolation, regression uses more available measurements and changes both the conditional mean fit and the finite noise realization. Its score difference cannot isolate the benefit of the additional context alone."),
         ("They hold the three diffusion fits", "They hold the three diffusion fits and one Gaussian ensemble fixed and exclude variation from new fits, seed resampling and the validation choice. The later comparison uses a TEST period examined earlier."),
     ):
         bind(anchor, expected_clause)
@@ -1828,15 +1828,15 @@ def deadline_claims(tex, rendered, real, evidence):
             and plotted["gaussian"]["negative_delta_dispersion"] > -plotted["gaussian"]["delta_target"] > 0,
             "clipping displacement and spread directions changed")
     bind("Clipping moves G5 draws", "Clipping moves G5 draws in the standardized primary coordinates with little change in energy score")
-    bind("For Gaussian interpolation, both", "For Gaussian interpolation, both the mean distance to withheld values and half the mean distance between draws decrease. The larger decrease in the subtracted term makes the energy score worse.")
+    bind("For Gaussian interpolation, both", "For Gaussian interpolation, both the mean distance to withheld values and half the mean distance between draws decrease. The energy score worsens because the subtracted term decreases more.")
     # Tables retain the numerical results omitted from the conceptual abstract.
     difference = real[0]["arm_means"]["D_raw"] - real[0]["arm_means"]["O-S_raw"]
     require(difference > 0, "selected penalty improvement direction changed")
-    bind("Experiments with conditional diffusion", "Experiments with conditional diffusion compare a residual penalty, algebraic completion and clipping using the energy score to assess predictive distributions.")
-    bind("The penalty gives", "The penalty gives little mean improvement over diffusion alone when validation selects the model, although it improves the score at the end of each training run.")
+    bind("Conditional diffusion experiments compare", "Conditional diffusion experiments compare a residual penalty, algebraic completion and clipping using the energy score.")
+    bind("The penalty gives", "The penalty gives little mean improvement over diffusion alone when validation chooses the checkpoint, although it improves the score at the end of each training run.")
     require(real[1]['methods']['G5_raw']['metrics']['cov90_mean']['month_balanced'] < .9,
             "G5 coverage no longer falls below nominal")
-    bind("A model that", "A model that derives one statistic from the others has the lowest mean score on the directly generated quantities. Its representation and training loss both change, and its intervals fall short of nominal coverage.")
+    bind("The model with algebraic completion", "The model with algebraic completion has the lowest mean score on the directly generated quantities. Its representation and training loss also change, and its intervals fall short of nominal coverage.")
     g5, boundary = (operator["methods"][name]["metrics"] for name in ("G5", "gaussian"))
     data_only = operator["methods"]["D"]["metrics"]
     target_reduction = data_only["raw_target_term"]["month_balanced"] - g5["raw_target_term"]["month_balanced"]
@@ -1863,8 +1863,8 @@ def deadline_claims(tex, rendered, real, evidence):
     selection = gaussian["selection"]["selected"]
     require(all(selection[k]["lambda"] == .1 and selection[k]["rho"] == 0 for k in ("raw", "corrected")),
             "published Gaussian selection differs")
-    bind("Both procedures select", "Both procedures select $\\lambda=0.1$ and $\\rho=0$, with VAL scores "
-         f"{selection['raw']['month_balanced_primary_es']:.5f} and {selection['corrected']['month_balanced_primary_es']:.5f}.")
+    bind("Both validation procedures select", "Both validation procedures select $\\lambda=0.1$ and $\\rho=0$, with raw and clipped VAL scores of "
+         f"{selection['raw']['month_balanced_primary_es']:.5f} and {selection['corrected']['month_balanced_primary_es']:.5f}, respectively.")
     for arm in ("G5", "O-S"):
         pair = gaussian["comparisons"][arm]
         if arm == "G5":
@@ -1903,10 +1903,11 @@ def deadline_claims(tex, rendered, real, evidence):
     table_labels = re.findall(r"\\label\{(tab:[^}]+)\}", strip_comments(tex))
     require(table_labels.count("tab:calibration") == 1, "coverage comparison requires calibration table")
     number = table_labels.index("tab:calibration") + 1
+    # Locate every copy regardless of table number; the full clause checks its value.
     bind_clause((tex.replace(r"\ref{tab:calibration}", str(number)), rendered),
-                clause_pattern("o-s's coverage"),
-                f"O-S's coverage falls farther below the nominal 90\\% than D's in Table~{number}. "
-                f"The difference is {difference:.1f} percentage points, beyond the prespecified threshold of two percentage points.")
+                clause_pattern("in table") + r"\s+\d+\s*,\s*" + clause_pattern("o-s's shortfall"),
+                f"In Table~{number}, O-S's shortfall from nominal 90\\% coverage is {difference:.1f} percentage points larger than D's, "
+                "exceeding the prespecified threshold of two percentage points.")
     fixed = evidence["fixed_final"]
     if fixed is not None:
         expected = {}
@@ -1926,7 +1927,7 @@ def deadline_claims(tex, rendered, real, evidence):
         bind("At the final training step", "At the final training step, O-S with the original coefficient has a lower raw energy score than D for all three seeds and on average.")
         bind("Further fits would be needed", "Further fits would be needed to establish whether this pattern persists beyond the current exploratory comparison.")
         bind("The final step was", "The final step was specified in advance. All twelve fits enter this exploratory comparison, without choosing a checkpoint or coefficient from their scores.")
-        bind("Residual estimation uses extra", "Residual estimation uses extra denoiser evaluations, so equal update counts involve different amounts of computation.")
+        bind("Residual estimation requires extra", "Residual estimation requires extra denoiser evaluations, so computational cost differs even at equal update counts.")
         bind("Equal step counts", "Equal step counts can involve different amounts of computation, and score differences may reflect convergence or overfitting.")
         residuals = [float(np.mean([row["results"]["raw"]["summary"]["r_obs_mean"]["month_balanced"]
                                    for row in fixed["rows"] if row["id"].startswith("c" + coefficient + "_s")]))
@@ -1934,7 +1935,7 @@ def deadline_claims(tex, rendered, real, evidence):
         energies = [float(np.mean(means[coefficient]["raw"])) for coefficient in FIXED_COEFFICIENTS]
         require(np.all(np.diff(residuals) < 0) and np.all(np.diff(energies[:3]) < 0)
                 and energies[-1] > energies[-2] and np.argmin(energies) == 2, "fixed-final mean trends changed")
-        bind("the mean residual decreases", "the mean residual decreases as the penalty grows, while the mean energy score first improves and then worsens")
+        bind("increasing the penalty reduces", "increasing the penalty reduces the mean residual, while the mean energy score first falls and then rises")
         bind("The strongest penalty gives", "The strongest penalty gives the smallest residual, while the original coefficient gives the best mean score.")
         signs = np.asarray(means["0.005"]["raw"]) - means["0"]["raw"]
         require(np.all(signs[:2] > 0) and signs[2] < 0, "largest-coefficient seed directions changed")
@@ -2033,7 +2034,7 @@ def residual_weight_claims(paper_dir, tex, rendered):
         return " to ".join(f"{v:.{precision}f}" for v in (min(values), max(values)))
 
     ratio = "physics_to_data_norm_ratio"
-    bind_clause(scopes, "At the final O-S checkpoints", "At the final O-S checkpoints, the norm of the residual gradient divided by the norm of the data gradient ranges from "
+    bind_clause(scopes, "At the final O-S checkpoints", "At the final O-S checkpoints, the ratio of the residual gradient norm to the data gradient norm ranges from "
                 + bounds("TRAIN", 100, ratio) + " on TRAIN and " + bounds("VAL", 100, ratio)
                 + " on VAL at $t=100$.")
     bind_clause(scopes, clause_pattern(prose_text("At $t=25$", source=True)), "At $t=25$, the ranges are " + bounds("TRAIN", 25, ratio)
@@ -2076,7 +2077,7 @@ def cancellation_claims(tex, rendered, record):
         ("Although the rules were specified", "Although the rules were specified earlier, they were implemented after inspection of the primary results, so the analysis remains exploratory."),
         ("TRAIN quartile thresholds", "TRAIN quartile thresholds are (" + ",".join(f"{v:.6f}" for v in cutoffs["context_energy"]["values"])
          + ") for the available intervals and (" + ",".join(f"{v:.6f}" for v in cutoffs["target_energy"]["values"]) + ") for the missing interval."),
-        ("A tie enters", "A tie enters the higher energy group, whereas a tie at the cancellation threshold enters the rest group."),
+        ("Values tied at an energy threshold", "Values tied at an energy threshold enter the higher energy group; values tied at the cancellation threshold enter the rest group."),
         ("The analysis covers all", f"The analysis covers all {len(groups)} groups: the full test set, high cancellation and the rest, and combinations of cancellation with energy conditions. Group membership and scores for all {len(record['methods'])} procedures are recorded."),
         ("Each score gives equal weight", "Each score gives equal weight to the months present, then averages the three diffusion seeds."),
     ):
@@ -2106,7 +2107,7 @@ def cancellation_claims(tex, rendered, record):
     for anchor, expected in (
         ("These results do not establish", "These results do not establish an O-S advantage over both methods that learn from data alone."),
         ("Grouping by the available context", "Grouping by the available context avoids selection on the hidden outcome, but it does not isolate cancellation from other correlated conditions."),
-        ("Although TRAIN supplies the thresholds", "Although TRAIN supplies the thresholds, the withheld outcome determines which TEST windows enter each group, so the comparison still depends on outcome selection."),
+        ("TRAIN supplies the thresholds", "TRAIN supplies the thresholds, but the withheld outcome determines which TEST windows enter each group. The comparison still depends on outcome selection."),
         ("The group combining high cancellation", "The group combining high cancellation in the missing hour with the lowest energy quartile contains only "
          f"{count(sparse['n_windows'])} windows from {count(sparse['n_years'])} years."),
         ("Such comparisons describe", "Such comparisons describe losses on selected TEST cases. A claim of conditional predictive superiority would need an evaluation that accounts for the rule assigning cases to each group."),
@@ -2323,7 +2324,7 @@ def illustration_claims(tex, rendered):
     # A sentence-start prefix distinguishes this interval definition from
     # the learned-toy and undercoverage mentions without anchoring on its claim.
     bind_clause((tex, rendered), r"(?:(?<=\.\s)|^)" + clause_pattern("the nominal"),
-                "The nominal 90\\% interval includes the endpoints given by the second and thirty-eighth values in increasing order.")
+                "The nominal 90\\% interval runs from the second to the thirty-eighth values in increasing order, including both endpoints.")
     clauses = (
         ('D, O-S and G5 share a linear scale', 'D, O-S and G5 share a linear scale within each row;'),
         ('Gaussian regression uses a separate', 'Gaussian regression uses a separate linear scale on the right.'),
@@ -2331,30 +2332,30 @@ def illustration_claims(tex, rendered):
         ('The axis limits include', 'The axis limits include all measurements, medians and interval ends in each subplot.'),
         ('The horizontal gray line', 'The horizontal gray line marks zero;'),
         ('predictions below it', 'predictions below it violate the nonnegativity of variance.'),
-        ('In both examples, diffusion', 'In both examples, diffusion medians generally exceed the withheld variance and the nominal intervals often miss it.'),
+        ('In both examples, diffusion', 'In both examples, diffusion medians generally exceed the withheld variance, which often lies outside the nominal intervals.'),
         ('In TEST window 120, each diffusion method', 'In TEST window 120, each diffusion method covers $v_s$ in zero of the twelve hidden bins.'),
         ('In window 360, D, O-S', 'In window 360, D, O-S and G5 cover zero, one and two bins, respectively.'),
         ('Gaussian regression covers all', 'Gaussian regression covers all twelve bins in both windows with much wider intervals.'),
         ('It uses the same residual covariance', 'It uses the same residual covariance for every context, and its distribution assigns probability to negative $v_s$, which is physically impossible.'),
         ('Gaussian regression covers all twelve bins in both windows with much wider intervals', 'Gaussian regression covers all twelve bins in both windows with much wider intervals. It uses the same residual covariance for every context, and its distribution assigns probability to negative $v_s$, which is physically impossible.'),
         ('The aggregate results also', 'The aggregate results also show that diffusion intervals cover the variance less often than nominal.'),
-        ('How often the particular errors', 'How often the particular errors in these examples occur across TEST, and how they arise during training, remain uncertain.'),
+        ('It remains uncertain how often', 'It remains uncertain how often the errors seen here occur across TEST or how they arise during training.'),
         ('Windows 120 and 360', 'Windows 120 and 360, counting from zero, are the midpoints of the two halves of the ordered list of 480 windows.'),
         ('The windows were chosen by position', 'The windows were chosen by position, independently of model error, after TEST had already been examined.'),
         ('Diffusion uses seed 7, the first', 'Diffusion uses seed 7, the first declared seed, with model weights chosen from raw validation samples: training step 9560 for D and 29636 for O-S and G5.'),
         ('Gaussian regression uses the fit', 'Gaussian regression uses the fit chosen by validation and the noise realization from seed 13.'),
-        ('How representative these two missing hours', 'How representative these two missing hours are across TEST remains uncertain.'),
+        ('It remains uncertain how well', 'It remains uncertain how well these two missing hours represent TEST.'),
         ('At each time and coordinate', 'At each time and coordinate, the colored curve is the marginal median of the 39 samples.'),
         ('The curves and intervals', 'The curves and intervals describe each coordinate at each time separately; simultaneous coverage of a trajectory requires separate assessment.'),
         ('Connecting the medians', 'Connecting the medians can produce an irregular curve that differs from every sampled trajectory.'),
         ('Thin lines show three sampled', 'Thin lines show three sampled trajectories, ensemble members 0, 1 and 2.'),
         ('Predictions are shown', 'Predictions are shown before clipping.'),
         ('The symmetric logarithmic scale', 'The symmetric logarithmic scale for $v_s$ displays small measured variances and Gaussian predictions outside the physical range.'),
-        ('The task reconstructs statistics', 'The task reconstructs statistics over five minutes; different sequences of minute averages can produce the same statistics.'),
+        ('The task reconstructs statistics', 'The task reconstructs statistics over five minutes, which can arise from different sequences of minute averages.'),
         ('Lines connect', 'Lines connect the four coefficient settings for each seed; solid black diamonds mark the mean across three seeds.'),
         ('The settings', 'The settings are equally spaced on the horizontal axis.'),
         ('Each model value gives', 'Each model value gives equal weight to the months present.'),
-        ('the mean residual decreases as the penalty grows, while', 'the mean residual decreases as the penalty grows, while the mean energy score first improves and then worsens.'),
+        ('increasing the penalty reduces the mean residual, while', 'increasing the penalty reduces the mean residual, while the mean energy score first falls and then rises.'),
         ('Reconstruction of TEST window 120', 'Reconstruction of TEST window 120 by D, O-S, G5 and Gaussian regression (columns), with model weights chosen by validation.'),
         ('The $v_s$ axis is linear', 'The $v_s$ axis is linear within $0.05$ nT$^2$ of zero and logarithmic outside, so equal vertical distances can represent different absolute errors in that row.'),
         ('Reconstruction of TEST window 360', 'Reconstruction of TEST window 360, using the same methods, seed choices, units and plotting conventions'),

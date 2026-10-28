@@ -127,11 +127,46 @@ def test_current_deadline_tables_and_prose_match_source_and_pdf(public_claims):
 def test_false_score_role_cannot_hide_before_valid_duplicate(public_claims, scope):
     tex, rendered, real, evidence = public_claims
     source = tex if scope == "source" else rendered
-    valid = "Experiments with conditional diffusion"
-    match = re.search(r"\s+".join(re.escape(word) for word in valid.split()), source)
-    assert match is not None
-    changed = source[:match.start()] + "Experiments with conditional diffusion use the energy score to assess mean predictions. " + source[match.start():]
+    valid = "Conditional diffusion experiments compare"
+    pattern = gate.clause_pattern(gate.prose_text(valid, source=True))
+    assert len(re.findall(pattern, gate.prose_text(source, source=scope == "source"))) == 1
+    changed = "Conditional diffusion experiments compare mean predictions using the energy score. " + source
     with pytest.raises((ValueError, ContractMismatch)):
+        gate.deadline_claims(changed if scope == "source" else tex,
+                             changed if scope == "PDF" else rendered, real, evidence)
+
+
+@pytest.mark.parametrize("scope", ["source", "PDF"])
+@pytest.mark.parametrize("alter_difference", [False, True])
+@pytest.mark.parametrize("valid_duplicate", [False, True])
+def test_wrong_coverage_reference_is_rejected(public_claims, scope, alter_difference, valid_duplicate):
+    tex, rendered, real, evidence = public_claims
+    # Explicit positive before changing the reference or coverage difference.
+    gate.deadline_claims(tex, rendered, real, evidence)
+    if scope == "source":
+        pattern = r"In Table~\\ref\{tab:calibration\}, O-S's shortfall[\s\S]*?two percentage points\."
+        original = tex
+    else:
+        pattern = r"In\s+Table\s+\d+,\s+O-S['’]s\s+shortfall[\s\S]*?two\s+percentage\s+points\."
+        original = rendered
+    matches = list(re.finditer(pattern, original))
+    assert len(matches) == 1
+    match = matches[0]
+    clause = match.group()
+    if scope == "source":
+        wrong = clause.replace(r"\ref{tab:calibration}", "999", 1)
+    else:
+        wrong, count = re.subn(r"(In\s+Table\s+)\d+", r"\g<1>999", clause, count=1)
+        assert count == 1
+    assert wrong != clause
+    if alter_difference:
+        wrong, count = re.subn(r"\d+\.\d+(?=\s+percentage\s+points\s+larger)", "99.9", wrong, count=1)
+        assert count == 1
+    changed = original[:match.start()] + wrong + original[match.end():]
+    if valid_duplicate:
+        changed += "\n" + clause
+    error = "missing or duplicate clause" if valid_duplicate else "clause differs"
+    with pytest.raises(ValueError, match=scope + ": " + error):
         gate.deadline_claims(changed if scope == "source" else tex,
                              changed if scope == "PDF" else rendered, real, evidence)
 
@@ -139,8 +174,14 @@ def test_false_score_role_cannot_hide_before_valid_duplicate(public_claims, scop
 @pytest.mark.parametrize("scope", ["source", "PDF"])
 @pytest.mark.parametrize("before,after", [
     ('fall short of nominal coverage', 'achieve nominal coverage'),
+    ('validation chooses the checkpoint', 'TEST chooses the checkpoint'),
+    ('the lowest mean score on the directly generated quantities', 'the highest mean score on the directly generated quantities'),
+    ('Its representation and training loss also change', 'Its representation changes but its training loss does not'),
     ('with little change in energy score', 'with a large improvement in energy score'),
-    ('The larger decrease in the subtracted term', 'The smaller decrease in the subtracted term'),
+    ('the subtracted term decreases more', 'the subtracted term decreases less'),
+    ('regression uses more available measurements', 'regression uses fewer available measurements'),
+    ('with raw and clipped VAL scores of', 'with clipped and raw VAL scores of'),
+    ('the mean energy score first falls and then rises', 'the mean energy score first rises and then falls'),
     ('0.1254', '0.2254'),
     ('-0.00287', '-0.01287'),
     ('1.9787', '1.9788'),
@@ -154,7 +195,7 @@ def test_false_score_role_cannot_hide_before_valid_duplicate(public_claims, scop
     ('the original coefficient gives the best mean score', 'the largest coefficient gives the best mean score'),
     ('1.9515', '1.9525'),
     ('exploratory', 'confirmatory'),
-    ('involve different amounts of computation', 'involve equal amounts of computation'),
+    ('computational cost differs even at equal update counts', 'computational cost is equal at equal update counts'),
     ('score differences may reflect convergence or overfitting', 'score differences establish convergence and rule out overfitting'),
     ('slightly smaller mean distance', 'slightly larger mean distance'),
     ('a larger spread term', 'a smaller spread term'),
