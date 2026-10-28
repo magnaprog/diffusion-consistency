@@ -65,7 +65,11 @@ def gaussian_sample(
     n_draws: int,
     rng: np.random.Generator,
 ) -> np.ndarray:
-    """mean_ref and resid_mean (72,); return (K, 72)."""
+    """Draw vectors with mean mean_ref + resid_mean and covariance cov.
+
+    For means of shape (d,) and covariance of shape (d, d), the result has
+    shape (n_draws, d).
+    """
     loc = np.asarray(mean_ref, dtype=np.float64) + np.asarray(resid_mean, dtype=np.float64)
     return rng.multivariate_normal(loc, cov, size=n_draws)
 
