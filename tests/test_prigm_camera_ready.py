@@ -346,7 +346,7 @@ def test_checkpoint_clauses_and_rendered_thousands_counts(checkpoint_claim_recor
     ('changing their difference from $-0.0028$', 'changing their difference from $+0.0028$'),
     ('61.0\\% of resamples', '61.1\\% of resamples'),
     ('every resample under either evaluation count', 'some resamples under either evaluation count'),
-    ('These choices and the evaluation count are fixed before additional TEST samples are generated.', 'These choices and the evaluation count are fixed after additional TEST samples are generated.'),
+    ('both these choices and the evaluation count are fixed before additional TEST samples are generated.', 'both these choices and the evaluation count are fixed after additional TEST samples are generated.'),
     ('fixed before additional TEST samples are generated', 'fixed after additional TEST samples are generated'),
     ('This calculation leaves the roles of regularization and overfitting unresolved', 'This calculation establishes the roles of regularization and overfitting'),
     ('contributes both validation months', 'contributes one validation month'),
@@ -372,7 +372,7 @@ def test_revised_checkpoint_clauses_reject_changes(checkpoint_claim_records, sco
 
 @pytest.mark.parametrize("scope", ["source", "PDF"])
 @pytest.mark.parametrize("kind,clause,old,new", [
-    ("checkpoint", "These choices and the evaluation count are fixed before additional TEST samples are generated.", "fixed before", "fixed after"),
+    ("checkpoint", "both these choices and the evaluation count are fixed before additional TEST samples are generated.", "fixed before", "fixed after"),
     ("calibration", "At seed 13, G5 decreases both distance to the measurements and spread; the larger decrease in distance outweighs the loss of spread.", "G5 decreases", "G5 increases"),
     ("calibration", "At seed 42, both increase; the larger increase in spread outweighs the greater distance to the measurements. Both patterns lower the score because spread is subtracted.", "both increase", "both decrease"),
 ])

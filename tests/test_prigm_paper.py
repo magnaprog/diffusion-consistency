@@ -401,7 +401,7 @@ def followup_prose(learned, reference, gradients, strata):
               + f"{coefficients[0]:.4f}, {coefficients[1]:.6f}, {coefficients[2]:.6f}, and {coefficients[3]:.1f}. "
               + "At the final noise level, the Min-SNR data weight is only $" + sci(values["w"][-1]) + "$. "
               + "These ratios compare loss coefficients; the corresponding gradient ratios also depend on the derivatives of the two terms.\n\n"
-              + "At the final O-S checkpoints, the norm of the residual gradient divided by the norm of the data gradient ranges from "
+              + "At the final O-S checkpoints, the ratio of the residual gradient norm to the data gradient norm ranges from "
               + span("train", 100, ratio) + " on TRAIN and " + span("val", 100, ratio) + " on VAL at $t=100$. "
               + "At $t=25$, the ranges are " + span("train", 25, ratio) + " and " + span("val", 25, ratio) + ". "
               + "Each range spans three seeds, with one calculation on eight windows per seed. "
@@ -426,7 +426,7 @@ def followup_prose(learned, reference, gradients, strata):
         + "Although the rules were specified earlier, they were implemented after inspection of the primary results, so the analysis remains exploratory.\n\n"
         + "TRAIN quartile thresholds are (" + vector(cutoffs["context_energy"]["values"], 6) + ") for the available intervals and ("
         + vector(cutoffs["target_energy"]["values"], 6) + ") for the missing interval. "
-        + "A tie enters the higher energy group, whereas a tie at the cancellation threshold enters the rest group. "
+        + "Values tied at an energy threshold enter the higher energy group; values tied at the cancellation threshold enter the rest group. "
         + f"The analysis covers all {len(groups)} groups: the full test set, high cancellation and the rest, and combinations of cancellation with energy conditions. Group membership and scores for all {len(strata['methods'])} procedures are recorded. "
         + "Each score gives equal weight to the months present, then averages the three diffusion seeds.\n\n"
         + f"High cancellation in the available measurements identifies {ch['n_windows']} windows across all {word(ch['n_years'])} years. "
@@ -439,7 +439,7 @@ def followup_prose(learned, reference, gradients, strata):
         + "Grouping by the available context avoids selection on the hidden outcome, but it does not isolate cancellation from other correlated conditions.\n\n"
         + f"High cancellation during the missing hour identifies {th['n_windows']} windows. O-S minus D is {target['mean_diff']:.4f}, with interval [{vector(target['year_95'], 4)}], "
         + f"compared with {tr['comparisons']['O-S_raw_minus_D_raw']['mean_diff']:.4f} in the remaining {tr['n_windows']} windows. "
-        + "Although TRAIN supplies the thresholds, the withheld outcome determines which TEST windows enter each group, so the comparison still depends on outcome selection. "
+        + "TRAIN supplies the thresholds, but the withheld outcome determines which TEST windows enter each group. The comparison still depends on outcome selection. "
         + "The group combining high cancellation in the missing hour with the lowest energy quartile contains only "
         + f"{word(sparse['n_windows'])} windows from {word(sparse['n_years'])} years. "
         + "Such comparisons describe losses on selected TEST cases. A claim of conditional predictive superiority would need an evaluation that accounts for the rule assigning cases to each group.")
@@ -672,8 +672,8 @@ def bundle_template(tmp_path_factory):
     paragraph = ("A stationary hidden Markov model isolates the residual estimator from denoiser fitting error. "
                  + r"For 36 replicate contexts at $t=100$, two denoiser evaluations give mean absolute $R_{\mathrm{obs}}=1.23\times10^{-5}$ in HMM units and energy score 5.123, "
                  + "compared with 2.356 for independent draws from the exact conditional distribution. "
-                 + "On a separate set of 288 HMM windows, two denoiser evaluations again score worse than exact conditional draws; "
-                 + "DDIM with 25, 50, and 100 evaluations gives scores much closer to that reference. "
+                 + "On a separate set of 288 HMM windows, scores from two denoiser evaluations are again worse than those from exact conditional draws. "
+                 + "On these windows, DDIM with 25, 50, and 100 evaluations gives scores much closer to that reference. "
                  + "These Monte Carlo comparisons have finite sampling error.")
     number_values = (200, 2000, 1000, 900, 800, 700, 300, 400, 250, 40, 10)
     count_text = " ".join(f"{v:,}".replace(",", "{,}") for v in number_values) + r" 10.00\% 2.35\times10^{-13} 0.1235"
@@ -995,7 +995,7 @@ def test_oracle_table_rounding_bound_to_each_method(bundle, key):
 @pytest.mark.parametrize("old,new", [("energy score 5.123", "energy score 5.124"),
                                     ("compared with 2.356", "compared with 2.357"),
                                     (r"1.23\times10^{-5}", r"1.23\times10^{-6}"),
-                                    ("again score worse than exact conditional draws", "again score better than exact conditional draws"),
+                                    ("again worse than those from exact conditional draws", "again better than those from exact conditional draws"),
                                     ("25, 50, and 100 evaluations", "25, 51, and 100 evaluations")])
 def test_main_toy_prose_mutations_cannot_hide_in_valid_table(bundle, old, new):
     tex = (bundle["root"] / "main.tex").read_text()
@@ -1009,7 +1009,7 @@ def test_main_toy_prose_mutations_cannot_hide_in_valid_table(bundle, old, new):
 @pytest.mark.parametrize("anchor,old,new", [
     ("For 36 replicate contexts", "energy score 5.123", "energy score 5.124"),
     ("For 36 replicate contexts", "compared with 2.356", "compared with 2.357"),
-    ("On a separate set", "again score worse", "again score better"),
+    ("On a separate set", "again worse", "again better"),
 ])
 def test_bad_toy_comparison_cannot_hide_behind_valid_duplicate(bundle_template, scope, anchor, old, new):
     root = bundle_template["root"]
@@ -2019,6 +2019,9 @@ def test_toy_ddim_clause_crosses_only_a_matching_operator_float(bundle_template,
     rendered = extracted(bundle_template["pages"])
     pdf_caption = "A synthetic operator figure with a linear region inside ±0.005."
     insertion = f"DDIM with\n3\n\fAxis labels\nFigure {number}: {pdf_caption}\n\n"
+    continuation = "25, 50, and 100 evaluations gives"
+    rendered, count = re.subn(r"\s+".join(map(re.escape, continuation.split())), continuation, rendered)
+    assert count == 1
     rendered, count = re.subn(r"DDIM\s+with\s+(?=25,\s*50,\s*and\s*100 evaluations gives)",
                              lambda _: insertion, rendered)
     assert count == 1
@@ -2200,6 +2203,7 @@ def test_every_followup_prose_number_is_clause_bound_in_source_and_pdf(bundle_te
     (FOLLOWUP_TITLES[0], "is insufficient to assess calibration here", "is sufficient to assess calibration here"),
     (FOLLOWUP_TITLES[0], "original random stream", "independent random stream for that distribution"),
     (FOLLOWUP_TITLES[1], "ratios compare loss coefficients", "ratios of gradient norms"),
+    (FOLLOWUP_TITLES[1], "ratio of the residual gradient norm to the data gradient norm", "ratio of the data gradient norm to the residual gradient norm"),
     (FOLLOWUP_TITLES[1], "three seeds, with one calculation on eight windows per seed", "three seeds, with eight individual window gradients per seed"),
     (FOLLOWUP_TITLES[1], "final O-S checkpoints", "first O-S checkpoints"),
     (FOLLOWUP_TITLES[1], "first and final common checkpoints", "final common checkpoints only"),
@@ -2214,7 +2218,7 @@ def test_every_followup_prose_number_is_clause_bound_in_source_and_pdf(bundle_te
     (FOLLOWUP_TITLES[2], "implemented after inspection", "implemented before inspection"),
     (FOLLOWUP_TITLES[2], "analysis remains exploratory", "analysis is confirmatory"),
     (FOLLOWUP_TITLES[2], "higher energy group", "lower energy group"),
-    (FOLLOWUP_TITLES[2], "a tie at the cancellation threshold enters the rest group", "a tie at the cancellation threshold enters the high group"),
+    (FOLLOWUP_TITLES[2], "values tied at the cancellation threshold enter the rest group", "values tied at the cancellation threshold enter the high group"),
     (FOLLOWUP_TITLES[2], "equal weight to the months present", "equal weight to individual windows"),
     (FOLLOWUP_TITLES[2], "All three seed differences are negative", "each of the three seeds has a positive difference"),
     (FOLLOWUP_TITLES[2], "the withheld outcome determines which TEST windows enter each group", "assigning these windows to groups avoids the outcome that the model must predict"),
@@ -2284,7 +2288,7 @@ def test_correct_duplicate_clause_cannot_rescue_wrong_clause_in_same_subsection(
     prose = b["additions"][title]
     anchors = ("Table compares nine diffusion fits to the stationary chain, with different residual objectives and 50 DDIM evaluations for sampling.",
                "These ratios compare loss coefficients; the corresponding gradient ratios also depend on the derivatives of the two terms.",
-               "Although TRAIN supplies the thresholds, the withheld outcome determines which TEST windows enter each group, so the comparison still depends on outcome selection.")
+               "TRAIN supplies the thresholds, but the withheld outcome determines which TEST windows enter each group. The comparison still depends on outcome selection.")
     clause = anchors[FOLLOWUP_TITLES.index(title)]
     broken = prose.replace(clause, clause.replace("50", "51") if title.startswith("Training diffusion") else clause.replace("loss coefficients", "gradient norms").replace("outcome determines", "outcome does not determine"))
     broken += "\n\n" + clause

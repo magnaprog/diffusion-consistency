@@ -253,7 +253,7 @@ def calibration_claims(tex, rendered, report, figure):
          rf"Gaussian regression covers {means['full_flank_gaussian'][1]:.1f}\% of $v_s$ observations, with "
          rf"{means['full_flank_gaussian'][0]:.1f}\% below and {means['full_flank_gaussian'][2]:.1f}\% above its intervals.")
     for clause in (
-        "The difference is calculated before rounding the two tail percentages.",
+        "The difference between the two tail fractions is calculated before either percentage is rounded.",
         "Each of 10{,}000 resamples calculates both fractions on the same sampled years and retains every occurrence of a repeated year.",
         "The interval concerns this one contrast, conditional on the existing models, checkpoints and draws; it excludes variation from new training seeds or a new checkpoint choice.",
     ):
@@ -298,8 +298,8 @@ def checkpoint_claims(tex, rendered, checked):
                     "D earlier-choice stability")
     for clause in (
         "D at seeds 13 and 42 retains its respective earlier choice in every resample under either evaluation count.",
-        "These choices and the evaluation count are fixed before additional TEST samples are generated.",
-        "Validation with 50 evaluations determines the checkpoint choices. These choices and the evaluation count are fixed before additional TEST samples are generated.",
+        "both these choices and the evaluation count are fixed before additional TEST samples are generated.",
+        "Validation with 50 evaluations selects the checkpoints, and both these choices and the evaluation count are fixed before additional TEST samples are generated.",
         "This calculation leaves the roles of regularization and overfitting unresolved.",
         "Each occurrence of a sampled year contributes both validation months, and every checkpoint uses the same resampled years.",
         "The model weights and draws remain constant, so these frequencies measure variation across validation years.",

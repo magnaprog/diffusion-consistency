@@ -20,19 +20,19 @@ MUTATIONS = (
     ("Connecting the medians can produce an irregular curve", "Connecting the medians must produce a smooth curve"),
     ("requires separate assessment", "is established by these bands"),
     ("same residual covariance for every context", "different residual covariances for different contexts"),
-    ("How often the particular errors in these examples occur across TEST", "These particular errors always occur throughout TEST"),
+    ("It remains uncertain how often the errors seen here occur across TEST", "These particular errors always occur throughout TEST"),
     ('Windows 120 and 360', 'Windows 121 and 360'),
     ('Diffusion uses seed 7, the first', 'Diffusion uses seed 13, the first'),
     ('training step 9560 for D', 'training step 29636 for D'),
     ('noise realization from seed 13', 'noise realization from seed 7'),
     ('after TEST had already been examined', 'before TEST was examined'),
-    ('How representative these two missing hours are across TEST remains uncertain', 'These two hours are representative of all TEST windows'),
+    ('It remains uncertain how well these two missing hours represent TEST', 'These two hours are representative of all TEST windows'),
     ('At each time and coordinate, the colored curve is the marginal median of the 39 samples', 'The colored curve gives the joint-trajectory median of the 39 samples'),
     ('median of the 39 samples', 'median of 117 samples pooled across seeds'),
-    ('the second and thirty-eighth values', 'the third and thirty-seventh values'),
+    ('the second to the thirty-eighth values', 'the third to the thirty-seventh values'),
     ('differs from every sampled trajectory', 'always reproduces a sampled trajectory'),
     ('The curves and intervals describe each coordinate at each time separately', 'The curves and intervals give simultaneous coverage of a trajectory'),
-    ('different sequences of minute averages can produce the same statistics', 'the statistics uniquely determine the sequence of minute averages'),
+    ('which can arise from different sequences of minute averages', 'which uniquely determine the sequence of minute averages'),
     ('ensemble members 0, 1 and 2', 'ensemble members 1, 2 and 3'),
     ('the starts of five-minute bins', 'the centers of five-minute bins'),
     ('Predictions are shown before clipping', 'Predictions are shown after clipping'),
@@ -49,7 +49,7 @@ MUTATIONS = (
     ('D, O-S and G5 share a linear scale', 'D, O-S and G5 share a logarithmic scale'),
     ('Gaussian regression uses a separate linear scale on the right', 'Gaussian regression uses the same linear scale on the left'),
     ('comparable only on the same scale', 'comparable across all scales'),
-    ('includes the endpoints', 'excludes the endpoints'),
+    ('including both endpoints', 'excluding both endpoints'),
     ('The axis limits include all measurements, medians and interval ends in each subplot', 'The axis limits exclude some measurements, medians and interval ends'),
     ('predictions below it violate the nonnegativity of variance', 'predictions below it satisfy the nonnegativity of variance'),
     ('diffusion medians generally exceed the withheld variance', 'diffusion medians generally fall below the withheld variance'),
@@ -59,9 +59,9 @@ MUTATIONS = (
     ('covers all twelve bins in both windows', 'covers eleven bins in both windows'),
     ('its distribution assigns probability to negative', 'its distribution assigns zero probability to negative'),
     ('The aggregate results also show that diffusion intervals cover the variance less often than nominal', 'The aggregate results also show that diffusion intervals cover the variance as often as nominal'),
-    ('and how they arise during training, remain uncertain', 'and how they arise during training, are established'),
-    ('the mean residual decreases as the penalty grows', 'the mean residual increases as the penalty grows'),
-    ('the mean energy score first improves and then worsens', 'the mean energy score first worsens and then improves'),
+    ('or how they arise during training', 'but their training causes are established'),
+    ('increasing the penalty reduces the mean residual', 'increasing the penalty increases the mean residual'),
+    ('the mean energy score first falls and then rises', 'the mean energy score first rises and then falls'),
     ('keeps the available measurements unchanged', 'changes the available measurements'),
     ('leaving short breaks', 'joining the transitions'),
 )
@@ -138,11 +138,11 @@ def test_bad_setting_spacing_cannot_hide_behind_valid_duplicate(prose, side):
 @pytest.mark.parametrize("side", [0, 1], ids=["source", "rendered"])
 def test_bad_interval_endpoints_cannot_hide_behind_valid_duplicate(prose, side):
     values = list(prose)
-    clause = r"The nominal 90\% interval includes the endpoints given by the second and thirty-eighth values in increasing order."
+    clause = r"The nominal 90\% interval runs from the second to the thirty-eighth values in increasing order, including both endpoints."
     if side == 1:
         clause = gate.clean_cell(clause)
     assert values[side].count(clause) == 1
-    values[side] = values[side].replace(clause, clause.replace("includes", "excludes"), 1) + "\n" + clause
+    values[side] = values[side].replace(clause, clause.replace("including", "excluding"), 1) + "\n" + clause
     location = "source" if side == 0 else "PDF"
     with pytest.raises(ValueError, match=location + ": (clause differs|missing or duplicate clause)"):
         gate.illustration_claims(*values)

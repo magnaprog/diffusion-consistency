@@ -12,7 +12,7 @@ camera-ready revision has been submitted.
 ## Install and check the runtime
 
 Run commands from the repository root. The code imports directly from this
-checkout; no editable installation is needed. A CPU installation can use:
+checkout without an editable installation. A CPU installation can use:
 
 ```bash
 python3 -m venv .venv
@@ -77,7 +77,7 @@ if scratch=$(mktemp -d /dev/shm/prigm-tests.XXXXXX); then
 fi
 ```
 
-Two test temporary-directory sites in `tests/test_prigm_operator_mechanism.py`
+Two temporary-directory locations in `tests/test_prigm_operator_mechanism.py`
 explicitly use `/dev/shm`; `TMPDIR` does not relocate them. CUDA tests skip in
 a CPU-only run, and the real OMNI schema test needs the original 2005 raw file.
 Missing PDF tools can cause additional skips. Report the actual results and
@@ -87,7 +87,7 @@ skip reasons for the revision being checked.
 
 The public copy includes TEST observations, toy arrays and results, original prediction scores and other numerical analyses, selected Gaussian predictions, and the inputs used to draw the figures. It also includes the later interval-error and checkpoint records when the manuscript uses them. Neural checkpoints, complete neural prediction sets, raw OMNI data, and TRAIN/VAL arrays are not included. Therefore, the available numerical checks reproduce only part of the experiments.
 
-The [source provenance record](../reproducibility/accepted_source/README.md) explains how eight exact copies of original source files are related to later reviewed code. All 43 current core modules are retained. Preserve the original evidence and its source hashes; results from a new run must remain identifiable as a different execution.
+The [source provenance record](../reproducibility/accepted_source/README.md) links eight exact copies of original source files to later reviewed code. All 43 current core modules are retained. Preserve the original evidence and its source hashes; results from a new run must remain identifiable as a different execution.
 
 The [documentation revision record](../reproducibility/documentation_source/README.md) maps 45 current files to their versions before the documentation changes: thirteen preserved on October 3 and 32 added on October 4, all from `8eff030`. The initial thirteen copies remain unchanged. The verifier authenticates both versions by hash and compares their Python syntax after removing docstrings. It follows this mapping to the earlier version, then follows the accepted-source mapping to the original execution source where required. Both sets of historical files must retain their bytes. These checks authenticate specific revisions; they do not prove equivalence for every possible runtime observation.
 
@@ -130,8 +130,8 @@ Create a separate directory for each new study and retain its declared settings,
 The figure-generating scripts share `paper/workshops/prigm/prigm.mplstyle`. Figure text and mathematics use DejaVu Serif, supplied by Matplotlib. Axis labels and subplot titles are 8 points; ticks, legends and notes are 7 points at the manuscript's display widths. Colors have consistent meanings, and markers, line patterns, hatching and subplot labels also identify the quantities. The Okabe-Ito method palette uses blue for D, vermilion for O-S, bluish green for G5 and reddish purple for Gaussian regression. In Figures 1(b) and 4(a), sky-blue bars show changes in distance to the withheld observations, orange hatched bars show the negative change in dispersion, and purple diamonds show the resulting score change. Figure 1(b) compares predictions after and before clipping; Figure 4(a) compares G5 with D. These score-component colors are distinct from the method palette. The scientific inputs, plotted numerical values, workshop manuscript template and body fonts remain unchanged.
 
 The generators resolve DejaVu Serif without a default-font fallback and embed
-TrueType subsets in the PDFs. No separate font installation is needed.
-Compiling TeX from the supplied PDFs also needs no plotting-font installation.
+TrueType subsets in the PDFs. No separate installation of plotting fonts is needed to generate
+the figures or compile TeX using the supplied PDFs.
 
 After the manuscript is final, rebuild and verify it:
 
@@ -161,7 +161,7 @@ python scripts/package_prigm_paper.py --output dist/prigm-camera-ready-overleaf.
 python scripts/package_prigm_paper.py --output dist/prigm-camera-ready-source.tar.gz
 ```
 
-The packaging command runs the verifier and checks the hashes of every file stored in the ZIP or TAR file. Extract each into a new directory and compile it independently. These TeX bundles contain the manuscript dependencies and experimental records, but exclude the full repository verifier, training code and compiled manuscript PDF.
+The packaging command runs the verifier and checks the hashes of every file stored in the ZIP or TAR file. Extract each archive into a new directory and compile it independently. These TeX bundles contain the manuscript dependencies and experimental records, but exclude the full repository verifier, training code and compiled manuscript PDF.
 
 For an arXiv source ZIP, use a fresh output directory:
 
@@ -171,7 +171,7 @@ python3 scripts/package_prigm_arxiv.py --output dist/prigm-arxiv-YYYYMMDD
 
 This command retains the title, author information, workshop layout, bibliography and figure contents. It gives the eight figure PDFs simple filenames and changes only their paths in the exported TeX. The twelve-file ZIP contains `main.tex`, `references.bib`, a newly built `main.bbl`, the original `neurips_2025.sty` and the eight figures. It excludes scientific data, programs and review records.
 
-The packager checks the scientific evidence, compiles both the source and an extraction of the ZIP, and compares every page with the workshop PDF at 100 DPI. It requires embedded outline fonts, settled references and no overfull boxes or oversized figures. Source changes during these checks cause failure. The output directory retains the source files, preview PDF, verification record and logs; failed attempts retain their logs. Use a new directory after resolving a failure.
+The packager checks the scientific evidence, compiles the source and the extracted ZIP separately, and compares every page from both builds with the workshop PDF at 100 DPI. It requires embedded outline fonts, settled references and no overfull boxes or oversized figures. Source changes during these checks cause failure. The output directory retains the source files, preview PDF, verification record and logs; failed attempts retain their logs. Use a new directory after resolving a failure.
 
 The ZIP is named `residual_penalties_algebraic_completion_arxiv.zip`, and the preview is `residual_penalties_algebraic_completion.pdf`. The command does not submit the paper or choose its category or license. During submission, select `main.tex` and pdfLaTeX, and inspect the service's generated preview. Local compilation does not establish a successful server build or acceptance.
 
