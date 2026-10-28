@@ -213,7 +213,8 @@ def test_legitimate_repeated_seed_mentions_do_not_duplicate_claim_anchors(public
     ("49.0\\% of observations lie below G5's", "49.1\\% of observations lie below G5's"),
     ('G5 decreases both distance', 'G5 increases both distance'),
     ('the larger increase in spread', 'the larger increase in distance'),
-    ('errors lie predominantly below the intervals at seeds 7 and 13', 'errors lie predominantly above the intervals at seeds 7 and 13'),
+    ('Both patterns lower the score because spread is subtracted', 'Both patterns lower the score because spread is added'),
+    ('missed observations lie predominantly below the intervals at seeds 7 and 13', 'missed observations lie predominantly above the intervals at seeds 7 and 13'),
     ('37.7\\% below', '37.8\\% below'),
     ('by 38.4 percentage points', 'by 38.5 percentage points'),
     ('the fraction below exceeds the fraction above by', 'the fraction above exceeds the fraction below by'),
@@ -345,8 +346,8 @@ def test_checkpoint_clauses_and_rendered_thousands_counts(checkpoint_claim_recor
     ('changing their difference from $-0.0028$', 'changing their difference from $+0.0028$'),
     ('61.0\\% of resamples', '61.1\\% of resamples'),
     ('every resample under either evaluation count', 'some resamples under either evaluation count'),
-    ('both the choices and evaluation count are fixed before any additional TEST samples are generated.', 'both the choices and evaluation count are fixed after any additional TEST samples are generated.'),
-    ('fixed before any additional TEST samples are generated', 'fixed after any additional TEST samples are generated'),
+    ('These choices and the evaluation count are fixed before additional TEST samples are generated.', 'These choices and the evaluation count are fixed after additional TEST samples are generated.'),
+    ('fixed before additional TEST samples are generated', 'fixed after additional TEST samples are generated'),
     ('This calculation leaves the roles of regularization and overfitting unresolved', 'This calculation establishes the roles of regularization and overfitting'),
     ('contributes both validation months', 'contributes one validation month'),
     ('Each occurrence of a sampled year', 'One occurrence of each sampled year'),
@@ -367,3 +368,29 @@ def test_revised_checkpoint_clauses_reject_changes(checkpoint_claim_records, sco
         rendered = rendered.replace(before, after)
     with pytest.raises(ValueError, match="caption differs|" + scope + ": (clause differs|missing or duplicate clause)"):
         camera.checkpoint_claims(tex, rendered, checkpoint_claim_records)
+
+
+@pytest.mark.parametrize("scope", ["source", "PDF"])
+@pytest.mark.parametrize("kind,clause,old,new", [
+    ("checkpoint", "These choices and the evaluation count are fixed before additional TEST samples are generated.", "fixed before", "fixed after"),
+    ("calibration", "At seed 13, G5 decreases both distance to the measurements and spread; the larger decrease in distance outweighs the loss of spread.", "G5 decreases", "G5 increases"),
+    ("calibration", "At seed 42, both increase; the larger increase in spread outweighs the greater distance to the measurements. Both patterns lower the score because spread is subtracted.", "both increase", "both decrease"),
+])
+def test_reworded_claim_cannot_hide_behind_valid_duplicate(
+        public_records, checkpoint_claim_records, scope, kind, clause, old, new):
+    tex, rendered = manuscript()
+    if scope == "PDF":
+        clause, old, new = (verifier.prose_text(value, source=True) for value in (clause, old, new))
+    original = tex if scope == "source" else rendered
+    assert original.count(clause) == 1 and clause.count(old) == 1
+    changed = original.replace(clause, clause.replace(old, new, 1), 1) + "\n" + clause
+    if scope == "source":
+        tex = changed
+    else:
+        rendered = changed
+    with pytest.raises(ValueError, match=scope + ": missing or duplicate clause"):
+        if kind == "checkpoint":
+            camera.checkpoint_claims(tex, rendered, checkpoint_claim_records)
+        else:
+            report, _, _, figure = public_records
+            camera.calibration_claims(tex, rendered, report, figure)

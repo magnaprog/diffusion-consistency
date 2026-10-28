@@ -19,7 +19,7 @@ from pathlib import Path
 
 ARCHIVE = "reproducibility/documentation_source"
 BASE_COMMIT = "8eff0305d0741ed77ea08be1f33b484aa3e0ed29"
-MANIFEST_SHA256 = "119e5a6fa807b0d56184533d0d5755e93d3f635cb4979d7f3e7cbc3b23eab046"
+MANIFEST_SHA256 = "564156200a1fbf13f0c2907886d0a2fc78964ca120fde25dd240aa6068ae4e6c"
 NAMES = frozenset({
     'analysis/export_prigm_calibration.py',
     'analysis/export_prigm_paper_evidence.py',

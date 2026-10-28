@@ -670,10 +670,10 @@ def bundle_template(tmp_path_factory):
     means = {k: v["mean_energy"] for k, v in oracle["methods"].items()}
     oracle_rows = {row: [f"{means[k]:.4f}"] for row, k in gate.ORACLE_ROWS.items()}
     paragraph = ("A stationary hidden Markov model isolates the residual estimator from denoiser fitting error. "
-                 + r"For 36 replicate contexts at $t=100$, two denoiser evaluations give mean absolute $R_{\mathrm{obs}}=1.23\times10^{-5}$ in HMM units and energy score 5.123. "
-                 + "Independent draws from the exact conditional distribution give an energy score of 2.356. "
-                 + "In a separate evaluation on 288 HMM windows, two denoiser evaluations also score worse than exact conditional draws, "
-                 + "while DDIM with 25, 50, and 100 evaluations gives scores much closer to the score of exact draws on those windows. "
+                 + r"For 36 replicate contexts at $t=100$, two denoiser evaluations give mean absolute $R_{\mathrm{obs}}=1.23\times10^{-5}$ in HMM units and energy score 5.123, "
+                 + "compared with 2.356 for independent draws from the exact conditional distribution. "
+                 + "On a separate set of 288 HMM windows, two denoiser evaluations again score worse than exact conditional draws; "
+                 + "DDIM with 25, 50, and 100 evaluations gives scores much closer to that reference. "
                  + "These Monte Carlo comparisons have finite sampling error.")
     number_values = (200, 2000, 1000, 900, 800, 700, 300, 400, 250, 40, 10)
     count_text = " ".join(f"{v:,}".replace(",", "{,}") for v in number_values) + r" 10.00\% 2.35\times10^{-13} 0.1235"
@@ -993,9 +993,9 @@ def test_oracle_table_rounding_bound_to_each_method(bundle, key):
 
 
 @pytest.mark.parametrize("old,new", [("energy score 5.123", "energy score 5.124"),
-                                    ("energy score of 2.356", "energy score of 2.357"),
+                                    ("compared with 2.356", "compared with 2.357"),
                                     (r"1.23\times10^{-5}", r"1.23\times10^{-6}"),
-                                    ("also score worse than exact conditional draws", "also score better than exact conditional draws"),
+                                    ("again score worse than exact conditional draws", "again score better than exact conditional draws"),
                                     ("25, 50, and 100 evaluations", "25, 51, and 100 evaluations")])
 def test_main_toy_prose_mutations_cannot_hide_in_valid_table(bundle, old, new):
     tex = (bundle["root"] / "main.tex").read_text()
@@ -1003,6 +1003,32 @@ def test_main_toy_prose_mutations_cannot_hide_in_valid_table(bundle, old, new):
     tex = tex.replace(old, new)
     with pytest.raises(ERRORS):
         gate.toy_claims(tex, gate.pdf_checks(bundle["root"]), gate.validate_toy(bundle["root"]))
+
+
+@pytest.mark.parametrize("scope", ["source", "PDF"])
+@pytest.mark.parametrize("anchor,old,new", [
+    ("For 36 replicate contexts", "energy score 5.123", "energy score 5.124"),
+    ("For 36 replicate contexts", "compared with 2.356", "compared with 2.357"),
+    ("On a separate set", "again score worse", "again score better"),
+])
+def test_bad_toy_comparison_cannot_hide_behind_valid_duplicate(bundle_template, scope, anchor, old, new):
+    root = bundle_template["root"]
+    tex = (root / "main.tex").read_text()
+    rendered = extracted(bundle_template["pages"])
+    paragraph = next(p for p in tex.split("\n\n") if "A stationary hidden Markov model isolates" in p)
+    clause = paragraph[paragraph.index(anchor):].split(". ", 1)[0] + "."
+    assert clause.count(old) == 1
+    evidence = gate.validate_toy(root)
+    gate.toy_claims(tex, rendered, evidence)
+    if scope == "source":
+        assert tex.count(clause) == 1
+        tex = tex.replace(clause, clause.replace(old, new) + " " + clause, 1)
+    else:
+        rendered, count = re.subn(r"\s+".join(map(re.escape, old.split())), new, rendered)
+        assert count == 1
+        rendered = rendered.replace("References", gate.clean_cell(clause).replace("^", "") + "\nReferences", 1)
+    with pytest.raises(ERRORS, match=scope + ": missing or duplicate clause"):
+        gate.toy_claims(tex, rendered, evidence)
 
 
 @pytest.mark.parametrize("marker", ["in progress", "NOT READY", "TODO", "TBD"])
@@ -1974,8 +2000,8 @@ def test_toy_clause_rejects_an_unmatched_page_top_float(bundle_template):
     root = bundle_template["root"]
     tex = (root / "main.tex").read_text()
     rendered = extracted(bundle_template["pages"])
-    rendered, count = re.subn(r"In a separate evaluation on\s+288\s+HMM\s+windows,",
-                             "In a separate evaluation on 288 HMM windows,\nFigure 1: An unmatched diagnostic.\n", rendered)
+    rendered, count = re.subn(r"On a separate set of\s+288\s+HMM\s+windows,",
+                             "On a separate set of 288 HMM windows,\nFigure 1: An unmatched diagnostic.\n", rendered)
     assert count == 1
     with pytest.raises(ERRORS, match="clause"):
         gate.toy_claims(tex, rendered, gate.validate_toy(root))

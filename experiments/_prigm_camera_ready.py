@@ -230,8 +230,8 @@ def calibration_claims(tex, rendered, report, figure):
             and r42["negative_delta_dispersion"] < 0 < r42["delta_target"]
             and max(r13["delta_energy"], r42["delta_energy"]) < 0, "seedwise contribution directions")
     # Exact seed coordinates remain checked by validate_calibration_figure.
-    bind("At seed 13, G5", "At seed 13, G5 decreases both distance to the measurements and spread, with the larger decrease in distance.")
-    bind("At seed 42, both", "At seed 42, both increase, with the larger increase in spread. Both patterns lower the score.")
+    bind("At seed 13, G5", "At seed 13, G5 decreases both distance to the measurements and spread; the larger decrease in distance outweighs the loss of spread.")
+    bind("At seed 42, both", "At seed 42, both increase; the larger increase in spread outweighs the greater distance to the measurements. Both patterns lower the score because spread is subtracted.")
     bind("This decomposition explains", "This decomposition explains the score differences for the existing predictions. It cannot identify a training mechanism or separate G5's changes to representation and loss.")
     methods = report["methods"]
     means = {name: 100 * np.asarray(row["mean"])[4] for name, row in methods.items()}
@@ -243,7 +243,7 @@ def calibration_claims(tex, rendered, report, figure):
     # valid duplicate. The fraction-difference clause has a separate anchor.
     g.bind_clause((tex, rendered), g.clause_pattern("averaged over the three fits,"),
          rf"Averaged over the three fits, {means['G5'][0]:.1f}\% of observations lie below G5's $v_s$ intervals and {means['G5'][2]:.1f}\% above them.")
-    bind("show a reversal that the averages obscure", "show a reversal that the averages obscure: errors lie predominantly below the intervals at seeds 7 and 13, and above them at seed 42. D also reverses direction at seed 42.")
+    bind("show a reversal that the averages obscure", "show a reversal that the averages obscure: missed observations lie predominantly below the intervals at seeds 7 and 13, and above them at seed 42. D also reverses direction at seed 42.")
     bind("O-S's mean fractions", rf"O-S's mean fractions are {means['O-S'][0]:.1f}\% below and {means['O-S'][2]:.1f}\% above.")
     ci = 100 * np.asarray(methods["G5"]["year_below_minus_above_95"])[:, 4]
     contrast = 100 * methods["G5"]["below_minus_above"][4]
@@ -298,8 +298,8 @@ def checkpoint_claims(tex, rendered, checked):
                     "D earlier-choice stability")
     for clause in (
         "D at seeds 13 and 42 retains its respective earlier choice in every resample under either evaluation count.",
-        "both the choices and evaluation count are fixed before any additional TEST samples are generated.",
-        "Validation with 50 evaluations determines the checkpoint choices, and both the choices and evaluation count are fixed before any additional TEST samples are generated.",
+        "These choices and the evaluation count are fixed before additional TEST samples are generated.",
+        "Validation with 50 evaluations determines the checkpoint choices. These choices and the evaluation count are fixed before additional TEST samples are generated.",
         "This calculation leaves the roles of regularization and overfitting unresolved.",
         "Each occurrence of a sampled year contributes both validation months, and every checkpoint uses the same resampled years.",
         "The model weights and draws remain constant, so these frequencies measure variation across validation years.",

@@ -1374,9 +1374,9 @@ def toy_claims(tex, rendered, evidence):
     residual = mantissa + r"\times10^{" + str(int(exponent)) + "}"
     clauses = (
         (r"For \d+ replicate contexts", "For 36 replicate contexts at $t=100$, two denoiser evaluations give mean absolute $R_{\\mathrm{obs}}="
-         + residual + f"$ in HMM units and energy score {context['mean_es_vs_ref']:.3f}."),
-        ("Independent draws from the exact", f"Independent draws from the exact conditional distribution give an energy score of {context['mean_reference_self_energy_mc']:.3f}."),
-        ("In a separate evaluation", "In a separate evaluation on 288 HMM windows, two denoiser evaluations also score worse than exact conditional draws, while DDIM with 25, 50, and 100 evaluations gives scores much closer to the score of exact draws on those windows"),
+         + residual + f"$ in HMM units and energy score {context['mean_es_vs_ref']:.3f}, compared with "
+         + f"{context['mean_reference_self_energy_mc']:.3f} for independent draws from the exact conditional distribution."),
+        ("On a separate set", "On a separate set of 288 HMM windows, two denoiser evaluations again score worse than exact conditional draws; DDIM with 25, 50, and 100 evaluations gives scores much closer to that reference"),
         ("These Monte Carlo comparisons", "These Monte Carlo comparisons have finite sampling error."),
     )
     for anchor, expected in clauses:
@@ -1815,7 +1815,7 @@ def deadline_claims(tex, rendered, real, evidence):
         bind_clause((tex, rendered), clause_pattern(prose_text(anchor, source=True)), expected_clause)
     selection = evidence["D_selection"]
     bind("For D, clipping the ensemble", f"For D, clipping the ensemble from the checkpoint selected using raw draws changes the energy score by ${selection['fixed_checkpoint_correction']:.5f}$")
-    bind("Selecting weights independently", f"Selecting weights independently on VAL after clipping adds ${selection['selection_effect']:.5f}$; only seed~7 changes checkpoint.")
+    bind("Selecting the checkpoint independently", f"Selecting the checkpoint independently on VAL after clipping contributes an additional score change of ${selection['selection_effect']:.5f}$; only seed~7 changes checkpoint.")
     for anchor, expected_clause in (
         ("Each percentile is calculated", "Each percentile is calculated from the draws and hidden bins of one window, then averaged over months and seeds. This differs from a percentile of all samples pooled together."),
         ("Minimum displacement", "Minimum displacement is not established for this map."),
@@ -1832,10 +1832,11 @@ def deadline_claims(tex, rendered, real, evidence):
     # Tables retain the numerical results omitted from the conceptual abstract.
     difference = real[0]["arm_means"]["D_raw"] - real[0]["arm_means"]["O-S_raw"]
     require(difference > 0, "selected penalty improvement direction changed")
-    bind("The energy score compares", "The energy score compares predictive distributions: a penalty on the identity residual gives little mean improvement over diffusion alone when validation chooses the model.")
+    bind("Experiments with conditional diffusion", "Experiments with conditional diffusion compare a residual penalty, algebraic completion and clipping using the energy score to assess predictive distributions.")
+    bind("The penalty gives", "The penalty gives little mean improvement over diffusion alone when validation selects the model, although it improves the score at the end of each training run.")
     require(real[1]['methods']['G5_raw']['metrics']['cov90_mean']['month_balanced'] < .9,
             "G5 coverage no longer falls below nominal")
-    bind("Generating the quantities needed", "Generating the quantities needed to derive the remaining statistic gives the lowest mean score on those quantities. Both representation and training loss change, and prediction intervals cover fewer withheld values than intended.")
+    bind("A model that", "A model that derives one statistic from the others has the lowest mean score on the directly generated quantities. Its representation and training loss both change, and its intervals fall short of nominal coverage.")
     g5, boundary = (operator["methods"][name]["metrics"] for name in ("G5", "gaussian"))
     data_only = operator["methods"]["D"]["metrics"]
     target_reduction = data_only["raw_target_term"]["month_balanced"] - g5["raw_target_term"]["month_balanced"]
@@ -1896,7 +1897,16 @@ def deadline_claims(tex, rendered, real, evidence):
     difference = 100 * (abs(coverage["O-S_raw"]["metrics"]["cov90_mean"]["month_balanced"] - .9)
                         - abs(coverage["D_raw"]["metrics"]["cov90_mean"]["month_balanced"] - .9))
     require(difference > 2, "original descriptive coverage flag changed")
-    bind("O-S's absolute departure", f"O-S's absolute departure from nominal 90\\% coverage exceeds D's by {difference:.1f} percentage points, beyond the prespecified two-point threshold.")
+    require(coverage["O-S_raw"]["metrics"]["cov90_mean"]["month_balanced"]
+            < coverage["D_raw"]["metrics"]["cov90_mean"]["month_balanced"] < .9,
+            "O-S/D undercoverage directions changed")
+    table_labels = re.findall(r"\\label\{(tab:[^}]+)\}", strip_comments(tex))
+    require(table_labels.count("tab:calibration") == 1, "coverage comparison requires calibration table")
+    number = table_labels.index("tab:calibration") + 1
+    bind_clause((tex.replace(r"\ref{tab:calibration}", str(number)), rendered),
+                clause_pattern("o-s's coverage"),
+                f"O-S's coverage falls farther below the nominal 90\\% than D's in Table~{number}. "
+                f"The difference is {difference:.1f} percentage points, beyond the prespecified threshold of two percentage points.")
     fixed = evidence["fixed_final"]
     if fixed is not None:
         expected = {}
@@ -1913,11 +1923,11 @@ def deadline_claims(tex, rendered, real, evidence):
         bind_table(tex, rendered, "tab:fixedfinal", expected, ("Coefficient / seed",))
         require(np.all(np.asarray(means["0.0005"]["raw"]) < means["0"]["raw"]), "final original-coefficient seed signs changed")
         bind("At the original coefficient, O-S", "At the original coefficient, O-S has a lower energy score than D for every seed at the end of training.")
-        bind("At the final training step, the original", "At the final training step, the original O-S coefficient gives a lower mean raw energy score than D and improves all three seeds.")
+        bind("At the final training step", "At the final training step, O-S with the original coefficient has a lower raw energy score than D for all three seeds and on average.")
         bind("Further fits would be needed", "Further fits would be needed to establish whether this pattern persists beyond the current exploratory comparison.")
         bind("The final step was", "The final step was specified in advance. All twelve fits enter this exploratory comparison, without choosing a checkpoint or coefficient from their scores.")
         bind("Residual estimation uses extra", "Residual estimation uses extra denoiser evaluations, so equal update counts involve different amounts of computation.")
-        bind("Computation can differ", "Computation can differ despite equal step counts, and score differences may reflect convergence or overfitting.")
+        bind("Equal step counts", "Equal step counts can involve different amounts of computation, and score differences may reflect convergence or overfitting.")
         residuals = [float(np.mean([row["results"]["raw"]["summary"]["r_obs_mean"]["month_balanced"]
                                    for row in fixed["rows"] if row["id"].startswith("c" + coefficient + "_s")]))
                      for coefficient in FIXED_COEFFICIENTS]
@@ -2327,7 +2337,8 @@ def illustration_claims(tex, rendered):
         ('Gaussian regression covers all', 'Gaussian regression covers all twelve bins in both windows with much wider intervals.'),
         ('It uses the same residual covariance', 'It uses the same residual covariance for every context, and its distribution assigns probability to negative $v_s$, which is physically impossible.'),
         ('Gaussian regression covers all twelve bins in both windows with much wider intervals', 'Gaussian regression covers all twelve bins in both windows with much wider intervals. It uses the same residual covariance for every context, and its distribution assigns probability to negative $v_s$, which is physically impossible.'),
-        ('The aggregate results also', 'The aggregate results also show undercoverage of the variance. How often the particular errors in these examples occur across TEST, and how they arise during training, remain uncertain.'),
+        ('The aggregate results also', 'The aggregate results also show that diffusion intervals cover the variance less often than nominal.'),
+        ('How often the particular errors', 'How often the particular errors in these examples occur across TEST, and how they arise during training, remain uncertain.'),
         ('Windows 120 and 360', 'Windows 120 and 360, counting from zero, are the midpoints of the two halves of the ordered list of 480 windows.'),
         ('The windows were chosen by position', 'The windows were chosen by position, independently of model error, after TEST had already been examined.'),
         ('Diffusion uses seed 7, the first', 'Diffusion uses seed 7, the first declared seed, with model weights chosen from raw validation samples: training step 9560 for D and 29636 for O-S and G5.'),
