@@ -3,7 +3,7 @@
 The first subplot compares denoiser outputs with conditional draws on repeated
 contexts. The second evaluates generated ensembles on 288 windows. Its line
 uses exact_reference.mean_energy, a different quantity from the conditional
-self-score in the first subplot. Both are finite Monte Carlo estimates.
+expected score in the first subplot. Both are finite Monte Carlo estimates.
 """
 
 from __future__ import annotations
@@ -205,7 +205,7 @@ def plot_evidence(context_rows, sampler_rows, reference):
                      color=COLORS[2], markersize=4, label="Denoising estimate")
         axes[0].plot(t, [row["mean_reference_self_energy_mc"] for row in context_rows], "o",
                      color=COLORS[3], markerfacecolor="none", markersize=7,
-                     label="Conditional self-score")
+                     label="Expected conditional score")
         axes[0].set_xticks(t)
         axes[0].set_xlabel("Corruption timestep $t$")
         axes[0].set_title("(a) Denoising", loc="left", fontsize=8)

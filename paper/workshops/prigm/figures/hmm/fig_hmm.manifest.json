@@ -3,7 +3,7 @@
   "figure": "fig_hmm",
   "source": {
     "path": "fig_hmm.py",
-    "sha256": "1291b5b8f5126f7a8f4b030d12c41b53e81a87d4a43e73f0d89d93cbfcca5e31"
+    "sha256": "221bb60c4774d89b801271cef62b8401b79241645385bfbd8b0159f751cf1d16"
   },
   "style": {
     "path": "prigm.mplstyle",
@@ -136,7 +136,7 @@
   "matplotlib_version": "3.10.9",
   "backend": "Agg",
   "output_sha256": {
-    "fig_hmm.pdf": "32803a5c3ac5fea4c1531f057018c7894b627853e427ddeb57621f57abf1ff20",
-    "fig_hmm.png": "23706eacdcdd80ba4b78c2e4914477c467bf34e6f220fbd0601ad7a12d22547a"
+    "fig_hmm.pdf": "787316eac782aaa929a01458a744641bdca405c363d719c849361976ae64ca55",
+    "fig_hmm.png": "203ad05f2e01fd9646157794f420e3f271552d09e6a6eb1316c3c79536db61a2"
   }
 }

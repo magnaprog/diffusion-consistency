@@ -383,7 +383,7 @@ def test_checkpoint_claim_mutations_are_rejected(checked_public, change):
         source = source.replace("figures/calibration/fig_calibration.pdf", "figures/checkpoints/fig_checkpoints.pdf")
         source = source.replace("CHECKPOINT_IMAGE", "figures/calibration/fig_calibration.pdf")
     else:
-        source = source.replace("both the choices and evaluation count are fixed before any additional TEST samples are generated.", "", 1)
+        source = source.replace("These choices and the evaluation count are fixed before additional TEST samples are generated.", "", 1)
     assert source != (PAPER / "main.tex").read_text()
     with pytest.raises(ERRORS):
         camera.checkpoint_claims(source, g.prose_text(source, source=True), checked_public)

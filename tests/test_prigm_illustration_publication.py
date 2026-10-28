@@ -58,7 +58,7 @@ MUTATIONS = (
     ('cover zero, one and two bins', 'cover one, two and three bins'),
     ('covers all twelve bins in both windows', 'covers eleven bins in both windows'),
     ('its distribution assigns probability to negative', 'its distribution assigns zero probability to negative'),
-    ('The aggregate results also show undercoverage of the variance', 'The aggregate results establish nominal coverage of the variance'),
+    ('The aggregate results also show that diffusion intervals cover the variance less often than nominal', 'The aggregate results also show that diffusion intervals cover the variance as often as nominal'),
     ('and how they arise during training, remain uncertain', 'and how they arise during training, are established'),
     ('the mean residual decreases as the penalty grows', 'the mean residual increases as the penalty grows'),
     ('the mean energy score first improves and then worsens', 'the mean energy score first worsens and then improves'),
