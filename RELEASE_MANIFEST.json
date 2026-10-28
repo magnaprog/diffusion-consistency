@@ -1,5 +1,5 @@
 {
-  "base_commit": "851281f77ea90f9f0262ec272ede28948289d25b",
+  "base_commit": "d61e5a248a3d4a89538c9e95ca288c9c312b2441",
   "excluded": [
     "Git history",
     "private handoffs and execution receipts",
@@ -93,7 +93,7 @@
     },
     "experiments/_prigm_documentation.py": {
       "bytes": 4983,
-      "sha256": "49c806cc988be23d0bf99ed0cdd45a2e66bfa2e4c6f8c4fc948336d50083a412"
+      "sha256": "f18c9f13bab009d85bae8d787b3ce774e493eed9b1d6cb6fd863d1992bb5c264"
     },
     "experiments/_prigm_illustrations.py": {
       "bytes": 24385,
@@ -476,8 +476,8 @@
       "sha256": "651d668e5a714579c8809b1e49c6a146f0c214b2996b2637bde4eed6fc9f5bff"
     },
     "prigm/controls.py": {
-      "bytes": 3232,
-      "sha256": "4a991b7af5274f414ce0b58d57594e0166e5c5a3dc41e8893ef63662d43f3c11"
+      "bytes": 3355,
+      "sha256": "f48093ccd6ffa946a6a8aed073934a4bb0024ea9ace6e07f1b4d4c9f203019ca"
     },
     "prigm/data.py": {
       "bytes": 9346,
@@ -661,7 +661,7 @@
     },
     "reproducibility/documentation_source/MANIFEST.json": {
       "bytes": 10014,
-      "sha256": "564156200a1fbf13f0c2907886d0a2fc78964ca120fde25dd240aa6068ae4e6c"
+      "sha256": "34a0d53119f8cae1e0cafa0e2c8e65fb8271ae3f08cace0a7efb878114c4638c"
     },
     "reproducibility/documentation_source/README.md": {
       "bytes": 2333,

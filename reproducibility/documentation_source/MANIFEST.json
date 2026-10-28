@@ -70,7 +70,7 @@
       "before_sha256": "998109aec1a85acc30002cd3f8f895ee0ba26e14b4165d9610d227558b74a358"
     },
     "prigm/controls.py": {
-      "after_sha256": "4a991b7af5274f414ce0b58d57594e0166e5c5a3dc41e8893ef63662d43f3c11",
+      "after_sha256": "f48093ccd6ffa946a6a8aed073934a4bb0024ea9ace6e07f1b4d4c9f203019ca",
       "before_sha256": "b75f588ef49b8cce59f701fbc86c3f076e635ddb9a95f48879607c6e3ef32536"
     },
     "prigm/data.py": {
