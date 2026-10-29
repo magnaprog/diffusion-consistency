@@ -677,10 +677,10 @@ def bundle_template(tmp_path_factory):
     means = {k: v["mean_energy"] for k, v in oracle["methods"].items()}
     oracle_rows = {row: [f"{means[k]:.4f}"] for row, k in gate.ORACLE_ROWS.items()}
     paragraph = ("An exact denoiser isolates error in the sampling approximation. "
-                 + r"Across 36 replicate contexts at $t=100$, two evaluations give mean absolute $R_{\mathrm{obs}}=1.23\times10^{-5}$ in HMM units, yet energy score 5.123 versus "
+                 + r"Across 36 cases at $t=100$, two evaluations give mean absolute $R_{\mathrm{obs}}=1.23\times10^{-5}$ in HMM units, yet energy score 5.123 versus "
                  + "2.356 for independent exact conditional samples. "
-                 + "On a separate set of 288 windows, two evaluations again give a poor score, while 25, 50, or 100 DDIM evaluations approach the exact conditional ensemble. "
-                 + "These estimates have finite sampling error.")
+                 + "Separately, DDIM sampling on 288 windows gives a poor score with two evaluations and scores close to that of the exact conditional ensemble with 25, 50, or 100. "
+                 + "All scores have finite sampling error.")
     number_values = (200, 2000, 1000, 900, 800, 700, 300, 400, 250, 40, 10)
     count_text = " ".join(f"{v:,}".replace(",", "{,}") for v in number_values) + r" 10.00\% 2.35\times10^{-13} 0.1235"
     q15_text = (r"This property also holds numerically for all 40 eligible intervals of 15 minutes that begin on a UTC quarter hour within the union of training windows: the calculation from three bins differs from that using the original fifteen vectors by at most $2.35\times10^{-13}\,\mathrm{nT}^2$. "
@@ -1005,8 +1005,8 @@ def test_oracle_table_rounding_bound_to_each_method(bundle, key):
 @pytest.mark.parametrize("old,new", [("energy score 5.123", "energy score 5.124"),
                                     ("versus 2.356", "versus 2.357"),
                                     (r"1.23\times10^{-5}", r"1.23\times10^{-6}"),
-                                    ("two evaluations again give a poor score", "two evaluations again give an excellent score"),
-                                    ("25, 50, or 100 DDIM evaluations", "25, 51, or 100 DDIM evaluations")])
+                                    ("gives a poor score with two evaluations", "gives an excellent score with two evaluations"),
+                                    ("25, 50, or 100", "25, 51, or 100")])
 def test_main_toy_prose_mutations_cannot_hide_in_valid_table(bundle, old, new):
     tex = (bundle["root"] / "main.tex").read_text()
     assert old in tex
@@ -1017,9 +1017,9 @@ def test_main_toy_prose_mutations_cannot_hide_in_valid_table(bundle, old, new):
 
 @pytest.mark.parametrize("scope", ["source", "PDF"])
 @pytest.mark.parametrize("anchor,old,new", [
-    ("Across 36 replicate contexts", "energy score 5.123", "energy score 5.124"),
-    ("Across 36 replicate contexts", "versus 2.356", "versus 2.357"),
-    ("On a separate set", "again give a poor score", "again give an excellent score"),
+    ("Across 36 cases", "energy score 5.123", "energy score 5.124"),
+    ("Across 36 cases", "versus 2.356", "versus 2.357"),
+    ("Separately, DDIM sampling on", "gives a poor score", "gives an excellent score"),
 ])
 def test_bad_toy_comparison_cannot_hide_behind_valid_duplicate(bundle_template, scope, anchor, old, new):
     root = bundle_template["root"]
@@ -2010,8 +2010,8 @@ def test_toy_clause_rejects_an_unmatched_page_top_float(bundle_template):
     root = bundle_template["root"]
     tex = (root / "main.tex").read_text()
     rendered = extracted(bundle_template["pages"])
-    rendered, count = re.subn(r"On a separate set of\s+288\s+windows,",
-                             "On a separate set of 288 windows,\nFigure 1: An unmatched diagnostic.\n", rendered)
+    rendered, count = re.subn(r"Separately, DDIM sampling on\s+288\s+windows",
+                             "Separately, DDIM sampling on 288 windows\nFigure 1: An unmatched diagnostic.\n", rendered)
     assert count == 1
     with pytest.raises(ERRORS, match="clause"):
         gate.toy_claims(tex, rendered, gate.validate_toy(root))
@@ -2028,11 +2028,11 @@ def test_toy_ddim_clause_crosses_only_a_matching_operator_float(bundle_template,
     number = labels.index("fig:operator") + 1
     rendered = extracted(bundle_template["pages"])
     pdf_caption = "A synthetic operator figure with a linear region inside ±0.005."
-    insertion = f"while\n3\n\fAxis labels\nFigure {number}: {pdf_caption}\n\n"
-    continuation = "25, 50, or 100 DDIM evaluations approach"
+    insertion = f"with\n3\n\fAxis labels\nFigure {number}: {pdf_caption}\n\n"
+    continuation = "25, 50, or 100"
     rendered, count = re.subn(r"\s+".join(map(re.escape, continuation.split())), continuation, rendered)
     assert count == 1
-    rendered, count = re.subn(r"while\s+(?=25,\s*50,\s*or\s*100 DDIM evaluations approach)",
+    rendered, count = re.subn(r"with\s+(?=25,\s*50,\s*or\s*100)",
                              lambda _: insertion, rendered)
     assert count == 1
     evidence = gate.validate_toy(root)
@@ -2046,7 +2046,7 @@ def test_toy_ddim_clause_crosses_only_a_matching_operator_float(bundle_template,
                                  lambda match: match[1] + "987.6543", rendered)
         assert count == 1
     elif damage == "sampler_name":
-        rendered = rendered.replace("DDIM evaluations approach", "other evaluations approach")
+        rendered = rendered.replace("DDIM sampling", "other sampling")
     if damage is None:
         gate.toy_claims(tex, rendered, evidence)
     else:
@@ -2140,8 +2140,9 @@ def test_learned_table_order_inventory_and_percentage_scaling(bundle_template, d
 FOLLOWUP_TITLES = ("Training diffusion models on the same HMM", "How the residual penalty is weighted", "Directional cancellation with thresholds from TRAIN")
 
 
-@pytest.mark.parametrize("damage", [None, "caption", "number", "value", "missing_row", "seed_sign"])
-def test_cancellation_clause_rejoins_only_the_complete_annual_table(bundle_template, damage):
+@pytest.mark.parametrize("location", ["seeds", "training_count"])
+@pytest.mark.parametrize("damage", [None, "caption", "number", "value", "missing_row", "seed_sign", "count", "count_duplicate"])
+def test_cancellation_clause_rejoins_only_the_complete_annual_table(bundle_template, location, damage):
     b = bundle_template
     tex = (b["root"] / "main.tex").read_text()
     labels = re.findall(r"\\label\{(tab:[^}]+)\}", tex)
@@ -2156,13 +2157,26 @@ def test_cancellation_clause_rejoins_only_the_complete_annual_table(bundle_templ
         rows[1][-1] = "987.6543"
     elif damage == "missing_row":
         rows.pop()
-    insertion = f"All three seed\n18\n\fTable {number}: {caption}\n" + "\n".join("  ".join(row) for row in rows) + "\n\n"
-    pdf, count = re.subn(r"All\s+three\s+seed\s+(?=differences are)",
+    rendered = extracted(b["pages"])
+    pattern = (r"All\s+three\s+seed\s+(?=differences are)" if location == "seeds" else
+               r"Every\s+one\s+of\s+the\s+[^\s]+\s+overlapping\s+training\s+windows\s+(?=contributes\s+equally)")
+    match = re.search(pattern, rendered)
+    assert match is not None
+    prefix = match[0].strip()
+    if damage in ("count", "count_duplicate"):
+        prefix = prefix.replace("three", "-999") if location == "seeds" else re.sub(r"\d+", "-999", prefix)
+    insertion = f"{prefix}\n18\n\fTable {number}: {caption}\n" + "\n".join("  ".join(row) for row in rows) + "\n\n"
+    pdf, count = re.subn(pattern,
                         lambda _: insertion, extracted(b["pages"]))
     assert count == 1
     if damage == "seed_sign":
         pdf, count = re.subn(r"differences are(\s+)negative\b", r"differences are\1positive", pdf)
         assert count == 1
+    if damage == "count_duplicate":
+        complete = re.search(pattern + r"[^.]+\.", rendered)[0]
+        # Keep the valid duplicate in the same subsection; preserve the false
+        # count across the table rather than replacing it during normalization.
+        pdf = pdf.replace(insertion, complete + "\n" + insertion, 1)
     check = followup_check(b, FOLLOWUP_TITLES[2])
     if damage is None:
         check(tex, pdf)
@@ -2658,7 +2672,7 @@ def test_numeric_claim_slots_reject_malformed_values_and_valid_duplicates(
     if kind == "toy":
         evidence = gate.validate_toy(b["root"])
         check = lambda source, pdf: gate.toy_claims(source, pdf, evidence)
-        pattern = r"Across\s+(?P<slot>36)\s+replicate contexts[\s\S]*?independent exact conditional samples\."
+        pattern = r"Across\s+(?P<slot>36)\s+cases[\s\S]*?independent exact conditional samples\."
     elif kind == "gradient":
         check = followup_check(b, FOLLOWUP_TITLES[1])
         pattern = r"At\s+\$?t\s*=\s*(?P<slot>25)\$?,\s+the ranges[\s\S]*?(?=\s+Each range spans)"

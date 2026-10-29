@@ -56,7 +56,7 @@ CUDA_VISIBLE_DEVICES='' MPLBACKEND=Agg OPENBLAS_NUM_THREADS=2 OMP_NUM_THREADS=2 
   python experiments/verify_prigm_paper.py
 ```
 
-The verifier compares selected numerical claims and figure records with the public experimental files. It checks which source versions produced those records and examines the supplied manuscript PDF. It does not retrain neural models or certify every sentence. Rebuild the PDF after changing TeX.
+The verifier compares selected numerical claims and figure records with the public experimental files. It compares the source versions with those recorded for the results and examines the supplied manuscript PDF. It does not retrain neural models or certify every sentence. Rebuild the PDF after changing TeX.
 
 The toy interval calculations regenerate the exact conditional ensembles with
 the original random stream. For each of the 288 windows, the verifier checks
@@ -111,6 +111,22 @@ python -m prigm.oracle --toy-eval paper/workshops/prigm/evidence/toy/toy.npz \
 
 This small execution check does not reproduce the paper's estimates. Omit the two size overrides to evaluate the default 288 windows and 39 draws.
 
+The checkpoint sensitivity analysis uses the supplied validation and test scores.
+It repeats validation choice in 10,000 resamples of years, using the same year
+multiplicities for both sets and all fits. To reproduce it on CPU:
+
+```bash
+mkdir -p runs
+python scripts/analyze_prigm_checkpoint_reselection.py \
+  --output runs/checkpoint-reselection.json
+```
+
+The output path must be new. The calculation compares checkpoint choice repeated
+in each resample with retaining the original choices in those same resamples.
+It measures sensitivity for the existing fits and samples; it does not represent
+uncertainty from retraining. The scientific verifier independently recomputes the
+selection counts and intervals from the public scores.
+
 For real-data reconstruction, obtain the 2005 through 2024 one-minute ASCII
 files in the [modified Level-3 OMNI format](https://spdf.gsfc.nasa.gov/pub/data/omni/high_res_omni/modified/hro_modified_format.txt)
 from the [NASA data directory](https://spdf.gsfc.nasa.gov/pub/data/omni/high_res_omni/modified/).
@@ -135,14 +151,17 @@ python experiments/run_prigm_fixed_final_sensitivity.py --help
 Create a separate directory for each new study and retain its declared settings,
 input hashes and execution records. The real-data coordinator chooses checkpoints
 from validation scores before evaluating TEST. The toy coordinator evaluates
-update 5000, and the coefficient sensitivity coordinator compares update 29636
-across its declared settings. Each checks source identities throughout its stages.
+update 5000. The coefficient sensitivity coordinator extends the original study
+at update 29636. It requires the exact original protocol, saved checkpoints,
+ensembles, arrays and matching execution sources, which are not all included
+in this release. An arbitrary fresh study cannot serve as its original input.
+Each coordinator checks source identities throughout its stages.
 Analyses of TEST data that were already examined remain retrospective; generating
 new predictions does not make those observations an independent test set.
 
 ## Build the paper and its source archives
 
-The figure-generating scripts share `paper/workshops/prigm/prigm.mplstyle`. Figure text and mathematics use DejaVu Serif, supplied by Matplotlib. Axis labels and subplot titles are 8 points; ticks, legends and notes are 7 points at the manuscript's display widths. Colors have consistent meanings, and markers, line patterns, hatching and subplot labels also identify the quantities. The Okabe-Ito method palette uses blue for D, vermilion for O-S, bluish green for G5 and reddish purple for Gaussian regression. In Figures 1(b) and 4(a), sky-blue bars show changes in distance to the withheld observations, orange hatched bars show the negative change in dispersion, and purple diamonds show the resulting score change. Figure 1(b) compares predictions after and before clipping; Figure 4(a) compares G5 with D. These score-component colors are distinct from the method palette. The scientific inputs, plotted numerical values, workshop manuscript template and body fonts remain unchanged.
+The figure-generating scripts share `paper/workshops/prigm/prigm.mplstyle`. Figure text and mathematics use DejaVu Serif, supplied by Matplotlib. Axis labels and subplot titles are 8 points; ticks, legends and notes are 7 points at the manuscript's display widths. Colors have consistent meanings, and markers, line patterns, hatching and subplot labels also identify the quantities. The Okabe-Ito method palette uses blue for D, vermilion for O-S, bluish green for G5 and reddish purple for Gaussian regression. In Figures 5(b) and 4(a), sky-blue bars show changes in distance to the withheld observations, orange hatched bars show the negative change in dispersion, and purple diamonds show the resulting score change. Figure 5(b) compares predictions after and before clipping; Figure 4(a) compares G5 with D. These score-component colors are distinct from the method palette. The scientific inputs, plotted numerical values, workshop manuscript template and body fonts remain unchanged.
 
 The generators resolve DejaVu Serif without a default-font fallback and embed
 TrueType subsets in the PDFs. No separate installation of plotting fonts is needed to generate
@@ -184,7 +203,7 @@ For an arXiv source ZIP, use a fresh output directory:
 python3 scripts/package_prigm_arxiv.py --output dist/prigm-arxiv-YYYYMMDD
 ```
 
-This command retains the title, author information, workshop layout, bibliography and figure contents. It gives the eight figure PDFs simple filenames and changes only their paths in the exported TeX. The twelve-file ZIP contains `main.tex`, `references.bib`, a newly built `main.bbl`, the original `neurips_2025.sty` and the eight figures. It excludes scientific data, programs and review records.
+This command retains the title, author information, workshop layout, bibliography and figure contents. It gives the nine figure PDFs simple filenames and changes only their paths in the exported TeX. The thirteen-file ZIP contains `main.tex`, `references.bib`, a newly built `main.bbl`, the original `neurips_2025.sty` and the nine figures. It excludes scientific data, programs and review records.
 
 The packager checks the scientific evidence, compiles the source and the extracted ZIP separately, and compares every page from both builds with the workshop PDF at 100 DPI. It requires embedded outline fonts, settled references and no overfull boxes or oversized figures. Source changes during these checks cause failure. The output directory retains the source files, preview PDF, verification record and logs; failed attempts retain their logs. Use a new directory after resolving a failure.
 
@@ -204,9 +223,10 @@ The ZIP is named `residual_penalties_algebraic_completion_arxiv.zip`, and the pr
 
 Private handoffs, execution logs, caches, raw inputs, old anonymous bundles,
 unused cycle/strata figures, the editorial wording scanner and the legacy GPU
-wrapper are excluded. Historical
-document names retained in scientific provenance strings identify original
-records; those private planning files are not release instructions.
+wrapper are excluded. Historical plan references in code comments, docstrings and scientific
+provenance identify original records. The private planning files are excluded;
+use the included manuscript for scientific definitions and this guide for
+current commands.
 
 Repository code uses the [MIT license](../LICENSE). Preserve its copyright
 and permission notice when distributing copies. The unchanged NeurIPS style

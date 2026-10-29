@@ -31,7 +31,7 @@ if hashlib.sha256(STYLE_PATH.read_bytes()).hexdigest() != STYLE_SHA256:
     raise ValueError("style changed during import")
 COLORS = tuple(STYLE["axes.prop_cycle"].by_key()["color"])
 HATCHES = ("", "///", "...", "xxx")
-# Same score-component colors as Figure 1; method colors remain separate.
+# Same score-component colors as the clipping figure; method colors remain separate.
 TERM_COLORS = ("#56B4E9", "#E69F00")
 SUMMARY_COLOR = "#7B2CBF"
 ALL_METHODS = {*METHODS, "I-S", "gaussian"}
@@ -129,9 +129,12 @@ def load_calibration(path, digest):
 
 
 def plot(decomposition, tails):
-    fig = plt.figure(figsize=(5.5, 5.0))
+    # Remove only the repeated assumption footer; keep the plotted panels' size.
+    height, removed = 4.7, .3
+    fig = plt.figure(figsize=(5.5, height))
     grid = fig.add_gridspec(2, 2, height_ratios=(0.85, 1), left=.12, right=.97,
-                           bottom=.22, top=.94, hspace=.60, wspace=.20)
+                           bottom=(.22 * 5 - removed) / height,
+                           top=(.94 * 5 - removed) / height, hspace=.60, wspace=.20)
     a = fig.add_subplot(grid[0, :])
     b = fig.add_subplot(grid[1, 0])
     c = fig.add_subplot(grid[1, 1], sharey=b)
@@ -184,12 +187,10 @@ def plot(decomposition, tails):
     handles = [Patch(facecolor=color, hatch=hatch, edgecolor="white", linewidth=0)
                for color, hatch in zip(COLORS, HATCHES)]
     fig.legend(handles, LABELS, frameon=False, fontsize=7, ncol=4, loc="lower center",
-               bbox_to_anchor=(.53, .125), columnspacing=1.3, handletextpad=.4)
-    fig.text(.53, .095, "Bars: mean of three diffusion fits or one Gaussian. Gray dots: individual fits.",
+               bbox_to_anchor=(.53, (.125 * 5 - removed) / height), columnspacing=1.3, handletextpad=.4)
+    fig.text(.53, (.095 * 5 - removed) / height,
+             "Bars: mean of three diffusion fits or one Gaussian. Gray dots: individual fits.",
              ha="center", fontsize=7)
-    fig.text(.53, .075, "The 5% line assumes that, at each time and coordinate,\n"
-             "the observation and ensemble members are exchangeable, with no ties.",
-             ha="center", va="top", fontsize=7)
     return fig
 
 
@@ -225,7 +226,7 @@ def main(argv=None):
         "pointwise_intervals_plotted": False,
         "seed_dots": {"seeds": list(SEEDS), "offsets_within_bar": [-.035, 0, .035],
                       "color": "0.4", "scope": "individual fixed neural models; not confidence intervals"},
-        "figure_inches": [5.5, 5.0], "interval_order_statistics": [2, 38],
+        "figure_inches": [5.5, 4.7], "interval_order_statistics": [2, 38],
         "axes": {"a": "linear; G5 minus D in 60 TRAIN-standardized coordinates; target minus dispersion",
                  "b": "linear percent; target strictly below second order statistic",
                  "c": "linear percent; target strictly above 38th order statistic"},

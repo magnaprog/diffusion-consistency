@@ -12,14 +12,16 @@ import numpy as np
 CHANNELS = ["mu_x", "mu_y", "mu_z", "m", "v_s"]
 METHODS = ("D", "I-S", "O-S", "G5", "gaussian", "full_flank_gaussian")
 SEEDS = [7, 13, 42]
-FIGURES = {"figures/calibration/fig_calibration.pdf", "figures/checkpoints/fig_checkpoints.pdf"}
+FIGURES = {"figures/calibration/fig_calibration.pdf", "figures/checkpoints/fig_checkpoints.pdf",
+           "figures/overview/fig_overview.pdf"}
 CALIBRATION_PINS = {
     "summary.json": "ad86c8344ee3c84d8423d0818a1d06ab7b0964ef70a7289bcc6ffcd32461873d",
     "per_window.npz": "d8f738012e3c8d2e977e21c77d404c5e7a76c2f996202127be02011c57ee65d4",
     "PROTOCOL.json": "00f15fae93bbb01846ec53ab726815464a28c7708d9ee79109ead0e7363899b5",
 }
 FIGURE_PINS = {
-    "fig_calibration": "0c5f9fc5a27acdc47fa739a4749b05eb47fc417858bebd17bc897b34a70d8144",
+    "fig_overview": "b526f9b0270378785388a6fdbbe1b86e96039d54f7ab29bd6a0cb69e86e2d0ec",
+    "fig_calibration": "aa39c366feedf5770309a8515fba0eacfc8d884d3cd51a41b947783ba7c9a4af",
     "fig_checkpoints": "8c56aaac2b5fb2e1a0c3525b909884b01ebbd0efe334894b92395d887390fe2f",
 }
 
@@ -156,7 +158,7 @@ def validate_calibration(paper, real):
 
 def figure_record(paper, name, inputs):
     from experiments import verify_prigm_paper as g
-    folder = "calibration" if name == "fig_calibration" else "checkpoints"
+    folder = {"fig_calibration": "calibration", "fig_checkpoints": "checkpoints", "fig_overview": "overview"}[name]
     root = g.local(paper, "figures/" + folder)
     path = root / (name + ".manifest.json")
     require(name in FIGURE_PINS and g.digest(path) == FIGURE_PINS[name], "reviewed figure manifest: " + name)
@@ -167,7 +169,7 @@ def figure_record(paper, name, inputs):
     g.agree(record.get("style"), {"path": "prigm.mplstyle",
                                   "sha256": g.digest(g.local(paper, "prigm.mplstyle"))},
             "figure style " + name)
-    g.agree(record["inputs"], {k: {"path": str(v) if name == "fig_checkpoints" else Path(v).name,
+    g.agree(record["inputs"], {k: {"path": Path(v).name if name == "fig_calibration" else str(v),
                                   "sha256": g.digest(g.local(paper, v))}
                                for k, v in inputs.items()}, "figure inputs " + name)
     outputs = {name + ".png", name + ".pdf"}
@@ -315,3 +317,183 @@ def checkpoint_claims(tex, rendered, checked):
     require(g.prose_text(g.float_caption(floats, "fig:checkpoints"), source=True) == g.prose_text(caption, source=True),
             "checkpoint caption differs")
     bind("How the D/O-S comparison changes", caption)
+
+
+def validate_reselection(paper, checked):
+    """Recompute the paired-year sensitivity from authenticated window scores.
+
+    Draw year indices directly, preserving repeated years. This does not use the
+    producer's month-reduction, selection or bootstrap helpers, or retrain fits.
+    """
+    from experiments import verify_prigm_paper as g
+    from experiments import _prigm_checkpoint_evidence as c
+    record = g.read_json(g.local(paper, "evidence/followup/checkpoint_reselection.json"))
+    g.private_check(record)
+    summary = checked["summary"]
+    input_path = "evidence/followup/checkpoints/SUMMARY.json"
+    input_hash = g.digest(g.local(paper, input_path))
+    g.agree(input_hash, checked["manifest"]["files"]["SUMMARY.json"], "reselection authenticated scores")
+    g.agree(g.read_json(g.local(paper, input_path)), summary, "reselection supplied scores")
+    years = {}
+    for split in ("VAL", "TEST"):
+        data = summary["scores"][split]
+        months = c.window_months(data["ids"], data["months"], split)
+        g.agree(sorted(data["data"]), sorted(c.JOBS), "reselection complete grid")
+        windows = np.asarray([data["data"][job] for job in c.JOBS])
+        require(windows.shape == (30, c.COUNTS[split]) and windows.dtype.kind in "if"
+                and np.isfinite(windows).all(), "reselection finite score population")
+        monthly = np.stack([windows[:, months == m].mean(axis=1) for m in np.unique(months)], axis=-1)
+        years[split] = monthly.reshape(6, 5, 20, 2).mean(axis=-1)
+    original = years["VAL"].mean(axis=-1).argmin(axis=1)
+    choices = {name: c.UPDATES[index] for name, index in zip(c.NAMES, original)}
+    g.agree(choices, {name: summary["policies"][name]["P50"] for name in c.NAMES},
+            "reselection original VAL choices")
+    sampled = np.random.Generator(np.random.PCG64(7003)).integers(0, 20, size=(10000, 20))
+    # Shape: fit, checkpoint, replicate. Identical indices pair all comparisons.
+    validation = years["VAL"][:, :, sampled].mean(axis=-1)
+    test = years["TEST"][:, :, sampled].mean(axis=-1)
+    winners = validation.argmin(axis=1)  # Ascending updates resolve exact ties.
+    fixed = test[np.arange(6), original]
+    reselected = np.take_along_axis(test, winners[:, None, :], axis=1)[:, 0, :]
+    observed = years["TEST"].mean(axis=-1)[np.arange(6), original]
+    expected = {
+        "schema_version": 1, "analysis": "checkpoint_reselection_existing_scores",
+        "scope": "Exploratory sensitivity conditional on existing fits, saved checkpoints and ensemble draws; previously exposed TEST period.",
+        "limits": ["No retraining or new model samples", "No new-fit uncertainty",
+                   "No nominal coverage claim under temporal dependence",
+                   "Accepted fixed-selection intervals and historical evidence unchanged"],
+        "procedure": {"generator": "PCG64", "seed": 7003, "replicates": 10000,
+                      "years": list(range(2005, 2025)), "validation_evaluations": 50,
+                      "test_evaluations": 50, "ensemble_members": 39,
+                      "updates": list(c.UPDATES), "groups": list(c.NAMES),
+                      "weighting": "Equal represented-month means; repeated year occurrences retain multiplicity",
+                      "pairing": "Identical year multiplicities for VAL and TEST, all groups, fixed and reselected comparisons",
+                      "selection": "VAL only; exact ties to earlier update; all three fits retained"},
+        "original_choices": choices,
+        "observed_TEST": {"D": float(observed[:3].mean()), "O-S": float(observed[3:].mean()),
+                          "O-S_minus_D": float(observed[3:].mean() - observed[:3].mean())},
+        "selection_counts": {name: {str(update): int(np.count_nonzero(winners[i] == j))
+                                    for j, update in enumerate(c.UPDATES)} for i, name in enumerate(c.NAMES)},
+        "input": {"path": "paper/workshops/prigm/" + input_path, "sha256": input_hash},
+        "source": {"path": "scripts/analyze_prigm_checkpoint_reselection.py",
+                   "sha256": g.digest(g.local(g.REPO, "scripts/analyze_prigm_checkpoint_reselection.py"))},
+        "helper_sha256": {name: g.digest(g.local(g.REPO, name))
+                          for name in ("prigm/config.py", "prigm/scoring.py", "prigm/select.py")},
+    }
+    for name, scores in (("fixed_selection", fixed), ("reselected", reselected)):
+        d, o = scores[:3].mean(axis=0), scores[3:].mean(axis=0)
+        require(np.all(d > 0), "reselection positive relative denominator")
+        delta = o - d
+        expected[name] = {"mean": float(delta.mean()),
+                          "percentile_2_5_97_5": np.quantile(delta, [.025, .975]).tolist(),
+                          "relative_percentile_2_5_97_5": np.quantile(delta / d, [.025, .975]).tolist()}
+    g.agree(record, expected, "checkpoint reselection")
+    return record
+
+
+def reselection_claims(tex, rendered, record):
+    from experiments import verify_prigm_paper as g
+    fixed = record["fixed_selection"]["percentile_2_5_97_5"]
+    selected = record["reselected"]["percentile_2_5_97_5"]
+    clause = ("Repeating checkpoint choice also tests whether this sensitivity changes the O-S/D comparison. "
+              "In 10{,}000 resamples at seed 7003, the same year multiplicities weight validation and TEST. "
+              "Validation with 50 evaluations chooses each fit's checkpoint anew, with ties favoring the earlier update. "
+              f"The 2.5th and 97.5th percentiles of O-S minus D are $[{selected[0]:.4f},{selected[1]:.4f}]$, "
+              f"close to $[{fixed[0]:.4f},{fixed[1]:.4f}]$ when the original choices are retained in the same resamples. "
+              "Thus, allowing model choice to vary preserves the small aggregate difference in this exercise. "
+              "Both calculations condition on the existing fits and samples; uncertainty from retraining and nominal coverage "
+              "under temporal dependence remain outside this sensitivity check.")
+    rendered = re.sub(r"\b\d{1,3}(?:,\d{3})+(?=\s+resamples)", lambda m: m[0].replace(",", ""), rendered)
+    g.bind_clause((tex, rendered), g.clause_pattern("Repeating checkpoint choice"), clause)
+    # Also count the numeric sentences independently: a false sentence outside
+    # the valid paragraph must not be hidden by that complete paragraph.
+    for anchor, sentence in (
+        (r"in\s+[^\s]+\s+" + g.clause_pattern("resamples at seed") + r"\s+[^,\s]+\s*,\s*",
+         "In 10{,}000 resamples at seed 7003, the same year multiplicities weight validation and TEST."),
+        (g.clause_pattern("Validation with") + r"\s+[^\s]+\s+" + g.clause_pattern("evaluations chooses each fit"),
+         "Validation with 50 evaluations chooses each fit's checkpoint anew, with ties favoring the earlier update."),
+        (r"the\s+[^\s]+\s+and\s+[^\s]+\s+" + g.clause_pattern("percentiles of O-S minus D"),
+         f"The 2.5th and 97.5th percentiles of O-S minus D are $[{selected[0]:.4f},{selected[1]:.4f}]$, "
+         f"close to $[{fixed[0]:.4f},{fixed[1]:.4f}]$ when the original choices are retained in the same resamples."),
+    ):
+        g.bind_clause((tex, rendered), anchor, sentence)
+
+
+def validate_overview(paper, checkpoints, calibration):
+    """Bind every overview coordinate to the independently checked populations."""
+    from experiments import verify_prigm_paper as g
+    from experiments import _prigm_checkpoint_evidence as c
+    inputs = {name: "evidence/followup/checkpoints/" + name
+              for name in (*sorted(c.FILES), "MANIFEST.json")}
+    inputs["calibration"] = "evidence/followup/calibration/summary.json"
+    figure = figure_record(paper, "fig_overview", inputs)
+    policies = checkpoints["summary"]["policies"]
+    require(all(p["P25"] == p["P50"] for p in policies.values()), "overview validation choice agreement")
+    # Recompute TEST month means from windows, not the producer's plotted data.
+    data = checkpoints["summary"]["scores"]["TEST"]
+    months = np.asarray(data["months"])
+    scores = {}
+    for arm in c.ARMS:
+        scores[arm] = []
+        for seed in SEEDS:
+            name = f"{arm}_s{seed}"
+            selected = []
+            for policy in ("F", "P25"):
+                values = np.asarray(data["data"][f"{name}-g{policies[name][policy]}"])
+                selected.append(float(np.mean([values[months == m].mean() for m in np.unique(months)])))
+            scores[arm].append(selected)
+    contrast = np.asarray(scores["O-S"]) - scores["D"]
+    g.agree(figure["panel_a"], {"policy_order": ["F", "P25"], "x": [0, 1], "seeds": SEEDS,
+            "score_by_arm": scores, "seedwise": contrast.tolist(), "mean": contrast.mean(axis=0).tolist(),
+            "policies": policies, "validation_choices_agree": True}, "overview checkpoint coordinates")
+    methods = ["D", "O-S", "G5", "full_flank_gaussian"]
+    g.agree(figure["method_order"], methods, "overview method order")
+    g.agree(figure["channels"], CHANNELS, "overview channel order")
+    expected = {}
+    # Calibration was independently reduced from per-window fractions above.
+    # Keep one Gaussian realization, without inventing three Gaussian fits.
+    for index, name in enumerate(methods):
+        row = calibration["methods"][name]
+        seeds = [None] if name == "full_flank_gaussian" else SEEDS
+        g.agree(row["fixed_model_seeds"], seeds, "overview model population")
+        models = 100 * np.asarray(row["model_means"])[:, :, 1]
+        require(models.shape == (len(seeds), 5), "overview model coverage shape")
+        y = np.arange(5) + (index - 1.5) * .15
+        expected[name] = {"fixed_model_seeds": seeds, "mean_percent": models.mean(axis=0).tolist(),
+                          "model_means_percent": models.tolist(), "y": y.tolist(),
+                          "individual_y": [(y + offset).tolist() for offset in (-.028, 0, .028)]
+                          if len(seeds) == 3 else []}
+    g.agree(figure["panel_b"], expected, "overview coverage coordinates")
+    g.agree(figure["dependency_sources"], {key: {"path": name, "sha256": g.digest(g.local(paper, name))}
+            for key, name in (("checkpoints", "fig_checkpoints.py"), ("calibration", "fig_calibration.py"))},
+            "overview dependency sources")
+    g.agree(figure["calibration_provenance"], {key: calibration[key] for key in ("bootstrap", "per_window_sha256")},
+            "overview calibration provenance")
+    metadata = {"schema_version": 1, "figure": "fig_overview", "protocol_sha256": c.PROTOCOL,
+                "scope_sha256": c.SCOPE, "interval_order_statistics": [2, 38], "n_draws": 39, "n_windows": 480,
+                "pointwise_intervals_plotted": False,
+                "coverage_reference": {"percent": 90, "assumption": "at each time and coordinate, "
+                                       "the observation and 39 ensemble members are exchangeable, with no ties"}}
+    g.agree({key: figure[key] for key in metadata}, metadata, "overview population and reference")
+    return figure
+
+
+def overview_claims(tex, rendered):
+    from experiments import verify_prigm_paper as g
+    floats = tex.replace(r"\begin{figure}", r"\begin{table}").replace(r"\end{figure}", r"\end{table}")
+    block = g.float_block(floats, "fig:overview")
+    require(re.findall(r"\\includegraphics(?:\[[^]]*\])?\{([^}]+)\}", block)
+            == ["figures/overview/fig_overview.pdf"], "overview label and image differ")
+    caption = ("Model choice and predictive uncertainty. (a) O-S minus D energy score at the final update and at the "
+               "checkpoints chosen independently by raw validation score. Symbols distinguish the three training seeds; "
+               "diamonds show their mean. Negative values favor O-S. Validation with 25 or 50 evaluations chooses the same six checkpoints. "
+               "(b) Raw nominal 90\\% interval coverage for each "
+               "magnetic quantity. Large filled markers average three diffusion fits; small open circles show individual fits. "
+               "Gaussian regression uses one ensemble per window. The dashed line marks 90\\%. Scores and coverage give equal "
+               "weight to months; coverage also averages the twelve hidden positions.")
+    require(g.prose_text(g.float_caption(floats, "fig:overview"), source=True) == g.prose_text(caption, source=True),
+            "overview caption differs")
+    g.bind_clause((tex, rendered), g.clause_pattern("Model choice and predictive uncertainty"), caption)
+    g.bind_clause((tex, rendered), g.clause_pattern("Validation with") + r"\s+[^\s]+\s+or\s+[^\s]+\s+"
+                  + g.clause_pattern("evaluations chooses"),
+                  "Validation with 25 or 50 evaluations chooses the same six checkpoints.")

@@ -3,7 +3,7 @@
   "figure": "fig_imputation",
   "source": {
     "path": "fig_imputation.py",
-    "sha256": "ed2002fa616cf86bb1f5e05ab3f0e95a266ef4e4780546c7654c1a8b91335869"
+    "sha256": "4bdf21b8f4d16846814b781b807849288c99b53badd632bb6413b2bf7fe6afdd"
   },
   "style": {
     "path": "prigm.mplstyle",
@@ -21,6 +21,7 @@
   },
   "case_index": 120,
   "case_id": "2010-08-2010-08-03T12:00-s71",
+  "case_label": "ACE \u00b7 3 August 2010",
   "channels": [
     "mu_x",
     "mu_y",
@@ -2685,8 +2686,8 @@
   "scope": "Raw draws, no pooled seeds, smoothing, sampling or clipping. Nominal marginal bands are not a calibration claim. Examples selected after TEST exposure.",
   "matplotlib_version": "3.10.9",
   "output_sha256": {
-    "fig_imputation.pdf": "cfbbb1524140f29b0ec22f534defe1aad72e7986c3b2dc5fa30df1af41a98988",
-    "fig_imputation.png": "b920e71148b3acb102a06faf67951cf472804ee4c3f25f2eb88525d319b99b53"
+    "fig_imputation.pdf": "5f9530789f7f4931505a040ead2107825a6c5d156f5dc7ff14377f10313eb888",
+    "fig_imputation.png": "4d541f33978b56f6cde94e00abb789d2dd0ee87a148702081ac35473c48d5b23"
   },
   "y_limits": [
     [

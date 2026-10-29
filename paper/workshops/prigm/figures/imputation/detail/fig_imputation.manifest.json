@@ -3,7 +3,7 @@
   "figure": "fig_imputation",
   "source": {
     "path": "fig_imputation.py",
-    "sha256": "ed2002fa616cf86bb1f5e05ab3f0e95a266ef4e4780546c7654c1a8b91335869"
+    "sha256": "4bdf21b8f4d16846814b781b807849288c99b53badd632bb6413b2bf7fe6afdd"
   },
   "style": {
     "path": "prigm.mplstyle",
@@ -5323,6 +5323,10 @@
       }
     }
   ],
+  "case_labels": {
+    "120": "ACE \u00b7 3 Aug 2010",
+    "360": "Wind \u00b7 4 Aug 2020"
+  },
   "y_scale": "linear",
   "limit_rule": "truth bins 16:32 and ranks 1,37; neural methods share limits, Gaussian separate; padding 8% of range, floor 1e-6",
   "axis_sides": {
@@ -5331,7 +5335,7 @@
   },
   "matplotlib_version": "3.10.9",
   "output_sha256": {
-    "fig_imputation.pdf": "66e9a16c88ea428770c3bab7066bf37ff8f6692982c6f24558237ff77f125355",
-    "fig_imputation.png": "8731c7326a740204b7f2b8d467e0799b13b0e8c950f57456585d3c899b43d20f"
+    "fig_imputation.pdf": "8e8d827cffd5052306dcc7902fccf4acee5f907e8a23a91c50456865d0c9858f",
+    "fig_imputation.png": "f2357204cd436202c867404e59ebd1dd06510e3db7bfcdb411110ca4edb1f59e"
   }
 }

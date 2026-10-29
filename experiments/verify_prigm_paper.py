@@ -1355,10 +1355,10 @@ def toy_claims(tex, rendered, evidence):
     paragraphs = [p for p in re.split(r"\n\s*\n", source) if "An exact denoiser isolates error" in p]
     require(len(paragraphs) == 1, "missing unique main-text toy diagnostic paragraph")
     main_rendered = re.split(r"(?m)^[ \t]*References[ \t]*$", pdf_without_line_numbers(rendered))[0]
-    # A page-top operator figure can separate "while" from the evaluation
+    # A page-top operator figure can separate "with" from the evaluation
     # counts. Rejoin only that page break and its source-matching figure caption.
     interrupted = list(re.finditer(
-        r"while\s+\d+\s*\f(?P<figure>[\s\S]*?)\n[ \t]*(?=25,\s*50,\s*or\s*100 DDIM evaluations approach)",
+        r"with\s+\d+\s*\f(?P<figure>[\s\S]*?)\n[ \t]*(?=[^\s]+,\s*[^\s]+,\s*or\s*[^\s]+)",
         main_rendered))
     if interrupted:
         require(len(interrupted) == 1, "ambiguous float in toy comparison")
@@ -1374,15 +1374,15 @@ def toy_claims(tex, rendered, evidence):
         require(re.fullmatch(clause_pattern(prose_text(caption, source=True)),
                              prose_text(match["figure"][captions[0].end():]).replace("±", "+-")) is not None,
                 "toy interruption caption differs")
-        main_rendered = main_rendered[:match.start()] + "while " + main_rendered[match.end():]
+        main_rendered = main_rendered[:match.start()] + "with " + main_rendered[match.end():]
     mantissa, exponent = f"{context['mean_abs_r_star']:.2e}".split("e")
     residual = mantissa + r"\times10^{" + str(int(exponent)) + "}"
     clauses = (
-        (r"Across [^\s]+ replicate contexts", "Across 36 replicate contexts at $t=100$, two evaluations give mean absolute $R_{\\mathrm{obs}}="
+        (r"Across [^\s]+ cases", "Across 36 cases at $t=100$, two evaluations give mean absolute $R_{\\mathrm{obs}}="
          + residual + f"$ in HMM units, yet energy score {context['mean_es_vs_ref']:.3f} versus "
          + f"{context['mean_reference_self_energy_mc']:.3f} for independent exact conditional samples."),
-        ("On a separate set", "On a separate set of 288 windows, two evaluations again give a poor score, while 25, 50, or 100 DDIM evaluations approach the exact conditional ensemble"),
-        ("These estimates", "These estimates have finite sampling error."),
+        ("Separately, DDIM sampling on", "Separately, DDIM sampling on 288 windows gives a poor score with two evaluations and scores close to that of the exact conditional ensemble with 25, 50, or 100"),
+        ("All scores have", "All scores have finite sampling error."),
     )
     for anchor, expected in clauses:
         bind_clause((paragraphs[0], main_rendered), anchor.lower(), expected)
@@ -1844,11 +1844,12 @@ def deadline_claims(tex, rendered, real, evidence):
     # Tables retain the numerical results omitted from the conceptual abstract.
     difference = real[0]["arm_means"]["D_raw"] - real[0]["arm_means"]["O-S_raw"]
     require(difference > 0, "selected penalty improvement direction changed")
-    bind("This study compares", "This study compares a residual penalty during diffusion training, algebraic completion of one variable, and clipping of samples to satisfy the moment constraints.")
-    bind("The penalty's benefit", "The penalty's benefit depends on the stage of training: choosing models by validation largely removes the mean improvement seen at the final update.")
+    bind("Conditional diffusion experiments", "Conditional diffusion experiments examine how enforcing this identity changes the predicted distribution.")
+    bind("Here, the comparisons distinguish", "Here, the comparisons distinguish a penalty during training, generation in fewer coordinates, and transformation of existing samples.")
+    bind("A residual penalty improves", "A residual penalty improves the score at the final training update, but most of its mean advantage disappears when validation chooses the model.")
     require(real[1]['methods']['G5_raw']['metrics']['cov90_mean']['month_balanced'] < .9,
             "G5 coverage no longer falls below nominal")
-    bind("The model that generates", "The model that generates fewer variables has the lowest mean energy score, though its prediction intervals cover too few measurements and its training objective also changes.")
+    bind("Generating fewer variables", "Generating fewer variables and completing the rest algebraically gives the lowest mean energy score among the methods tested, with changes to both representation and loss. Its intervals still cover too few measurements.")
     g5, boundary = (operator["methods"][name]["metrics"] for name in ("G5", "gaussian"))
     data_only = operator["methods"]["D"]["metrics"]
     target_reduction = data_only["raw_target_term"]["month_balanced"] - g5["raw_target_term"]["month_balanced"]
@@ -1935,10 +1936,10 @@ def deadline_claims(tex, rendered, real, evidence):
         bind_table(tex, rendered, "tab:fixedfinal", expected, ("Coefficient / seed",))
         require(np.all(np.asarray(means["0.0005"]["raw"]) < means["0"]["raw"]), "final original-coefficient seed signs changed")
         bind("At the original coefficient, O-S", "At the original coefficient, O-S has a lower energy score than D at the end of all three training runs.")
-        bind("At the final update, O-S", "At the final update, O-S with the original coefficient has a lower raw score than D for all three seeds.")
+        bind("At the final update, however", "At the final update, however, O-S with the original coefficient has a lower raw score than D for all three seeds.")
         bind("These exploratory results show", "These exploratory results show that the D/O-S comparison depends on the stage of training evaluated; its persistence across additional fits is untested.")
         bind("The training step for this comparison", "The training step for this comparison was specified in advance, and all twelve fits are included. Their TEST scores serve to compare the coefficients, without choosing a coefficient or an earlier model state from those scores.")
-        bind("The residual term adds", "The residual term adds denoiser evaluations and hence computational cost at equal update counts.")
+        bind("The penalty adds", "The penalty adds denoiser evaluations and computational cost.")
         bind("The comparison is exploratory:", "The comparison is exploratory: equal update counts can involve different amounts of computation, and differences in score may reflect convergence or overfitting.")
         residuals = [float(np.mean([row["results"]["raw"]["summary"]["r_obs_mean"]["month_balanced"]
                                    for row in fixed["rows"] if row["id"].startswith("c" + coefficient + "_s")]))
@@ -2075,11 +2076,13 @@ def residual_weight_claims(paper_dir, tex, rendered):
 def cancellation_claims(tex, rendered, record):
     """Bind published TRAIN cutoffs and validated TEST reductions, not a TRAIN refit."""
     scopes = claim_subsection(tex, rendered, "Directional cancellation with thresholds from TRAIN")
-    # A page-top annual table can interrupt the seed-sign sentence. Rejoin only
+    # A page-top annual table can interrupt the seed or training-count sentence. Rejoin only
     # its complete source-matching caption, header and rows; the detailed-table
     # gate separately binds these cells to the numerical evidence.
     text = prose_text(scopes[1])
-    interruptions = list(re.finditer(r"all three seed\s+(table \d+:[\s\S]*?)\s+(?=differences are)", text))
+    interruptions = list(re.finditer(
+        r"(?P<prefix>all\s+[^\s]+\s+seed|every one of the\s+[^\s]+\s+overlapping training windows)"
+        r"\s+(?P<table>table \d+:[\s\S]*?)\s+(?=differences are|contributes equally)", text))
     if interruptions:
         require(len(interruptions) == 1, "ambiguous annual table in cancellation prose")
         labels = re.findall(r"\\label\{(tab:[^}]+)\}", strip_comments(tex))
@@ -2087,9 +2090,9 @@ def cancellation_claims(tex, rendered, record):
         expected = (f"Table {labels.index('tab:years') + 1}: " + float_caption(tex, "tab:years")
                     + " " + " ".join(" ".join(row) for row in source_table_rows(tex, "tab:years")))
         match = interruptions[0]
-        require(re.fullmatch(clause_pattern(prose_text(expected, source=True)), match[1]) is not None,
+        require(re.fullmatch(clause_pattern(prose_text(expected, source=True)), match["table"]) is not None,
                 "cancellation interruption table differs")
-        scopes = (scopes[0], text[:match.start()] + "all three seed " + text[match.end():])
+        scopes = (scopes[0], text[:match.start()] + match["prefix"] + " " + text[match.end():])
     cutoffs, groups = record["cutoffs"], record["groups"]
     n = record["arrays"]["TRAIN"]["n_windows"]
     for cutoff in cutoffs.values():
@@ -2490,6 +2493,12 @@ def source_checks(paper_dir, tex):
     from experiments import _prigm_camera_ready as camera_ready
     if camera_ready.claimed(paper_dir, tex):
         expected_figures |= camera_ready.FIGURES
+        require(figures == [
+            "figures/overview/fig_overview.pdf", "figures/checkpoints/fig_checkpoints.pdf",
+            "figures/hmm/fig_hmm.pdf", "figures/calibration/fig_calibration.pdf",
+            "figures/operator/fig_operator.pdf", "figures/fixed_final/fig_fixed_final.pdf",
+            "figures/imputation/case_120/fig_imputation.pdf", "figures/imputation/case_360/fig_imputation.pdf",
+            "figures/imputation/detail/fig_imputation.pdf"], "reviewed figure order differs")
     require(len(figures) == len(expected_figures) and set(figures) == expected_figures,
             "primary figure inventory contains missing, historical or unbound assets")
     for name in figures:
@@ -2737,6 +2746,17 @@ def verify(paper_dir=PAPER):
         if checkpoint_figure is not None and tex is not None and rendered is not None:
             report.check("camera-ready checkpoint claims and scope in source and PDF",
                 lambda: camera_ready.checkpoint_claims(tex, rendered, checkpoint_data))
+        reselection = None
+        if checkpoint_data is not None:
+            reselection = report.check("checkpoint reselection: paired years, choices and percentile sensitivity",
+                lambda: camera_ready.validate_reselection(paper_dir, checkpoint_data))
+        else:
+            report.add("checkpoint reselection", False, "requires authenticated checkpoint scores")
+        if reselection is not None and tex is not None and rendered is not None:
+            report.check("checkpoint reselection claims and counts in source and PDF",
+                         lambda: camera_ready.reselection_claims(tex, rendered, reselection))
+        else:
+            report.add("checkpoint reselection claims", False, "requires checked sensitivity, manuscript and PDF")
         calibration, calibration_figure = None, None
         if real is not None and deadline is not None:
             calibration = report.check("camera-ready tail diagnostics: all models, months and paired intervals",
@@ -2749,6 +2769,17 @@ def verify(paper_dir=PAPER):
         if calibration_figure is not None and tex is not None and rendered is not None:
             report.check("camera-ready calibration claims and scope in source and PDF",
                          lambda: camera_ready.calibration_claims(tex, rendered, calibration, calibration_figure))
+        overview = None
+        if checkpoint_data is not None and calibration is not None:
+            overview = report.check("overview figure: authenticated sources, policy contrasts and model coverage coordinates",
+                lambda: camera_ready.validate_overview(paper_dir, checkpoint_data, calibration))
+        else:
+            report.add("overview figure", False, "requires authenticated checkpoint and calibration records")
+        if overview is not None and tex is not None and rendered is not None:
+            report.check("overview figure caption and population in source and PDF",
+                         lambda: camera_ready.overview_claims(tex, rendered))
+        else:
+            report.add("overview figure claims", False, "requires checked figure, manuscript and PDF")
     if real is not None and observations is not None:
         report.check("TEST tertiles, group IDs and frozen-score statistics",
                      lambda: validate_test_strata(paper_dir, real, observations))
