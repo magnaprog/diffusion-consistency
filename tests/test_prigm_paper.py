@@ -45,6 +45,8 @@ def source_revision_copy(tmp_path, monkeypatch):
     shutil.copytree(gate.REPO / archive, tmp_path / archive)
     documentation = Path(gate.documentation.ARCHIVE)
     shutil.copytree(gate.REPO / documentation, tmp_path / documentation)
+    later_documentation = Path(gate.documentation.OCT29_ARCHIVE)
+    shutil.copytree(gate.REPO / later_documentation, tmp_path / later_documentation)
     (tmp_path / "prigm").mkdir()
     for name in (*REVISED_SOURCES, "prigm/config.py"):
         shutil.copyfile(gate.REPO / name, tmp_path / name)
@@ -370,18 +372,18 @@ def followup_prose(learned, reference, gradients, strata):
             f"{metric['r_obs_mean']['mean']:.4f}", f"{metric['frac_support_violation_beyond_rounding']['mean'] * 100:.1f}",
             f"{metric['cov90_mean']['mean'] * 100:.1f}"]
     ref = reference["secondary"]
-    caption = ("Diffusion models for the hidden Markov example after 5{,}000 optimizer updates at seed 7, evaluated on 288 windows with 39 draws each. "
-               "Clipping uses the same model state and draws. Raw $|R|$ is the mean absolute residual of the observation identity in HMM units. "
-               "The inequality column is the percentage of generated bins failing a physical inequality beyond rounding tolerance; it excludes the equality test. "
+    caption = ("Nine diffusion fits to the stationary hidden Markov model after 5{,}000 optimizer updates at seed 7. "
+               "Evaluation uses 288 windows and 39 samples per window; clipping retains the model state and samples. Raw $|R|$ is the mean absolute residual of the observation identity in HMM units. "
+               "The inequality column gives the percentage of generated bins that fail a moment inequality beyond rounding tolerance, separately from the equality residual. "
                "Coverage averages the five primary coordinates and twelve positions. "
-               "The separate exact conditional ensemble has "
-               f"{ref['cov90_mean']['mean'] * 100:g}\\% coverage under the inclusive nominal 90\\% interval convention.")
-    toy_prose = "Table compares nine diffusion fits to the stationary chain, with different residual objectives and 50 DDIM evaluations for sampling.\n\n" + table("tab:learnedtoy", rows, caption)
-    toy_prose += (f"\nFor exact conditional draws, inclusive intervals cover {ref['cov90_mean']['mean'] * 100:.1f}\\% and "
-                  f"{ref['cov50_mean']['mean'] * 100:.2f}\\% of the primary coordinates under the nominal 90\\% and 50\\% endpoint conventions. "
-                  f"Their mean widths are {ref['width90_mean']['mean']:.4f} and {ref['width50_mean']['mean']:.4f} in standardized coordinates. "
-                  "Ties in this discrete distribution can raise the coverage of inclusive intervals. Therefore, coverage expected for a continuous distribution is insufficient to assess calibration here. "
-                  "The interval calculations use the original random stream and reproduce all 288 original energy scores before computing coverage and width.")
+               "The independent exact conditional ensemble has "
+               f"{ref['cov90_mean']['mean'] * 100:g}\\% coverage for the inclusive nominal 90\\% intervals.")
+    toy_prose = "Table compares nine fits to the stationary chain with 50 DDIM evaluations for sampling.\n\n" + table("tab:learnedtoy", rows, caption)
+    toy_prose += (f"\nDiscreteness also matters for interval coverage. The exact conditional ensembles in Table 2 give coverage of {ref['cov90_mean']['mean'] * 100:.1f}\\% and "
+                  f"{ref['cov50_mean']['mean'] * 100:.2f}\\% under the nominal 90\\% and 50\\% conventions, "
+                  f"with mean widths {ref['width90_mean']['mean']:.4f} and {ref['width50_mean']['mean']:.4f} in standardized coordinates. "
+                  "The intervals include their endpoints, so tied values can raise coverage above the values expected for a continuous distribution. This explains why the nominal percentages alone would mischaracterize calibration in this toy."
+                  "")
     final = gradients["grids"]["29636"]
     values = final["reports"]["O-S_s7-train.json"]["schedule"]["probe_values"]
     coefficients = [.0005 / (2 * s * w) for s, w in zip(values["sigma"], values["w"])]
@@ -394,21 +396,22 @@ def followup_prose(learned, reference, gradients, strata):
         pair = (min(numbers), max(numbers))
         return " to ".join(sci(v) for v in pair) if scientific else " to ".join(format(v, ".0f" if t == 100 else ".4f") for v in pair)
     ratio = "physics_to_data_norm_ratio"
-    weight = ("For each O-S seed, the calculation uses the same eight TRAIN windows and eight VAL windows at the first and final common checkpoints, with noise seed 7003 and $c_R=0.0005$. "
-              "Both residuals and both estimators are evaluated at t in (1,25,50,100) while the model weights remain constant. "
-              "The relative weight of the residual penalty varies with the diffusion timestep, even at $c_R=0.0005$. "
-              r"With $\lambda_t=c_R/(2\Sigma_t)$, the ratios $\lambda_t/w_t$ at $t=1,25,50,100$ are "
+    weight = ("To examine how the penalty enters optimization, the gradient comparison evaluates the weighted data and residual terms on the same batches before clipping the total gradient. "
+              "For each seed, the same eight TRAIN and eight VAL windows are used at the first and final O-S checkpoints, with noise seed 7003 and $c_R=0.0005$. "
+              "Both residuals and both estimators are evaluated at t in (1,25,50,100) without changing the model weights. "
+              "A constant $c_R$ still gives different relative penalty weights across noise levels. "
+              r"With $\lambda_t=c_R/(2\Sigma_t)$ and $c_R=0.0005$, the ratios $\lambda_t/w_t$ at $t=1,25,50,100$ are "
               + f"{coefficients[0]:.4f}, {coefficients[1]:.6f}, {coefficients[2]:.6f}, and {coefficients[3]:.1f}. "
-              + "At the final noise level, the Min-SNR data weight is only $" + sci(values["w"][-1]) + "$. "
-              + "These ratios compare loss coefficients; the corresponding gradient ratios also depend on the derivatives of the two terms.\n\n"
-              + "At the final O-S checkpoints, the ratio of the residual gradient norm to the data gradient norm ranges from "
+              + "The large final ratio accompanies a Min-SNR data weight of $" + sci(values["w"][-1]) + "$. "
+              + "To understand the effect on optimization, the derivatives of both loss terms also matter.\n\n"
+              + "At the final O-S checkpoints, the ratio of residual to data gradient norms ranges from "
               + span("train", 100, ratio) + " on TRAIN and " + span("val", 100, ratio) + " on VAL at $t=100$. "
               + "At $t=25$, the ranges are " + span("train", 25, ratio) + " and " + span("val", 25, ratio) + ". "
-              + "Each range spans three seeds, with one calculation on eight windows per seed. "
-              + "The absolute TRAIN residual-gradient norms at $t=100$ are " + span("train", 100, "physics_gradient_norm", True)
-              + ", much smaller than the " + span("train", 1, "physics_gradient_norm") + " range at $t=1$. "
-              + "The large ratio at high noise accompanies a small absolute gradient. "
-              + "These measurements precede clipping of the total gradient, and optimizer updates combine noise levels. The residual term's contribution to prediction quality remains unresolved.")
+              + "Each range spans three seeds, with eight windows per seed. "
+              + "In absolute terms, however, the TRAIN residual-gradient norm at $t=100$ is only " + span("train", 100, "physics_gradient_norm", True)
+              + ", compared with " + span("train", 1, "physics_gradient_norm") + " at $t=1$. "
+              + "Thus, a large ratio can accompany a small gradient. "
+              + "Optimizer updates combine noise levels and clip the total gradient afterward. These ratios describe the loss gradients at individual noise levels; their effect on prediction quality also depends on the rest of the training trajectory.")
     cutoffs, groups = strata["cutoffs"], strata["groups"]
     ch, cr, th, tr = [groups[k] for k in ("context_high", "context_rest", "target_high", "target_rest")]
     def vector(values, precision):
@@ -419,30 +422,31 @@ def followup_prose(learned, reference, gradients, strata):
     g5 = ch["comparisons"]["O-S_raw_minus_G5_raw"]
     target = th["comparisons"]["O-S_raw_minus_D_raw"]
     sparse = groups["target_q1_high"]
-    cancellation = ("Group membership uses mean $C$ over the 36 available bins or mean $A$ over the twelve hidden bins. "
+    cancellation = ("The groups use mean $C$ over the 36 available bins or mean $A$ over the twelve hidden bins. "
         + "High cancellation means strictly above the TRAIN 75th percentile: "
         + f"{cutoffs['context_cancellation']['values'][0]:.6f} for the available intervals and {cutoffs['target_absolute_cancellation']['values'][0]:.6f} for the missing interval. "
-        + f"All {strata['arrays']['TRAIN']['n_windows']} overlapping training windows contribute equally to these thresholds; normalization instead uses distinct bins. "
-        + "Although the rules were specified earlier, they were implemented after inspection of the primary results, so the analysis remains exploratory.\n\n"
+        + f"Every one of the {strata['arrays']['TRAIN']['n_windows']} overlapping training windows contributes equally to these thresholds, whereas normalization uses distinct bins. "
+        + "The rules predate the implementation, which followed inspection of the primary results; the analysis is exploratory.\n\n"
         + "TRAIN quartile thresholds are (" + vector(cutoffs["context_energy"]["values"], 6) + ") for the available intervals and ("
         + vector(cutoffs["target_energy"]["values"], 6) + ") for the missing interval. "
-        + "Values tied at an energy threshold enter the higher energy group; values tied at the cancellation threshold enter the rest group. "
-        + f"The analysis covers all {len(groups)} groups: the full test set, high cancellation and the rest, and combinations of cancellation with energy conditions. Group membership and scores for all {len(strata['methods'])} procedures are recorded. "
-        + "Each score gives equal weight to the months present, then averages the three diffusion seeds.\n\n"
+        + "A value equal to an energy threshold enters the higher energy group. A value equal to the cancellation threshold enters the rest group. "
+        + f"The {len(groups)} groups comprise the full test set, high cancellation and the rest, and combinations of cancellation with energy conditions. All {len(strata['methods'])} procedures are evaluated in each group. "
+        + "Scores give equal weight to the months present and then average the three diffusion seeds.\n\n"
         + f"High cancellation in the available measurements identifies {ch['n_windows']} windows across all {word(ch['n_years'])} years. "
         + f"O-S minus D is {pair['mean_diff']:.4f}, with a 95\\% interval of [{vector(pair['year_95'], 4)}] from resampling years. "
-        + "All three seed differences are negative, but the interval still "
+        + "All three seed differences are negative, while the interval "
         + ("includes" if pair['year_95'][0] <= 0 <= pair['year_95'][1] else "excludes") + " zero. "
         + f"O-S minus G5 is {g5['mean_diff']:.4f}, with interval [{vector(g5['year_95'], 4)}], "
-        + f"while O-S minus D is {cr['comparisons']['O-S_raw_minus_D_raw']['mean_diff']:.4f} in the remaining {cr['n_windows']} windows. "
-        + "These results do not establish an O-S advantage over both methods that learn from data alone. "
-        + "Grouping by the available context avoids selection on the hidden outcome, but it does not isolate cancellation from other correlated conditions.\n\n"
+        + f"and O-S minus D is {cr['comparisons']['O-S_raw_minus_D_raw']['mean_diff']:.4f} in the remaining {cr['n_windows']} windows. "
+        + "G5 has a lower mean score in this group, while the O-S versus D interval "
+        + ("spans" if pair['year_95'][0] <= 0 <= pair['year_95'][1] else "excludes") + " zero. "
+        + "The group uses information available to the model; cancellation can still vary with other magnetic conditions.\n\n"
         + f"High cancellation during the missing hour identifies {th['n_windows']} windows. O-S minus D is {target['mean_diff']:.4f}, with interval [{vector(target['year_95'], 4)}], "
         + f"compared with {tr['comparisons']['O-S_raw_minus_D_raw']['mean_diff']:.4f} in the remaining {tr['n_windows']} windows. "
-        + "TRAIN supplies the thresholds, but the withheld outcome determines which TEST windows enter each group. The comparison still depends on outcome selection. "
-        + "The group combining high cancellation in the missing hour with the lowest energy quartile contains only "
+        + "Although the thresholds come from TRAIN, assignment to these TEST groups uses the withheld values. The score comparison is consequently conditional on outcome selection. "
+        + "Combining high cancellation during the missing hour with the lowest energy quartile leaves "
         + f"{word(sparse['n_windows'])} windows from {word(sparse['n_years'])} years. "
-        + "Such comparisons describe losses on selected TEST cases. A claim of conditional predictive superiority would need an evaluation that accounts for the rule assigning cases to each group.")
+        + "Their scores describe this small subset of TEST outcomes. Interpreting them as evidence of conditional predictive superiority depends on accounting for the rule that uses withheld values to form the groups.")
     return rows, caption, {"Training diffusion models on the same HMM": toy_prose,
                            "How the residual penalty is weighted": weight, "Directional cancellation with thresholds from TRAIN": cancellation}
 
@@ -630,13 +634,16 @@ def bundle_template(tmp_path_factory):
     (figure / "fig_hmm.pdf").write_bytes(b"synthetic figure PDF bytes")
     (figure / "fig_hmm.png").write_bytes(b"synthetic figure PNG bytes")
     shutil.copyfile(gate.PAPER / "prigm.mplstyle", root / "prigm.mplstyle")
-    save(figure / "fig_hmm.manifest.json", {"schema_version": 1, "figure": "fig_hmm", "input_schema_version": 2,
+    save(figure / "fig_hmm.manifest.json", {"schema_version": 2, "figure": "fig_hmm", "input_schema_version": 2,
          "source": {"path": "fig_hmm.py", "sha256": gate.digest(gate.PAPER / "fig_hmm.py")}, "inputs": input_specs,
          "style": {"path": "prigm.mplstyle", "sha256": gate.digest(root / "prigm.mplstyle")},
          "toy_eval_sha256": gate.digest(toy / "toy.npz"), "boundary_law": "stationary", "conditioning": "pooled",
          "hmm_n_context": 144, "hmm_n_paths": 128, "verified_common_source_hashes": {k: base["source_hashes"][k] for k in shared},
-         "plotted_rows": {"panel_a_context": context, "panel_b_samplers": samplers, "panel_b_horizontal_reference": reference},
-         "unplotted_context_mean_abs_r_star": residuals, "output_sha256": {name: gate.digest(figure / name) for name in ("fig_hmm.pdf", "fig_hmm.png")}})
+         "plotted_rows": {"panel_a_context": context,
+                          "panel_b_context_residuals": [{"t": row["t"], "n": row["n"],
+                              "mean_abs_r_star": residuals[str(row["t"])]} for row in context],
+                          "panel_c_samplers": samplers, "panel_c_horizontal_reference": reference},
+         "output_sha256": {name: gate.digest(figure / name) for name in ("fig_hmm.pdf", "fig_hmm.png")}})
 
     quality = {"raw_inputs": {str(y): {"sha256": raw_hashes[str(y)], "path": f"omni_min{y}.asc", "n_minutes": 525600} for y in years},
                "train_starts_by_year": {str(y): 10 for y in years}, "candidate_train_grid_starts_by_year": {str(y): 100 for y in years},
@@ -669,14 +676,15 @@ def bundle_template(tmp_path_factory):
                           f"{m['r_obs_mean']['month_balanced']:.3f}", f"{100 * m['frac_support_violation_beyond_rounding']['month_balanced']:.1f}"]
     means = {k: v["mean_energy"] for k, v in oracle["methods"].items()}
     oracle_rows = {row: [f"{means[k]:.4f}"] for row, k in gate.ORACLE_ROWS.items()}
-    paragraph = ("A stationary hidden Markov model isolates the residual estimator from denoiser fitting error. "
-                 + r"For 36 replicate contexts at $t=100$, two denoiser evaluations give mean absolute $R_{\mathrm{obs}}=1.23\times10^{-5}$ in HMM units and energy score 5.123, "
-                 + "compared with 2.356 for independent draws from the exact conditional distribution. "
-                 + "On a separate set of 288 HMM windows, scores from two denoiser evaluations are again worse than those from exact conditional draws. "
-                 + "On these windows, DDIM with 25, 50, and 100 evaluations gives scores much closer to that reference. "
-                 + "These Monte Carlo comparisons have finite sampling error.")
+    paragraph = ("An exact denoiser isolates error in the sampling approximation. "
+                 + r"Across 36 replicate contexts at $t=100$, two evaluations give mean absolute $R_{\mathrm{obs}}=1.23\times10^{-5}$ in HMM units, yet energy score 5.123 versus "
+                 + "2.356 for independent exact conditional samples. "
+                 + "On a separate set of 288 windows, two evaluations again give a poor score, while 25, 50, or 100 DDIM evaluations approach the exact conditional ensemble. "
+                 + "These estimates have finite sampling error.")
     number_values = (200, 2000, 1000, 900, 800, 700, 300, 400, 250, 40, 10)
     count_text = " ".join(f"{v:,}".replace(",", "{,}") for v in number_values) + r" 10.00\% 2.35\times10^{-13} 0.1235"
+    q15_text = (r"This property also holds numerically for all 40 eligible intervals of 15 minutes that begin on a UTC quarter hour within the union of training windows: the calculation from three bins differs from that using the original fifteen vectors by at most $2.35\times10^{-13}\,\mathrm{nT}^2$. "
+                + r"Replacing each bin by its mean vector discards its vector variance and reduces the result by $0.1235\,\mathrm{nT}^2$ on average.")
     tex = (r"\documentclass{article}" + "\n" + r"\usepackage[dblblindworkshop]{neurips_2025}" + "\n"
            + r"\workshoptitle{2nd Workshop on Principles of Generative Modeling}" + "\n"
            + r"\makeatletter\renewcommand{\@noticestring}{" + gate.NOTICE + r"}\makeatother" + "\n"
@@ -685,7 +693,7 @@ def bundle_template(tmp_path_factory):
            + table("tab:main", main_rows, "Independently-selected correction is distinct from same-checkpoint repair. Inequality-only failures beyond rounding, not full realizability.")
            + r"\includegraphics{figures/hmm/fig_hmm.pdf}" + "\n"
            + r"\bibliography{references}\bibliographystyle{plainnat}\appendix\section{Appendix}" + "\n\n"
-           + count_text + "\n\n" + table("tab:oracle", oracle_rows, "Stationary pooled reference.") + r"\end{document}")
+           + count_text + "\n\n" + q15_text + "\n\n" + table("tab:oracle", oracle_rows, "Stationary pooled reference.") + r"\end{document}")
     (root / "main.tex").write_text(tex)
     (root / "references.bib").write_text("@article{fixture,\n title={Synthetic citation title},\n author={Someone},\n year={2026}\n}\n")
     visible_paragraph = gate.clean_cell(paragraph).replace("^", "")
@@ -694,7 +702,7 @@ def bundle_template(tmp_path_factory):
               *textwrap.wrap("Table 1: " + gate.clean_cell(gate.float_caption(tex, "tab:main")), width=100),
               *[row + "  " + "  ".join(values) for row, values in main_rows.items()]],
              ["Methods"], ["Results"], ["Discussion"], ["References", "[1] Someone. Synthetic citation title. 2026."],
-             ["A  Appendix", " ".join(map(str, number_values)), "10.00% 2.35x10-13 0.1235", "Table 2: Stationary pooled reference.",
+             ["A  Appendix", " ".join(map(str, number_values)), "10.00% 2.35x10-13 0.1235", *textwrap.wrap(fixture_visible(q15_text), width=100), "Table 2: Stationary pooled reference.",
               *[row + "  " + "  ".join(values) for row, values in oracle_rows.items()]]]
     details = gate.detailed_table_values((comparison, summary), observations)
     for number, (label, rows) in enumerate(details.items(), 3):
@@ -938,7 +946,7 @@ def test_hmm_population_and_reductions(bundle, damage):
         gate.validate_toy(bundle["root"])
 
 
-@pytest.mark.parametrize("damage", ["generator", "point", "output", "npz"])
+@pytest.mark.parametrize("damage", ["generator", "point", "residual_point", "output", "npz"])
 def test_figure_and_npz_hash_bindings(bundle, damage):
     if damage == "npz":
         path = bundle["toy"] / "toy.npz"
@@ -949,8 +957,10 @@ def test_figure_and_npz_hash_bindings(bundle, damage):
         def change(row):
             if damage == "generator":
                 row["source"]["sha256"] = fake_hash("unknown generator")
+            elif damage == "residual_point":
+                row["plotted_rows"]["panel_b_context_residuals"][0]["mean_abs_r_star"] += 1e-18
             else:
-                row["plotted_rows"]["panel_b_samplers"][0]["mean_energy"] += 1e-14
+                row["plotted_rows"]["panel_c_samplers"][0]["mean_energy"] += 1e-14
         mutate(bundle["figure"] / "fig_hmm.manifest.json", change)
     with pytest.raises(ERRORS):
         gate.validate_toy(bundle["root"])
@@ -993,10 +1003,10 @@ def test_oracle_table_rounding_bound_to_each_method(bundle, key):
 
 
 @pytest.mark.parametrize("old,new", [("energy score 5.123", "energy score 5.124"),
-                                    ("compared with 2.356", "compared with 2.357"),
+                                    ("versus 2.356", "versus 2.357"),
                                     (r"1.23\times10^{-5}", r"1.23\times10^{-6}"),
-                                    ("again worse than those from exact conditional draws", "again better than those from exact conditional draws"),
-                                    ("25, 50, and 100 evaluations", "25, 51, and 100 evaluations")])
+                                    ("two evaluations again give a poor score", "two evaluations again give an excellent score"),
+                                    ("25, 50, or 100 DDIM evaluations", "25, 51, or 100 DDIM evaluations")])
 def test_main_toy_prose_mutations_cannot_hide_in_valid_table(bundle, old, new):
     tex = (bundle["root"] / "main.tex").read_text()
     assert old in tex
@@ -1007,15 +1017,15 @@ def test_main_toy_prose_mutations_cannot_hide_in_valid_table(bundle, old, new):
 
 @pytest.mark.parametrize("scope", ["source", "PDF"])
 @pytest.mark.parametrize("anchor,old,new", [
-    ("For 36 replicate contexts", "energy score 5.123", "energy score 5.124"),
-    ("For 36 replicate contexts", "compared with 2.356", "compared with 2.357"),
-    ("On a separate set", "again worse", "again better"),
+    ("Across 36 replicate contexts", "energy score 5.123", "energy score 5.124"),
+    ("Across 36 replicate contexts", "versus 2.356", "versus 2.357"),
+    ("On a separate set", "again give a poor score", "again give an excellent score"),
 ])
 def test_bad_toy_comparison_cannot_hide_behind_valid_duplicate(bundle_template, scope, anchor, old, new):
     root = bundle_template["root"]
     tex = (root / "main.tex").read_text()
     rendered = extracted(bundle_template["pages"])
-    paragraph = next(p for p in tex.split("\n\n") if "A stationary hidden Markov model isolates" in p)
+    paragraph = next(p for p in tex.split("\n\n") if "An exact denoiser isolates error" in p)
     clause = paragraph[paragraph.index(anchor):].split(". ", 1)[0] + "."
     assert clause.count(old) == 1
     evidence = gate.validate_toy(root)
@@ -2000,8 +2010,8 @@ def test_toy_clause_rejects_an_unmatched_page_top_float(bundle_template):
     root = bundle_template["root"]
     tex = (root / "main.tex").read_text()
     rendered = extracted(bundle_template["pages"])
-    rendered, count = re.subn(r"On a separate set of\s+288\s+HMM\s+windows,",
-                             "On a separate set of 288 HMM windows,\nFigure 1: An unmatched diagnostic.\n", rendered)
+    rendered, count = re.subn(r"On a separate set of\s+288\s+windows,",
+                             "On a separate set of 288 windows,\nFigure 1: An unmatched diagnostic.\n", rendered)
     assert count == 1
     with pytest.raises(ERRORS, match="clause"):
         gate.toy_claims(tex, rendered, gate.validate_toy(root))
@@ -2018,11 +2028,11 @@ def test_toy_ddim_clause_crosses_only_a_matching_operator_float(bundle_template,
     number = labels.index("fig:operator") + 1
     rendered = extracted(bundle_template["pages"])
     pdf_caption = "A synthetic operator figure with a linear region inside ±0.005."
-    insertion = f"DDIM with\n3\n\fAxis labels\nFigure {number}: {pdf_caption}\n\n"
-    continuation = "25, 50, and 100 evaluations gives"
+    insertion = f"while\n3\n\fAxis labels\nFigure {number}: {pdf_caption}\n\n"
+    continuation = "25, 50, or 100 DDIM evaluations approach"
     rendered, count = re.subn(r"\s+".join(map(re.escape, continuation.split())), continuation, rendered)
     assert count == 1
-    rendered, count = re.subn(r"DDIM\s+with\s+(?=25,\s*50,\s*and\s*100 evaluations gives)",
+    rendered, count = re.subn(r"while\s+(?=25,\s*50,\s*or\s*100 DDIM evaluations approach)",
                              lambda _: insertion, rendered)
     assert count == 1
     evidence = gate.validate_toy(root)
@@ -2036,7 +2046,7 @@ def test_toy_ddim_clause_crosses_only_a_matching_operator_float(bundle_template,
                                  lambda match: match[1] + "987.6543", rendered)
         assert count == 1
     elif damage == "sampler_name":
-        rendered = rendered.replace("DDIM with", "Other sampler with")
+        rendered = rendered.replace("DDIM evaluations approach", "other evaluations approach")
     if damage is None:
         gate.toy_claims(tex, rendered, evidence)
     else:
@@ -2195,35 +2205,35 @@ def test_every_followup_prose_number_is_clause_bound_in_source_and_pdf(bundle_te
 
 
 @pytest.mark.parametrize("title,old,new", [
-    (FOLLOWUP_TITLES[0], "same model state and draws", "independently selected checkpoints and draws"),
-    (FOLLOWUP_TITLES[0], "excludes the equality", "includes the equality"),
-    (FOLLOWUP_TITLES[0], "failing a physical inequality beyond rounding tolerance", "fail the equality by any amount"),
+    (FOLLOWUP_TITLES[0], "clipping retains the model state and samples", "clipping selects a new model state and samples"),
+    (FOLLOWUP_TITLES[0], "separately from the equality residual", "including the equality residual"),
+    (FOLLOWUP_TITLES[0], "that fail a moment inequality beyond rounding tolerance", "that fail the equality by any amount"),
     (FOLLOWUP_TITLES[0], "five primary coordinates", "six generated coordinates"),
-    (FOLLOWUP_TITLES[0], "Ties in this discrete distribution", "The exact conditional distribution is continuous and has no ties"),
-    (FOLLOWUP_TITLES[0], "is insufficient to assess calibration here", "is sufficient to assess calibration here"),
-    (FOLLOWUP_TITLES[0], "original random stream", "independent random stream for that distribution"),
-    (FOLLOWUP_TITLES[1], "ratios compare loss coefficients", "ratios of gradient norms"),
-    (FOLLOWUP_TITLES[1], "ratio of the residual gradient norm to the data gradient norm", "ratio of the data gradient norm to the residual gradient norm"),
-    (FOLLOWUP_TITLES[1], "three seeds, with one calculation on eight windows per seed", "three seeds, with eight individual window gradients per seed"),
+    (FOLLOWUP_TITLES[0], "tied values can raise coverage", "tied values cannot raise coverage"),
+    (FOLLOWUP_TITLES[0], "would mischaracterize calibration in this toy", "fully characterize calibration in this toy"),
+    (FOLLOWUP_TITLES[0], "The exact conditional ensembles in Table 2", "An independent ensemble in Table 2"),
+    (FOLLOWUP_TITLES[1], "derivatives of both loss terms also matter", "loss coefficients alone determine gradient ratios"),
+    (FOLLOWUP_TITLES[1], "ratio of residual to data gradient norms", "ratio of data to residual gradient norms"),
+    (FOLLOWUP_TITLES[1], "three seeds, with eight windows per seed", "three seeds, with eight individual window gradients per seed"),
     (FOLLOWUP_TITLES[1], "final O-S checkpoints", "first O-S checkpoints"),
-    (FOLLOWUP_TITLES[1], "first and final common checkpoints", "final common checkpoints only"),
+    (FOLLOWUP_TITLES[1], "first and final O-S checkpoints", "final O-S checkpoints only"),
     (FOLLOWUP_TITLES[1], "Both residuals and both estimators", "One residual and one estimator"),
     (FOLLOWUP_TITLES[1], "on TRAIN and", "on TEST and"),
-    (FOLLOWUP_TITLES[1], "accompanies a small absolute gradient", "establishes a large absolute gradient"),
-    (FOLLOWUP_TITLES[1], "measurements precede clipping of the total gradient", "measurements follow clipping of the total gradient"),
+    (FOLLOWUP_TITLES[1], "can accompany a small gradient", "establishes a large gradient"),
+    (FOLLOWUP_TITLES[1], "batches before clipping the total gradient", "batches after clipping the total gradient"),
     (FOLLOWUP_TITLES[2], "strictly above", "at or above"),
     (FOLLOWUP_TITLES[2], "36 available bins", "36 hidden bins"),
     (FOLLOWUP_TITLES[2], "twelve hidden bins", "twelve available bins"),
-    (FOLLOWUP_TITLES[2], "overlapping training windows contribute equally", "distinct training bins contribute equally"),
-    (FOLLOWUP_TITLES[2], "implemented after inspection", "implemented before inspection"),
-    (FOLLOWUP_TITLES[2], "analysis remains exploratory", "analysis is confirmatory"),
+    (FOLLOWUP_TITLES[2], "overlapping training windows contributes equally", "distinct training bins contributes equally"),
+    (FOLLOWUP_TITLES[2], "followed inspection", "preceded inspection"),
+    (FOLLOWUP_TITLES[2], "analysis is exploratory", "analysis is confirmatory"),
     (FOLLOWUP_TITLES[2], "higher energy group", "lower energy group"),
-    (FOLLOWUP_TITLES[2], "values tied at the cancellation threshold enter the rest group", "values tied at the cancellation threshold enter the high group"),
+    (FOLLOWUP_TITLES[2], "A value equal to the cancellation threshold enters the rest group", "A value equal to the cancellation threshold enters the high group"),
     (FOLLOWUP_TITLES[2], "equal weight to the months present", "equal weight to individual windows"),
     (FOLLOWUP_TITLES[2], "All three seed differences are negative", "each of the three seeds has a positive difference"),
-    (FOLLOWUP_TITLES[2], "the withheld outcome determines which TEST windows enter each group", "assigning these windows to groups avoids the outcome that the model must predict"),
+    (FOLLOWUP_TITLES[2], "assignment to these TEST groups uses the withheld values", "assignment to these TEST groups uses only available values"),
     (FOLLOWUP_TITLES[2], "lowest energy quartile", "highest energy quartile"),
-    (FOLLOWUP_TITLES[2], "A claim of conditional predictive superiority would need an evaluation that accounts for the rule assigning cases to each group", "these losses establish superiority of a conditional distribution"),
+    (FOLLOWUP_TITLES[2], "Interpreting them as evidence of conditional predictive superiority depends on accounting for the rule that uses withheld values to form the groups", "these losses establish superiority of a conditional distribution"),
 ])
 def test_followup_semantic_scope_cannot_change_in_source_or_pdf(bundle_template, title, old, new):
     b = bundle_template
@@ -2286,11 +2296,11 @@ def test_correct_duplicate_clause_cannot_rescue_wrong_clause_in_same_subsection(
     b = bundle_template
     tex = (b["root"] / "main.tex").read_text()
     prose = b["additions"][title]
-    anchors = ("Table compares nine diffusion fits to the stationary chain, with different residual objectives and 50 DDIM evaluations for sampling.",
-               "These ratios compare loss coefficients; the corresponding gradient ratios also depend on the derivatives of the two terms.",
-               "TRAIN supplies the thresholds, but the withheld outcome determines which TEST windows enter each group. The comparison still depends on outcome selection.")
+    anchors = ("Table compares nine fits to the stationary chain with 50 DDIM evaluations for sampling.",
+               "To understand the effect on optimization, the derivatives of both loss terms also matter.",
+               "Although the thresholds come from TRAIN, assignment to these TEST groups uses the withheld values. The score comparison is consequently conditional on outcome selection.")
     clause = anchors[FOLLOWUP_TITLES.index(title)]
-    broken = prose.replace(clause, clause.replace("50", "51") if title.startswith("Training diffusion") else clause.replace("loss coefficients", "gradient norms").replace("outcome determines", "outcome does not determine"))
+    broken = prose.replace(clause, clause.replace("50", "51") if title.startswith("Training diffusion") else clause.replace("derivatives of both loss terms also matter", "loss coefficients alone suffice").replace("uses the withheld values", "uses only available values"))
     broken += "\n\n" + clause
     check = followup_check(b, title)
     with pytest.raises(ERRORS):
@@ -2344,9 +2354,9 @@ def test_clause_signs_exponents_percentages_and_numeric_token_boundaries(good, b
 def test_followup_actual_pdf_mutation_fails_with_correct_text_elsewhere(bundle, title):
     prose = bundle["additions"][title]
     # A real PDF extraction, complementing the exhaustive extracted-text mutations.
-    old, new = {FOLLOWUP_TITLES[0]: ("excludes the equality", "includes the equality"),
-                FOLLOWUP_TITLES[1]: ("measurements precede clipping of the total gradient", "measurements follow clipping of the total gradient"),
-                FOLLOWUP_TITLES[2]: ("analysis remains exploratory", "analysis is confirmatory")}[title]
+    old, new = {FOLLOWUP_TITLES[0]: ("separately from the equality residual", "including the equality residual"),
+                FOLLOWUP_TITLES[1]: ("batches before clipping the total gradient", "batches after clipping the total gradient"),
+                FOLLOWUP_TITLES[2]: ("analysis is exploratory", "analysis is confirmatory")}[title]
     pages = copy.deepcopy(bundle["pages"])
     pages[bundle["addition_pages"][title]] = addition_lines(title, prose.replace(old, new), FOLLOWUP_TITLES.index(title) + 1)
     pages[3] += textwrap.wrap(fixture_visible(prose), width=100)
@@ -2545,10 +2555,9 @@ def test_bad_gradient_timing_cannot_hide_behind_valid_duplicate(bundle_template,
     title = FOLLOWUP_TITLES[1]
     tex = (b["root"] / "main.tex").read_text()
     prose = b["additions"][title]
-    clause = ("These measurements precede clipping of the total gradient, and optimizer updates combine noise levels. "
-              "The residual term's contribution to prediction quality remains unresolved.")
+    clause = ("To examine how the penalty enters optimization, the gradient comparison evaluates the weighted data and residual terms on the same batches before clipping the total gradient.")
     assert prose.count(clause) == 1
-    changed = prose.replace(clause, clause.replace("precede", "follow") + "\n" + clause, 1)
+    changed = prose.replace(clause, clause.replace("before", "after") + "\n" + clause, 1)
     check = followup_check(b, title)
     check(tex, extracted(b["pages"]))
     pages = copy.deepcopy(b["pages"])
@@ -2558,3 +2567,148 @@ def test_bad_gradient_timing_cannot_hide_behind_valid_duplicate(bundle_template,
         pages[b["addition_pages"][title]] = addition_lines(title, changed, FOLLOWUP_TITLES.index(title) + 1)
     with pytest.raises(ERRORS, match=scope + ": missing or duplicate clause"):
         check(tex, extracted(pages))
+
+
+@pytest.mark.parametrize("scope", ["source", "PDF"])
+@pytest.mark.parametrize("valid_duplicate", [False, True])
+@pytest.mark.parametrize("prefix,old,new", [
+    ("This property also holds numerically", "40 eligible intervals", "41 eligible intervals"),
+    ("This property also holds numerically", "2.35", "2.36"),
+    ("Replacing each bin by its mean vector", "0.1235", "0.2235"),
+])
+def test_q15_complete_claim_rejects_wrong_value_and_correct_decoy(
+        bundle_template, scope, valid_duplicate, prefix, old, new):
+    b = bundle_template
+    tex = (b["root"] / "main.tex").read_text()
+    rendered = gate.prose_text(extracted(b["pages"]))
+    real = gate.validate_real(b["root"])
+    gate.data_audit(b["root"], tex, rendered, real)
+    q15 = next(p for p in tex.split("\n\n") if p.startswith("This property also holds numerically"))
+    clause = q15.split("Replacing each bin", 1)[0].strip() if prefix.startswith("This") else "Replacing each bin" + q15.split("Replacing each bin", 1)[1]
+    if scope == "PDF":
+        clause, old, new = (gate.prose_text(v, source=True) for v in (clause, old, new))
+    original = tex if scope == "source" else rendered
+    assert original.count(clause) == 1 and clause.count(old) == 1
+    changed = original.replace(clause, clause.replace(old, new, 1), 1)
+    if valid_duplicate:
+        changed += "\n" + clause
+    with pytest.raises(ERRORS, match=scope + ": (clause differs|missing or duplicate clause)"):
+        gate.data_audit(b["root"], changed if scope == "source" else tex,
+                       changed if scope == "PDF" else rendered, real)
+
+
+@pytest.mark.parametrize("scope", ["source", "PDF"])
+@pytest.mark.parametrize("valid_duplicate", [False, True])
+@pytest.mark.parametrize("value", ["1000", "900"])
+def test_reintroduced_training_minute_claim_stays_checked(bundle_template, scope, valid_duplicate, value):
+    b = bundle_template
+    tex = (b["root"] / "main.tex").read_text()
+    rendered = extracted(b["pages"])
+    real = gate.validate_real(b["root"])
+    # Absence is permitted after relocation to the release guide.
+    gate.data_audit(b["root"], tex, rendered, real)
+    clause = "The training dates contain 1000 recorded minutes, including 900 with valid magnetic vectors."
+    original = tex if scope == "source" else rendered
+    valid = original + "\n" + clause
+    gate.data_audit(b["root"], valid if scope == "source" else tex,
+                   valid if scope == "PDF" else rendered, real)
+    changed = original + "\n" + clause.replace(value, str(int(value) + 1), 1)
+    if valid_duplicate:
+        changed += "\n" + clause
+    with pytest.raises(ERRORS, match="clause differs|missing or duplicate clause"):
+        gate.data_audit(b["root"], changed if scope == "source" else tex,
+                       changed if scope == "PDF" else rendered, real)
+
+
+@pytest.mark.parametrize("scope", ["source", "PDF"])
+@pytest.mark.parametrize("valid_duplicate", [False, True])
+@pytest.mark.parametrize("alter_value", [False, True])
+def test_exact_coverage_binds_original_ensemble_table(bundle_template, scope, valid_duplicate, alter_value):
+    b = bundle_template
+    tex = (b["root"] / "main.tex").read_text()
+    check = followup_check(b, FOLLOWUP_TITLES[0])
+    rendered = extracted(b["pages"])
+    check(tex, rendered)
+    original = tex if scope == "source" else rendered
+    match = re.search(r"The exact conditional ensembles in Table\s+2[\s\S]*?calibration in this toy\.", original)
+    assert match is not None
+    clause = match[0]
+    wrong = re.sub(r"Table\s+2", "Table 99", clause, count=1)
+    if alter_value:
+        wrong, n = re.subn(r"(coverage\s+of\s+)\d+\.\d+", r"\g<1>99.9", wrong, count=1)
+        assert n == 1
+    changed = original[:match.start()] + wrong + original[match.end():]
+    if valid_duplicate:
+        # Add inside the same subsection, before the next heading.
+        changed = changed[:match.start()] + clause + "\n" + changed[match.start():]
+    with pytest.raises(ERRORS, match=scope + ": (clause differs|missing or duplicate clause)"):
+        check(changed if scope == "source" else tex, changed if scope == "PDF" else rendered)
+
+
+@pytest.mark.parametrize("scope", ["source", "PDF"])
+@pytest.mark.parametrize("value", ["999", "-999", "NaN"])
+@pytest.mark.parametrize("valid_duplicate", [False, True])
+@pytest.mark.parametrize("kind", ["toy", "gradient", "learned", "learned_caption",
+                                  "cancellation_train", "cancellation_groups", "cancellation_seeds"])
+def test_numeric_claim_slots_reject_malformed_values_and_valid_duplicates(
+        bundle_template, scope, value, valid_duplicate, kind):
+    b = bundle_template
+    tex = (b["root"] / "main.tex").read_text()
+    rendered = extracted(b["pages"])
+    if kind == "toy":
+        evidence = gate.validate_toy(b["root"])
+        check = lambda source, pdf: gate.toy_claims(source, pdf, evidence)
+        pattern = r"Across\s+(?P<slot>36)\s+replicate contexts[\s\S]*?independent exact conditional samples\."
+    elif kind == "gradient":
+        check = followup_check(b, FOLLOWUP_TITLES[1])
+        pattern = r"At\s+\$?t\s*=\s*(?P<slot>25)\$?,\s+the ranges[\s\S]*?(?=\s+Each range spans)"
+    elif kind.startswith("cancellation"):
+        check = followup_check(b, FOLLOWUP_TITLES[2])
+        pattern = {
+            "cancellation_train": r"Every one of the (?P<slot>\d+) overlapping training windows[\s\S]*?distinct bins\.",
+            "cancellation_groups": r"The\s+(?P<slot>\d+)\s+groups\s+comprise[\s\S]*?each\s+group\.",
+            "cancellation_seeds": r"All (?P<slot>three) seed differences[\s\S]*? zero\.",
+        }[kind]
+    else:
+        check = followup_check(b, FOLLOWUP_TITLES[0])
+        pattern = (r"compares\s+(?P<slot>nine)\s+fits[\s\S]*?for sampling\." if kind == "learned"
+                   else r"(?P<slot>Nine)\s+diffusion fits[\s\S]*?seed 7\.")
+    check(tex, rendered)
+    original = tex if scope == "source" else rendered
+    matches = list(re.finditer(pattern, original))
+    assert len(matches) == 1
+    match = matches[0]
+    clause = match[0]
+    start, end = match.start("slot") - match.start(), match.end("slot") - match.start()
+    wrong = clause[:start] + value + clause[end:]
+    changed = original[:match.start()] + wrong + (" " + clause if valid_duplicate else "") + original[match.end():]
+    message = "missing or duplicate clause" if valid_duplicate else "clause differs"
+    with pytest.raises(ValueError, match=scope + ": " + message):
+        check(changed if scope == "source" else tex, changed if scope == "PDF" else rendered)
+
+
+
+@pytest.mark.parametrize("scope", ["source", "PDF", "both"])
+@pytest.mark.parametrize("prefix", ["-", "+", "NaN-"])
+@pytest.mark.parametrize("valid_duplicate", [False, True])
+def test_caption_fit_count_keeps_malformed_prefix_in_claim(
+        bundle_template, scope, prefix, valid_duplicate):
+    b = bundle_template
+    tex = (b["root"] / "main.tex").read_text()
+    rendered = extracted(b["pages"])
+    check = followup_check(b, FOLLOWUP_TITLES[0])
+    check(tex, rendered)
+    values = [tex, rendered]
+    for side in (0, 1):
+        if scope not in ("both", ("source", "PDF")[side]):
+            continue
+        matches = list(re.finditer(r"Nine\s+diffusion\s+fits[\s\S]*?seed\s+7\.", values[side]))
+        assert len(matches) == 1
+        match = matches[0]
+        clause = match[0]
+        changed = prefix + clause + (" " + clause if valid_duplicate else "")
+        values[side] = values[side][:match.start()] + changed + values[side][match.end():]
+    location = "PDF" if scope == "PDF" else "source"
+    message = "missing or duplicate clause" if valid_duplicate else "clause differs"
+    with pytest.raises(ValueError, match=location + ": " + message):
+        check(*values)

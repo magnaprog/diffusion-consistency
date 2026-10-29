@@ -139,7 +139,7 @@ README = """# Diffusion consistency
 
 Code and public evidence for **Residual Penalties Versus Algebraic Completion In Conditional Diffusion**, accepted at the 2nd Workshop on Principles of Generative Modeling, NeurIPS 2026.
 
-The study compares ways to impose algebraic constraints when conditional diffusion predicts magnetic statistics for an hour of withheld measurements. It distinguishes mathematical consistency from predictive accuracy. The [paper](paper/workshops/prigm/main.pdf) describes the methods, results and limitations; its [TeX source](paper/workshops/prigm/main.tex) is included.
+Six statistics of the solar wind magnetic field obey an exact algebraic identity. The study asks whether enforcing that identity improves conditional diffusion's predictions for an hour of withheld measurements. It compares a residual penalty, generating five statistics and deriving the sixth, and clipping generated values to satisfy the constraints on these statistics. These comparisons distinguish algebraic consistency from the accuracy of the predictive distribution. The [paper](paper/workshops/prigm/main.pdf) describes the methods, results and limitations; its [TeX source](paper/workshops/prigm/main.tex) is included.
 
 The [release guide](docs/prigm_release.md) covers installation, CPU tests, evidence verification, data reconstruction and paper builds. The public evidence includes TEST observations, numerical results, toy arrays, selected Gaussian predictions and inputs for the figures. Neural checkpoints, complete neural prediction sets, TRAIN/VAL arrays and raw OMNI files are not included, so the available checks reproduce only part of the experiments. The original three training seeds and earlier exposure to TEST limit the conclusions as stated in the paper.
 
@@ -174,12 +174,25 @@ def code_names(root):
 def collect(root):
     """Collect the manuscript's declared files, release code and source history.
 
-    Reuse the files selected by the paper packager. Authenticate both source
+    Reuse the files selected by the paper packager. Authenticate the source
     mappings and retain the same bytes that those checks examined.
     """
     paper_files, _, evidence = paper_package.collect(root / PAPER)
     files = {f"{PAPER}/{name}": value for name, value in paper_files.items() if name != "LICENSE"}
     codes = code_names(root)
+    revision_manifest_name = f"{documentation.OCT29_ARCHIVE}/MANIFEST.json"
+    files[revision_manifest_name], _ = paper_package.read_source(paper_package.inside(root, revision_manifest_name))
+    revision_manifest = documentation.oct29_manifest_record(files[revision_manifest_name])
+    previous = {}
+    for name in sorted(documentation.OCT29_NAMES):
+        if name not in codes:
+            raise ValueError("October 29 documentation snapshot has an undeclared producer")
+        previous_name = f"{documentation.OCT29_ARCHIVE}/{name}"
+        for path in (name, previous_name):
+            files[path], _ = paper_package.read_source(paper_package.inside(root, path))
+        documentation.validate_oct29_revision(
+            name, files[name], files[previous_name], revision_manifest["files"][name])
+        previous[name] = files[previous_name]
     doc_manifest_name = f"{documentation.ARCHIVE}/MANIFEST.json"
     files[doc_manifest_name], _ = paper_package.read_source(paper_package.inside(root, doc_manifest_name))
     doc_manifest = documentation.manifest_record(files[doc_manifest_name])
@@ -188,11 +201,13 @@ def collect(root):
             raise ValueError("documentation snapshot has an undeclared producer")
         baseline_name = f"{documentation.ARCHIVE}/{name}"
         for path in (name, baseline_name):
-            files[path], _ = paper_package.read_source(paper_package.inside(root, path))
-        documentation.validate_revision(name, files[name], files[baseline_name], record)
+            if path not in files:
+                files[path], _ = paper_package.read_source(paper_package.inside(root, path))
+        documentation.validate_revision(name, previous.get(name, files[name]), files[baseline_name], record)
     names = codes | set(ROOT_FILES) | {
         "docs/prigm_release.md", f"{PAPER}/main.pdf", f"{PAPER}/fig_audit.py",
         f"{documentation.ARCHIVE}/README.md",
+        f"{documentation.OCT29_ARCHIVE}/README.md",
         f"{ACCEPTED}/MANIFEST.json", f"{ACCEPTED}/README.md"}
     manifest_name = f"{ACCEPTED}/MANIFEST.json"
     files[manifest_name], _ = paper_package.read_source(paper_package.inside(root, manifest_name))

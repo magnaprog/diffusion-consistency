@@ -4,6 +4,7 @@ import copy
 import hashlib
 import importlib.util
 import json
+import math
 from pathlib import Path
 
 import matplotlib.pyplot as plt
@@ -68,7 +69,8 @@ def evidence(figures):
     hmm.update(n_context=144, n_context_per_regime=4, n_paths=128,
                timesteps=[1, 25, 50, 100], context_by_t={}, context=[])
     for index, timestep in enumerate(hmm["timesteps"]):
-        energy, reference, residual = 3.23456789 + index * 0.5, 3.01234567, 0.01 * index
+        energy, reference = 3.23456789 + index * 0.5, 3.01234567
+        residual = (2e-16, 4e-15, 0.02, 0.04)[index]
         hmm["context_by_t"][str(timestep)] = {
             "n": 36, "mean_es_vs_ref": energy,
             "mean_reference_self_energy_mc": reference, "mean_abs_r_star": residual}
@@ -115,8 +117,13 @@ def test_real_entrypoint_writes_portable_exact_manifest(tmp_path, figures, evide
         assert manifest["style"] == {"path": "prigm.mplstyle",
                                      "sha256": digest(PAPER / "prigm.mplstyle")}
         rows = manifest["plotted_rows"]
-        assert rows["panel_b_horizontal_reference"]["mean_energy"] == oracle["methods"]["exact_reference"]["mean_energy"]
-        assert rows["panel_b_horizontal_reference"]["mean_energy"] != oracle["reference_self_energy_mc"]
+        assert manifest["schema_version"] == 2
+        assert "unplotted_context_mean_abs_r_star" not in manifest
+        assert rows["panel_c_horizontal_reference"]["mean_energy"] == oracle["methods"]["exact_reference"]["mean_energy"]
+        assert rows["panel_c_horizontal_reference"]["mean_energy"] != oracle["reference_self_energy_mc"]
+        assert rows["panel_b_context_residuals"] == [
+            {"t": t, "n": 36, "mean_abs_r_star": hmm["context_by_t"][str(t)]["mean_abs_r_star"]}
+            for t in hmm_plot.TIMESTEPS]
     hashes = {p.name: digest(p) for p in output.iterdir()}
     with pytest.raises(SystemExit) as error:
         module.main([*arguments, "--output-dir", str(output)])
@@ -179,8 +186,8 @@ def test_figures_fit_single_column_without_hidden_clipping(tmp_path, figures, ev
         row["mean_diff"] *= 1000
         for key in ("year_95", "twoyear_95"):
             row[key] = [value * 1000 for value in row[key]]
-    context, samplers, reference, _, _ = hmm_plot.validate_evidence(hmm, oracle)
-    plots = [audit.plot_comparisons(rows), hmm_plot.plot_evidence(context, samplers, reference)]
+    context, samplers, reference, _, residuals = hmm_plot.validate_evidence(hmm, oracle)
+    plots = [audit.plot_comparisons(rows), hmm_plot.plot_evidence(context, samplers, reference, residuals)]
     try:
         values = [v for r in rows for v in (r["mean_diff"], *r["year_95"], *r["twoyear_95"])]
         low, high = plots[0].axes[0].get_xlim()
@@ -188,13 +195,14 @@ def test_figures_fit_single_column_without_hidden_clipping(tmp_path, figures, ev
         for ax in plots[1].axes:
             assert ax.xaxis.label.get_fontsize() == ax.yaxis.label.get_fontsize() == 8
             assert ax.xaxis.label.get_fontfamily() == ["DejaVu Serif"]
-            assert all(text.get_fontsize() == 7 for text in ax.get_legend().get_texts())
             assert ax.lines[0].get_color() == hmm_plot.COLORS[2]
+        for ax in (plots[1].axes[0], plots[1].axes[2]):
+            assert all(text.get_fontsize() == 7 for text in ax.get_legend().get_texts())
             assert ax.lines[1].get_color() == hmm_plot.COLORS[3]
         for line in plots[1].axes[0].lines:
             assert line.get_linestyle() == "None"
             assert list(line.get_xdata()) == [1, 25, 50, 100]
-        assert list(plots[1].axes[1].lines[1].get_ydata()) == [reference["mean_energy"]] * 2
+        assert list(plots[1].axes[2].lines[1].get_ydata()) == [reference["mean_energy"]] * 2
         for figure in plots:
             assert figure.get_size_inches()[0] <= 5.5
             figure.canvas.draw()
@@ -220,6 +228,88 @@ def test_figures_fit_single_column_without_hidden_clipping(tmp_path, figures, ev
     finally:
         for figure in plots:
             plt.close(figure)
+
+
+def test_hmm_existing_values_reach_all_three_axes_exactly(figures):
+    module = figures[1]
+    root = PAPER / "evidence/toy"
+    hmm = json.loads((root / "hmm-stationary-01.json").read_text())
+    oracle = json.loads((root / "oracle-stationary-01.json").read_text())
+    context, samplers, reference, _, residuals = module.validate_evidence(hmm, oracle)
+    fig = module.plot_evidence(context, samplers, reference, residuals)
+    try:
+        assert len(fig.axes) == 3
+        a, b, c = fig.axes
+        assert list(a.lines[0].get_ydata()) == [hmm["context_by_t"][str(t)]["mean_es_vs_ref"]
+                                              for t in module.TIMESTEPS]
+        assert list(a.lines[1].get_ydata()) == [hmm["context_by_t"][str(t)]["mean_reference_self_energy_mc"]
+                                              for t in module.TIMESTEPS]
+        assert b.get_yscale() == "log" and len(b.lines) == 1
+        assert list(b.lines[0].get_xdata()) == list(module.TIMESTEPS)
+        assert list(b.lines[0].get_ydata()) == [hmm["context_by_t"][str(t)]["mean_abs_r_star"]
+                                              for t in module.TIMESTEPS]
+        assert b.lines[0].get_linestyle() == "None"
+        assert list(c.lines[0].get_ydata()) == [oracle["methods"][name]["mean_energy"]
+                                              for name, _ in module.SAMPLERS]
+        assert list(c.lines[1].get_ydata()) == [oracle["methods"]["exact_reference"]["mean_energy"]] * 2
+        assert a.lines[1].get_label() == c.lines[1].get_label() == "Exact conditional samples"
+        assert b.texts[0].get_text() == r"$4.17\times 10^{-5}$"
+        assert c.get_position().width > a.get_position().width
+    finally:
+        plt.close(fig)
+
+
+@pytest.mark.parametrize("invalid", [0.0, -1e-16, float("nan"), float("inf"), -float("inf")])
+def test_hmm_log_axis_refuses_invalid_values_before_creating_figure(figures, evidence, invalid):
+    module = figures[1]
+    context, samplers, reference, _, residuals = module.validate_evidence(evidence[1], evidence[2])
+    residuals["1"] = invalid
+    before = plt.get_fignums()
+    with pytest.raises(ValueError):
+        module.plot_evidence(context, samplers, reference, residuals)
+    assert plt.get_fignums() == before
+
+
+@pytest.mark.parametrize("invalid", [0.0, -1e-16, 1e-15, float("nan"), float("inf")])
+def test_hmm_residual_aggregate_matches_small_individual_values(figures, invalid):
+    module = figures[1]
+    root = PAPER / "evidence/toy"
+    hmm = json.loads((root / "hmm-stationary-01.json").read_text())
+    oracle = json.loads((root / "oracle-stationary-01.json").read_text())
+    module.validate_evidence(hmm, oracle)
+    hmm["context_by_t"]["1"]["mean_abs_r_star"] = invalid
+    with pytest.raises(ValueError):
+        module.validate_evidence(hmm, oracle)
+
+
+@pytest.mark.parametrize("value", [0.0, -1e-16])
+def test_hmm_log_residual_rejects_consistent_nonpositive_evidence(figures, evidence, value):
+    module = figures[1]
+    _, hmm, oracle = evidence
+    module.validate_evidence(hmm, oracle)
+    hmm["context_by_t"]["1"]["mean_abs_r_star"] = value
+    for row in hmm["context"]:
+        if row["t"] == 1:
+            row["mean_abs_r_star"] = value
+    with pytest.raises(ValueError, match="positive mean"):
+        module.validate_evidence(hmm, oracle)
+
+
+@pytest.mark.parametrize("value", [0.0, -1e-16])
+def test_hmm_individual_residual_sign_with_positive_aggregate(figures, evidence, value):
+    module = figures[1]
+    _, hmm, oracle = evidence
+    module.validate_evidence(hmm, oracle)
+    group = [row for row in hmm["context"] if row["t"] == 1]
+    group[0]["mean_abs_r_star"] = value
+    mean = math.fsum(row["mean_abs_r_star"] for row in group) / len(group)
+    assert mean > 0
+    hmm["context_by_t"]["1"]["mean_abs_r_star"] = mean
+    if value == 0:
+        assert module.validate_evidence(hmm, oracle)[4]["1"] == mean
+    else:
+        with pytest.raises(ValueError, match="nonnegative"):
+            module.validate_evidence(hmm, oracle)
 
 
 def test_figure_counts_match_scientific_configuration(figures):

@@ -115,7 +115,11 @@ def month_balanced_mean_replicated(
     year_of,
     years_draw: np.ndarray,
 ) -> float:
-    """With-replacement year (or two-year) blocks. Repeat years, keep Aug+Sep together."""
+    """Average represented months for each occurrence in the flat sequence years_draw.
+
+    Repeated years contribute repeatedly. For resampling in groups of two
+    years, the caller includes both years from each sampled group.
+    """
     values = np.asarray(values, dtype=np.float64)
     month_ids = np.asarray(month_ids)
     years = np.array([year_of(m) for m in month_ids], dtype=np.int64)

@@ -4,7 +4,9 @@ For a listed module, require the current and preserved baseline bytes to
 match the two hashes in the reviewed manifest. Then compare their Python
 syntax trees after removing docstrings; comments are already absent from
 that representation. Return the immediate baseline hash only when both
-identity and syntax checks pass. An unlisted module retains its current hash.
+identity and syntax checks pass. The three October 29 revisions first resolve
+to their previous active versions, then use the earlier mapping where listed.
+An unlisted module retains its current hash.
 
 This mapping covers the recorded revisions, not arbitrary later wording
 changes. It authenticates their relationship to preserved source; it does
@@ -68,6 +70,15 @@ NAMES = frozenset({
     'scripts/prigm_checkpoint_followup.py',
 })
 
+OCT29_ARCHIVE = "reproducibility/documentation_revisions/2026-10-29"
+OCT29_BASE_COMMIT = "3c197eef6e50be8c070e5690d0d0a75ef32ac312"
+OCT29_MANIFEST_SHA256 = "2015b9d9038793cd14ca7a0e61a2a9be3f2d4d5e18a6606eea571c8872e65b19"
+OCT29_NAMES = frozenset({
+    "analysis/export_prigm_toy_evidence.py",
+    "prigm/scoring.py",
+    "prigm/schedule.py",
+})
+
 
 def digest(payload):
     return hashlib.sha256(payload).hexdigest()
@@ -80,6 +91,18 @@ def manifest_record(payload):
     if (record["schema_version"] != 1 or record["base_commit"] != BASE_COMMIT
             or set(record["files"]) != NAMES):
         raise ValueError("documentation source inventory differs")
+    return record
+
+
+def oct29_manifest_record(payload):
+    if digest(payload) != OCT29_MANIFEST_SHA256:
+        raise ValueError("October 29 documentation manifest differs from the reviewed version")
+    record = json.loads(payload)
+    if (set(record) != {"schema_version", "base_commit", "files"}
+            or type(record["schema_version"]) is not int or record["schema_version"] != 1
+            or record["base_commit"] != OCT29_BASE_COMMIT
+            or set(record["files"]) != OCT29_NAMES):
+        raise ValueError("October 29 documentation source inventory differs")
     return record
 
 
@@ -98,9 +121,8 @@ def executable_ast(payload):
     return ast.dump(_WithoutDocstrings().visit(ast.parse(payload)))
 
 
-def validate_revision(name, current, baseline, record):
-    """Check the exact two versions and equality apart from comments/docstrings."""
-    if name not in NAMES or set(record) != {"before_sha256", "after_sha256"}:
+def _validate_pair(name, current, baseline, record):
+    if set(record) != {"before_sha256", "after_sha256"}:
         raise ValueError("undeclared documentation source revision: " + name)
     if (digest(current) != record["after_sha256"]
             or digest(baseline) != record["before_sha256"]):
@@ -108,6 +130,20 @@ def validate_revision(name, current, baseline, record):
     if executable_ast(current) != executable_ast(baseline):
         raise ValueError("documentation revision changes executable syntax: " + name)
     return record["before_sha256"]
+
+
+def validate_revision(name, current, baseline, record):
+    """Check the original documentation revision against its preserved source."""
+    if name not in NAMES:
+        raise ValueError("undeclared documentation source revision: " + name)
+    return _validate_pair(name, current, baseline, record)
+
+
+def validate_oct29_revision(name, current, previous, record):
+    """Check one of the three October 29 revisions against its previous version."""
+    if name not in OCT29_NAMES:
+        raise ValueError("undeclared October 29 documentation source revision: " + name)
+    return _validate_pair(name, current, previous, record)
 
 
 def _read(root, name):
@@ -121,8 +157,13 @@ def _read(root, name):
 
 
 def source_hash(root, name):
-    """Resolve this documentation revision to its exact immediate baseline."""
+    """Resolve the two recorded documentation revisions in their declared order."""
     current = _read(root, name)
+    if name in OCT29_NAMES:
+        revision = oct29_manifest_record(_read(root, OCT29_ARCHIVE + "/MANIFEST.json"))
+        previous = _read(root, OCT29_ARCHIVE + "/" + name)
+        validate_oct29_revision(name, current, previous, revision["files"][name])
+        current = previous
     if name not in NAMES:
         return digest(current)
     record = manifest_record(_read(root, ARCHIVE + "/MANIFEST.json"))

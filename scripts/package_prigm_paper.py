@@ -871,7 +871,9 @@ def collect(root):
         for name in (figure, png, source):
             add(name)
         manifest = check_json(add(str(pdf.with_suffix(".manifest.json"))), figure)
-        if (manifest["schema_version"] != 1 or manifest["figure"] != stem
+        expected_schema = 2 if stem == "fig_hmm" else 1
+        if (type(manifest["schema_version"]) is not int
+                or manifest["schema_version"] != expected_schema or manifest["figure"] != stem
                 or manifest["source"] != {"path": source, "sha256": digest(files[source])}
                 or manifest["output_sha256"] != {
                     PurePosixPath(n).name: digest(files[n]) for n in (figure, png)}):

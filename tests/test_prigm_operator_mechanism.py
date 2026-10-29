@@ -15,7 +15,6 @@ causal training claim.
 import copy
 import json
 from pathlib import Path
-import tempfile
 
 import numpy as np
 import pytest
@@ -200,105 +199,104 @@ def test_completion_regression_cannot_silently_add_seventh_coordinate(monkeypatc
 
 
 @pytest.fixture
-def study(normalizer):
+def study(normalizer, tmp_path):
     """Real loader, array/commit hashes and primary/secondary producers, tiny N.
 
     Checkpoint digests are synthetic selected identities, not model weight files.
-    Files live exclusively in a fresh /dev/shm tree and are removed afterwards.
+    Files live in the temporary directory pytest assigns to this test.
     """
-    with tempfile.TemporaryDirectory(prefix="prigm-mechanism-", dir="/dev/shm") as directory:
-        root = Path(directory)
-        arrays = root / "artifacts/inventory"
-        arrays.mkdir(parents=True)
-        ids = ["2005-08-01T00:00-s52", "2005-08-02T00:00-s52", "2005-09-01T00:00-s71"]
-        months = np.array([200508, 200508, 200509])
-        rng = np.random.default_rng(902)
-        truth = closure_correct(rng.normal(size=(len(ids), 48, 6)))
-        identity = {}
-        for split in ("TRAIN", "VAL", "TEST"):
-            path = arrays / f"{split.lower()}.npz"
-            np.savez(path, z=truth, ids=np.asarray(ids), split=split, mean=normalizer.mean,
-                     scale=normalizer.scale, b_ref_sq=normalizer.b_ref_sq, n_bins=normalizer.n_bins)
-            identity[split] = load_arrays(path, split)[3]
-        protocol = {
-            "schema_version": 2, "exposure": "historical_test_exposed", "array_root": str(arrays),
-            "arrays": identity, "arms": list(mechanism.bootstrap.ARMS), "seeds": list(mechanism.FINAL_SEEDS),
-            "milestones": [9560, 29636], "samplers": {"TEST": {"n_eval": 50, "n_draws": 39, "eval_seed": 7}},
-            "controls": {"interpolation": {"conditioning": "two_boundaries"},
-                         "persistence": {"conditioning": "left_boundary"},
-                         "gaussian": {"rho": 0., "jitter": 1e-6, "seed": 13}},
-            "inference_source_hashes": {f"prigm/{p.name}": sha256_file(p)
-                                        for p in Path(mechanism.bootstrap.__file__).parent.glob("*.py")},
-            "private_execution_path": "/home/private/do-not-export",
-        }
-        (root / "PROTOCOL.json").write_bytes(json_bytes(protocol))
-        digest = sha256_file(root / "PROTOCOL.json")
-        selection = {"schema_version": 2, "protocol_sha256": digest, "exposure": "historical_test_exposed",
-                     "selected": {}, "test_jobs": [], "test_checkpoint_hashes": []}
+    root = tmp_path
+    arrays = root / "artifacts/inventory"
+    arrays.mkdir(parents=True)
+    ids = ["2005-08-01T00:00-s52", "2005-08-02T00:00-s52", "2005-09-01T00:00-s71"]
+    months = np.array([200508, 200508, 200509])
+    rng = np.random.default_rng(902)
+    truth = closure_correct(rng.normal(size=(len(ids), 48, 6)))
+    identity = {}
+    for split in ("TRAIN", "VAL", "TEST"):
+        path = arrays / f"{split.lower()}.npz"
+        np.savez(path, z=truth, ids=np.asarray(ids), split=split, mean=normalizer.mean,
+                 scale=normalizer.scale, b_ref_sq=normalizer.b_ref_sq, n_bins=normalizer.n_bins)
+        identity[split] = load_arrays(path, split)[3]
+    protocol = {
+        "schema_version": 2, "exposure": "historical_test_exposed", "array_root": str(arrays),
+        "arrays": identity, "arms": list(mechanism.bootstrap.ARMS), "seeds": list(mechanism.FINAL_SEEDS),
+        "milestones": [9560, 29636], "samplers": {"TEST": {"n_eval": 50, "n_draws": 39, "eval_seed": 7}},
+        "controls": {"interpolation": {"conditioning": "two_boundaries"},
+                     "persistence": {"conditioning": "left_boundary"},
+                     "gaussian": {"rho": 0., "jitter": 1e-6, "seed": 13}},
+        "inference_source_hashes": {f"prigm/{p.name}": sha256_file(p)
+                                    for p in Path(mechanism.bootstrap.__file__).parent.glob("*.py")},
+        "private_execution_path": "/home/private/do-not-export",
+    }
+    (root / "PROTOCOL.json").write_bytes(json_bytes(protocol))
+    digest = sha256_file(root / "PROTOCOL.json")
+    selection = {"schema_version": 2, "protocol_sha256": digest, "exposure": "historical_test_exposed",
+                 "selected": {}, "test_jobs": [], "test_checkpoint_hashes": []}
 
-        def publish(parent, ensemble_root, meta):
-            channels = meta["n_generated"]
-            dtype = np.float32 if meta.get("procedure", "diffusion") == "diffusion" else np.float64
-            draws = rng.normal(size=(len(ids), 39, channels, 48)).astype(dtype)
-            publish_ensemble(ensemble_root, draws, ids, meta)
-            commit = sha256_file(ensemble_root / "gen_00000000/COMMIT.json")
-            for kind in ("raw", "corrected"):
-                records, scores = [], []
-                for samples, y in zip(draws, truth):
-                    z = decode_ensemble(samples, normalizer)
-                    if kind == "corrected":
-                        z = closure_correct(z)
-                    scores.append(energy_score(hidden_primary_std(z, normalizer),
-                                               hidden_primary_std(y[None, 18:30], normalizer)[0]))
-                    records.append(window_diagnostics(z, y, normalizer, dtype))
-                primary = {
-                    "schema_version": 2, "protocol_sha256": digest, "ensemble_commit_sha256": commit,
-                    "arrays": identity["TEST"], "ids": ids, "months": months.tolist(), "n": len(ids),
-                    "procedure": meta.get("procedure", "diffusion"),
-                    "checkpoint_sha256": meta.get("checkpoint_sha256"),
-                    "control_fit_sha256": meta.get("control_fit_sha256"), "corrected": kind == "corrected",
-                    "scores": scores, "mean": float(np.mean(scores)),
-                    "month_balanced": month_balanced_mean(scores, months),
-                }
-                (parent / f"score-{kind}.json").write_bytes(json_bytes(primary))
-                secondary = {k: primary[k] for k in mechanism.followup.SECONDARY_IDENTITY}
-                secondary.update(correct=kind == "corrected", interval_protocol=mechanism.followup.INTERVAL_PROTOCOL,
-                                 per_window=records, **summarize_diagnostics(records, months))
-                (parent / f"secondaries-{kind}.json").write_bytes(json_bytes(secondary))
+    def publish(parent, ensemble_root, meta):
+        channels = meta["n_generated"]
+        dtype = np.float32 if meta.get("procedure", "diffusion") == "diffusion" else np.float64
+        draws = rng.normal(size=(len(ids), 39, channels, 48)).astype(dtype)
+        publish_ensemble(ensemble_root, draws, ids, meta)
+        commit = sha256_file(ensemble_root / "gen_00000000/COMMIT.json")
+        for kind in ("raw", "corrected"):
+            records, scores = [], []
+            for samples, y in zip(draws, truth):
+                z = decode_ensemble(samples, normalizer)
+                if kind == "corrected":
+                    z = closure_correct(z)
+                scores.append(energy_score(hidden_primary_std(z, normalizer),
+                                           hidden_primary_std(y[None, 18:30], normalizer)[0]))
+                records.append(window_diagnostics(z, y, normalizer, dtype))
+            primary = {
+                "schema_version": 2, "protocol_sha256": digest, "ensemble_commit_sha256": commit,
+                "arrays": identity["TEST"], "ids": ids, "months": months.tolist(), "n": len(ids),
+                "procedure": meta.get("procedure", "diffusion"),
+                "checkpoint_sha256": meta.get("checkpoint_sha256"),
+                "control_fit_sha256": meta.get("control_fit_sha256"), "corrected": kind == "corrected",
+                "scores": scores, "mean": float(np.mean(scores)),
+                "month_balanced": month_balanced_mean(scores, months),
+            }
+            (parent / f"score-{kind}.json").write_bytes(json_bytes(primary))
+            secondary = {k: primary[k] for k in mechanism.followup.SECONDARY_IDENTITY}
+            secondary.update(correct=kind == "corrected", interval_protocol=mechanism.followup.INTERVAL_PROTOCOL,
+                             per_window=records, **summarize_diagnostics(records, months))
+            (parent / f"secondaries-{kind}.json").write_bytes(json_bytes(secondary))
 
-        for arm in mechanism.bootstrap.ARMS:
-            for seed in mechanism.FINAL_SEEDS:
-                name = f"{arm}_s{seed}"
-                raw_gen, corrected_gen = 9560, 29636 if (arm, seed) == ("D", 7) else 9560
-                selection["selected"][name] = {
-                    kind: {"generation": gen, "checkpoint_sha256": sha256_bytes(f"{name}:{gen}".encode()), "score": 1.}
-                    for kind, gen in (("raw", raw_gen), ("corrected", corrected_gen))}
-                for gen in sorted({raw_gen, corrected_gen}):
-                    checkpoint = sha256_bytes(f"{name}:{gen}".encode())
-                    selection["test_jobs"].append([name, gen])
-                    selection["test_checkpoint_hashes"].append(checkpoint)
-                    parent = root / f"artifacts/test/{name}-g{gen}"
-                    parent.mkdir(parents=True)
-                    publish(parent, parent / "ensemble", {
-                        "protocol_sha256": digest, "arrays": identity["TEST"], "checkpoint_sha256": checkpoint,
-                        "arm": arm, "seed": seed, "generation_updates": gen, "n_generated": 5 if arm == "G5" else 6,
-                        "sampler": protocol["samplers"]["TEST"], "state_convention": STATE_CONVENTION,
-                        "noise_convention": NOISE_CONVENTION})
-        controls = root / "artifacts/controls_test"
-        controls.mkdir()
-        fit = controls / "gaussian_fit.npz"
-        np.savez(fit, residual_mean=np.zeros(72), covariance=np.eye(72))
-        for name in mechanism.bootstrap.CONTROLS:
-            publish(controls / name, controls / name, {
-                "protocol_sha256": digest, "arrays": identity["TEST"], "training_arrays": identity["TRAIN"],
-                "procedure": name, "control": protocol["controls"][name], "n_generated": 6,
-                "state_convention": "physical_control_standardized_float64",
-                "control_fit_sha256": sha256_file(fit) if name == "gaussian" else None})
-        (root / "SELECTION.json").write_bytes(json_bytes(selection))
-        (root / "TEST_STARTED.json").write_bytes(json_bytes({
-            "phase": "TEST_STARTED", "previous_test_exposure": True, "protocol_sha256": digest,
-            "selection_sha256": sha256_file(root / "SELECTION.json")}))
-        yield root, digest
+    for arm in mechanism.bootstrap.ARMS:
+        for seed in mechanism.FINAL_SEEDS:
+            name = f"{arm}_s{seed}"
+            raw_gen, corrected_gen = 9560, 29636 if (arm, seed) == ("D", 7) else 9560
+            selection["selected"][name] = {
+                kind: {"generation": gen, "checkpoint_sha256": sha256_bytes(f"{name}:{gen}".encode()), "score": 1.}
+                for kind, gen in (("raw", raw_gen), ("corrected", corrected_gen))}
+            for gen in sorted({raw_gen, corrected_gen}):
+                checkpoint = sha256_bytes(f"{name}:{gen}".encode())
+                selection["test_jobs"].append([name, gen])
+                selection["test_checkpoint_hashes"].append(checkpoint)
+                parent = root / f"artifacts/test/{name}-g{gen}"
+                parent.mkdir(parents=True)
+                publish(parent, parent / "ensemble", {
+                    "protocol_sha256": digest, "arrays": identity["TEST"], "checkpoint_sha256": checkpoint,
+                    "arm": arm, "seed": seed, "generation_updates": gen, "n_generated": 5 if arm == "G5" else 6,
+                    "sampler": protocol["samplers"]["TEST"], "state_convention": STATE_CONVENTION,
+                    "noise_convention": NOISE_CONVENTION})
+    controls = root / "artifacts/controls_test"
+    controls.mkdir()
+    fit = controls / "gaussian_fit.npz"
+    np.savez(fit, residual_mean=np.zeros(72), covariance=np.eye(72))
+    for name in mechanism.bootstrap.CONTROLS:
+        publish(controls / name, controls / name, {
+            "protocol_sha256": digest, "arrays": identity["TEST"], "training_arrays": identity["TRAIN"],
+            "procedure": name, "control": protocol["controls"][name], "n_generated": 6,
+            "state_convention": "physical_control_standardized_float64",
+            "control_fit_sha256": sha256_file(fit) if name == "gaussian" else None})
+    (root / "SELECTION.json").write_bytes(json_bytes(selection))
+    (root / "TEST_STARTED.json").write_bytes(json_bytes({
+        "phase": "TEST_STARTED", "previous_test_exposure": True, "protocol_sha256": digest,
+        "selection_sha256": sha256_file(root / "SELECTION.json")}))
+    yield root, digest
 
 
 def cli(study, output):
@@ -467,14 +465,13 @@ def test_final_rehash_rejects_input_change_after_operator_analysis(study, monkey
         mechanism.analyze_study(root, digest)
 
 
-def test_output_dangling_symlink_is_not_followed():
-    with tempfile.TemporaryDirectory(prefix="prigm-mechanism-output-", dir="/dev/shm") as directory:
-        root = Path(directory)
-        output = root / "output.json"
-        output.symlink_to(root / "absent")
-        with pytest.raises(FileExistsError):
-            mechanism.main(["--study-root", "unused", "--protocol-sha256", "unused", "--output", str(output)])
-        assert not (root / "absent").exists()
+def test_output_dangling_symlink_is_not_followed(tmp_path):
+    root = tmp_path
+    output = root / "output.json"
+    output.symlink_to(root / "absent")
+    with pytest.raises(FileExistsError):
+        mechanism.main(["--study-root", "unused", "--protocol-sha256", "unused", "--output", str(output)])
+    assert not (root / "absent").exists()
 
 
 @pytest.mark.parametrize("args", [[], ["--study-root", "absent", "--output", "unused"]])

@@ -3,7 +3,7 @@
   "figure": "fig_fixed_final",
   "source": {
     "path": "fig_fixed_final.py",
-    "sha256": "6832c356b2930f2b1407dfa80270e1a61c65172c3ed3a79d3cb2d08c75c76371"
+    "sha256": "1c10df020733b572100d54af3b92d91c4bb11bcde86aa4d8d84703ec0aa34634"
   },
   "style": {
     "path": "prigm.mplstyle",
@@ -148,7 +148,7 @@
   },
   "matplotlib_version": "3.10.9",
   "output_sha256": {
-    "fig_fixed_final.pdf": "c7c2dc47b990ee8182b4ceaaea07df72fc5f6a28a55a01e608ccb3297178c875",
-    "fig_fixed_final.png": "92b2c3e485880701532280e709e295434dab6437b315d42f93c51fdae2c18faa"
+    "fig_fixed_final.pdf": "ab1bb6aa28190721e2bb9155f52c9a69af665aaa3a72850fc45909eb0c499aa2",
+    "fig_fixed_final.png": "6219c8b0c3e483c9b1b149d6f31d72466a710761f7769703b9ce3dcd333efb1c"
   }
 }

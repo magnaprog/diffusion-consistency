@@ -1,5 +1,5 @@
 {
-  "base_commit": "c6847a7344e2b0f40dbc4d213e392de11743038e",
+  "base_commit": "19d1be8fd8b22d2b9da50a3d09a6424a898e6655",
   "excluded": [
     "Git history",
     "private handoffs and execution receipts",
@@ -24,8 +24,8 @@
       "sha256": "f6ca35eed9a14abeed6f8e18204a08086214b76254604449b2533f700aba4196"
     },
     "README.md": {
-      "bytes": 2154,
-      "sha256": "f295a1bf9cf76f1db3c1533370953a56138b59e713020a315ffd9ca957f96c0f"
+      "bytes": 2411,
+      "sha256": "b98cc9e336fc44b97238d7107a809fb075c704ccae2d2c4ece5b92be7da13932"
     },
     "analysis/__init__.py": {
       "bytes": 0,
@@ -44,8 +44,8 @@
       "sha256": "59fce446fc1c07cbc71711e329372f57241d31c6fcd5dad76c022dfeb5ed4fb8"
     },
     "analysis/export_prigm_toy_evidence.py": {
-      "bytes": 29375,
-      "sha256": "0ae23017bcd94199440a6e42a45a73077eef9f6c29b85fee2910342029590c61"
+      "bytes": 29381,
+      "sha256": "dd2b1e70050131cae35f283eee036bb60e6d306c743c3775b78dce9133b45a9b"
     },
     "analysis/prigm_followup_summary.py": {
       "bytes": 23424,
@@ -68,8 +68,8 @@
       "sha256": "06106e59d81c340fd582815346d208054200ee70bc15228c44d623ce7f9595b9"
     },
     "docs/prigm_release.md": {
-      "bytes": 14762,
-      "sha256": "f718dbdb6bcccc336c35264f3c48bc6c25cc3fa1997f32b91844f16dba87c15b"
+      "bytes": 14780,
+      "sha256": "dcf1f972970911bedbf8f6336d3fb6b890c05d2168bff4ec0aec93a7c5aa0f2b"
     },
     "environment.yml": {
       "bytes": 128,
@@ -84,20 +84,20 @@
       "sha256": "746de9e2eca9adc92c24a9fc8337f59f3e537dd5c9c61d09dd9af88bb0094ecb"
     },
     "experiments/_prigm_camera_ready.py": {
-      "bytes": 23107,
-      "sha256": "87e46935c77883007a2f4ad14dd0348ca630eac9da118ab6ff563eafd2184304"
+      "bytes": 22862,
+      "sha256": "bb6eae4daf1be430e7901e070e92f4d433af9ee0a70ad0a533a5028ce7181939"
     },
     "experiments/_prigm_checkpoint_evidence.py": {
       "bytes": 27138,
       "sha256": "d41e24eb3550874eaba2f6cb389e8ea3847fa1583ddb3e162aa177055b211d86"
     },
     "experiments/_prigm_documentation.py": {
-      "bytes": 4983,
-      "sha256": "f18c9f13bab009d85bae8d787b3ce774e493eed9b1d6cb6fd863d1992bb5c264"
+      "bytes": 6844,
+      "sha256": "3a0590ded0932b33faab39dc2f08b65f7e10eebdd35858a8b2ef54e521ccac63"
     },
     "experiments/_prigm_illustrations.py": {
       "bytes": 24385,
-      "sha256": "6eb468b16d0e73a19abc0f7e2f0885446e2a5219d5fa24fc5b8bdb521d1af9bc"
+      "sha256": "a92fbbfa54f5c2d01c51bc2824aac2fa2b2f921ce71963ef790b39c1686076d4"
     },
     "experiments/run_prigm_fixed_final_sensitivity.py": {
       "bytes": 29096,
@@ -112,8 +112,8 @@
       "sha256": "9fcb2a7064d057af0ced88c4b329d9c677033e71f9b2d59a77a6179c863029fe"
     },
     "experiments/verify_prigm_paper.py": {
-      "bytes": 190268,
-      "sha256": "6cc01932c72a181037b79d3830fe9a4f4a1d3707b8eb5544956e93dbe77deaf5"
+      "bytes": 195085,
+      "sha256": "a8342d99119e2f0cee6b198bb61e814c4c3b3461f8621599c2b74dc98b5e0938"
     },
     "paper/workshops/prigm/evidence/data/MANIFEST.json": {
       "bytes": 1548,
@@ -304,20 +304,20 @@
       "sha256": "73bc793bd7d17e5c4904534c183e000435d98a7058ed8d862de68e1cd81cc3a3"
     },
     "paper/workshops/prigm/fig_calibration.py": {
-      "bytes": 14110,
-      "sha256": "5f4046ca99c0f023013519fb5df0b986260b69ed7945e84fde35ea4dbfb7f4a1"
+      "bytes": 14263,
+      "sha256": "5f3c90a007b3ca51e3307979b7822d0fb2215bbfbb941af39ba77607aabc06d4"
     },
     "paper/workshops/prigm/fig_checkpoints.py": {
       "bytes": 16612,
       "sha256": "44e26d777dd8cc2e9846798e02db21c6fffba2a3a551394291cf3bb6a1d14f0a"
     },
     "paper/workshops/prigm/fig_fixed_final.py": {
-      "bytes": 11371,
-      "sha256": "6832c356b2930f2b1407dfa80270e1a61c65172c3ed3a79d3cb2d08c75c76371"
+      "bytes": 11376,
+      "sha256": "1c10df020733b572100d54af3b92d91c4bb11bcde86aa4d8d84703ec0aa34634"
     },
     "paper/workshops/prigm/fig_hmm.py": {
-      "bytes": 14979,
-      "sha256": "221bb60c4774d89b801271cef62b8401b79241645385bfbd8b0159f751cf1d16"
+      "bytes": 16972,
+      "sha256": "9a7119a2b0039a35224401de48c4f50297bca860dd765cd61b8bb2b12a4e4170"
     },
     "paper/workshops/prigm/fig_imputation.py": {
       "bytes": 21149,
@@ -328,16 +328,16 @@
       "sha256": "0c1b0528ab1e26ab2f3b4eefbb620296d68783eb3c1155940961c82b3b4a2ce0"
     },
     "paper/workshops/prigm/figures/calibration/fig_calibration.manifest.json": {
-      "bytes": 17356,
-      "sha256": "ad2af45c5157435c902fb49e7c9e0950567692e6abf4286d6fa6c5824a44ec91"
+      "bytes": 17397,
+      "sha256": "0c5f9fc5a27acdc47fa739a4749b05eb47fc417858bebd17bc897b34a70d8144"
     },
     "paper/workshops/prigm/figures/calibration/fig_calibration.pdf": {
-      "bytes": 54586,
-      "sha256": "524f38ff6fa13f87ba680dbad62014c4cc13415539c77186838df7e89299f56b"
+      "bytes": 54654,
+      "sha256": "34a9561c7a428a799e754a1cc0ab412e6171566cc36b023e5ab206a0fa832b63"
     },
     "paper/workshops/prigm/figures/calibration/fig_calibration.png": {
-      "bytes": 106975,
-      "sha256": "da2f4f4147f4bcb65931de12ecd37472b11352fc732ca3b514852557bde41170"
+      "bytes": 112927,
+      "sha256": "21cbd40baf134ec8aa45248474ebdaa11cf0eb1b681a6bcb36eaafcac09e00f8"
     },
     "paper/workshops/prigm/figures/checkpoints/fig_checkpoints.manifest.json": {
       "bytes": 5935,
@@ -353,27 +353,27 @@
     },
     "paper/workshops/prigm/figures/fixed_final/fig_fixed_final.manifest.json": {
       "bytes": 3854,
-      "sha256": "db2436baa4ae0229a870eafef05c867ab1e77d94426c5d0b65fd6111cc721f44"
+      "sha256": "5bd0176437a707c6c3f800103dc6d6b2db08a1905391c6633bb4b195de14d8fb"
     },
     "paper/workshops/prigm/figures/fixed_final/fig_fixed_final.pdf": {
-      "bytes": 20600,
-      "sha256": "c7c2dc47b990ee8182b4ceaaea07df72fc5f6a28a55a01e608ccb3297178c875"
+      "bytes": 20499,
+      "sha256": "ab1bb6aa28190721e2bb9155f52c9a69af665aaa3a72850fc45909eb0c499aa2"
     },
     "paper/workshops/prigm/figures/fixed_final/fig_fixed_final.png": {
-      "bytes": 91659,
-      "sha256": "92b2c3e485880701532280e709e295434dab6437b315d42f93c51fdae2c18faa"
+      "bytes": 92621,
+      "sha256": "6219c8b0c3e483c9b1b149d6f31d72466a710761f7769703b9ce3dcd333efb1c"
     },
     "paper/workshops/prigm/figures/hmm/fig_hmm.manifest.json": {
-      "bytes": 5922,
-      "sha256": "31c7e2fb73bcbd63f328dc001ba1498330904a0b3057d2542f50a318c442d8b7"
+      "bytes": 6496,
+      "sha256": "1dc67343a59c418f0de8f9777664d0d386c033742ba4b434eb4657fe5f8f34ae"
     },
     "paper/workshops/prigm/figures/hmm/fig_hmm.pdf": {
-      "bytes": 17371,
-      "sha256": "787316eac782aaa929a01458a744641bdca405c363d719c849361976ae64ca55"
+      "bytes": 19050,
+      "sha256": "551412329ccb977e902c50d1d58f0c9cd7b9ebf135a30ddfca8f0cc44955a528"
     },
     "paper/workshops/prigm/figures/hmm/fig_hmm.png": {
-      "bytes": 41724,
-      "sha256": "203ad05f2e01fd9646157794f420e3f271552d09e6a6eb1316c3c79536db61a2"
+      "bytes": 66436,
+      "sha256": "c43c9b89766a7ed5d49bbad2ddb9b145326bec5a2a8c69ed4ad9c60cadddc197"
     },
     "paper/workshops/prigm/figures/imputation/case_120/fig_imputation.manifest.json": {
       "bytes": 68410,
@@ -424,12 +424,12 @@
       "sha256": "89d9b9b1cca7a29add91c242ca0e0bcb447094ffb87eedb8c8b5041898ae2739"
     },
     "paper/workshops/prigm/main.pdf": {
-      "bytes": 524428,
-      "sha256": "12b6f2dae0b4b40a823ea79e9485f65de2a23c7aa58ce5aeea555b97b6bbe123"
+      "bytes": 526753,
+      "sha256": "587eeb616da525be44849845babd588ca5cca04efea1d70a7a7cf6fbd4715cff"
     },
     "paper/workshops/prigm/main.tex": {
-      "bytes": 93813,
-      "sha256": "6d775442bf5b600a3d4819b0ddde48881c72631a772caf8956df525520f618e5"
+      "bytes": 93691,
+      "sha256": "f6f20980d9d0fc294c87b35c5e59f97380bc216524b279cf8a86e1c35dd536f2"
     },
     "paper/workshops/prigm/neurips_2025.sty": {
       "bytes": 13023,
@@ -588,12 +588,12 @@
       "sha256": "0ddc5c98012615cae6664c140311aff1fe196023aac3abd8a8d7e076ebf69f55"
     },
     "prigm/schedule.py": {
-      "bytes": 3075,
-      "sha256": "74f01db9176fd365a0e0279dc973e2eb59f534c2585b6c3ee21e24d5e68d1a8e"
+      "bytes": 3169,
+      "sha256": "98009f4e9f8707e35a71b32416115784effe00af0fee78949548f07f95c97411"
     },
     "prigm/scoring.py": {
-      "bytes": 8226,
-      "sha256": "430ce17ee4e0ce56fb66797423771f556c0bfe291b252da39161c1d68006d79d"
+      "bytes": 8372,
+      "sha256": "aee13eb5fe1a8e645de8c9f89d7ba776e9ddd6e135a6835010fb4ed2d1f49b53"
     },
     "prigm/select.py": {
       "bytes": 982,
@@ -658,6 +658,26 @@
     "reproducibility/accepted_source/prigm/scoring.py": {
       "bytes": 7140,
       "sha256": "4c0ddfe36fdbe2e558cdcda1e743016fa647ea86432c7477361e15490d9a6eaf"
+    },
+    "reproducibility/documentation_revisions/2026-10-29/MANIFEST.json": {
+      "bytes": 765,
+      "sha256": "2015b9d9038793cd14ca7a0e61a2a9be3f2d4d5e18a6606eea571c8872e65b19"
+    },
+    "reproducibility/documentation_revisions/2026-10-29/README.md": {
+      "bytes": 1587,
+      "sha256": "1dbab906675cdd4beaaf0389a790560d74440c469da204c6dced14b41853a5a6"
+    },
+    "reproducibility/documentation_revisions/2026-10-29/analysis/export_prigm_toy_evidence.py": {
+      "bytes": 29375,
+      "sha256": "0ae23017bcd94199440a6e42a45a73077eef9f6c29b85fee2910342029590c61"
+    },
+    "reproducibility/documentation_revisions/2026-10-29/prigm/schedule.py": {
+      "bytes": 3075,
+      "sha256": "74f01db9176fd365a0e0279dc973e2eb59f534c2585b6c3ee21e24d5e68d1a8e"
+    },
+    "reproducibility/documentation_revisions/2026-10-29/prigm/scoring.py": {
+      "bytes": 8226,
+      "sha256": "430ce17ee4e0ce56fb66797423771f556c0bfe291b252da39161c1d68006d79d"
     },
     "reproducibility/documentation_source/MANIFEST.json": {
       "bytes": 10014,
@@ -852,16 +872,16 @@
       "sha256": "7037d234c601423f77c2fd2366f87edd72e82d8742efddb70e80100484bc47e7"
     },
     "scripts/export_prigm_release.py": {
-      "bytes": 13537,
-      "sha256": "1798eb0ef9dc7cc165a5cb5c0941af2ad2b2d1e1f0765b047bb15942f8c8c087"
+      "bytes": 14755,
+      "sha256": "869183c8a8eb4989d0fbacfcff8b0cac36f384200e01336aa3e00b7dbd56aa4f"
     },
     "scripts/package_prigm_arxiv.py": {
       "bytes": 10649,
       "sha256": "c963134a23c7f1abfdecc91dfeb65fa61f9e48680990cb0d6f3fbda23a42f1c9"
     },
     "scripts/package_prigm_paper.py": {
-      "bytes": 56850,
-      "sha256": "5f3816275eca27a08477132c964afb3f906e197497e061478405a3850dedbc25"
+      "bytes": 56983,
+      "sha256": "60a4a014f87d8e3efb7acc1504604c3845c421b5e4e55d37c10319dcfb44c5ea"
     },
     "scripts/prigm_checkpoint_followup.py": {
       "bytes": 42181,
@@ -892,16 +912,16 @@
       "sha256": "975ef362824124b68f46623cf2292ba9db0cebd7e742f3df2a0d4795789b05a0"
     },
     "tests/test_prigm_calibration_figure.py": {
-      "bytes": 8720,
-      "sha256": "bd9d6e3c4c4caebee0393df28aa9387aa3693742bd57e4bed9a33c52ca1c6712"
+      "bytes": 9483,
+      "sha256": "30d01b00e6218a86a09d71f5a3fd67e6db25280c03a70d2c1fb373f552e18b35"
     },
     "tests/test_prigm_camera_ready.py": {
-      "bytes": 20311,
-      "sha256": "7e49bd326e6d33d53faf978c10e07de006d0f8af8b0c0d6ac5da82809bf8629c"
+      "bytes": 24228,
+      "sha256": "3453986279ce9d5c356d3674791cf1af5bf2c085b9114b0bf29a33a5a48f4030"
     },
     "tests/test_prigm_checkpoint_evidence.py": {
-      "bytes": 21010,
-      "sha256": "3d3d3d5137d5447ed985ea5812a6214ab5c1ab76d7d9eabc18f7a2f65f08c198"
+      "bytes": 20998,
+      "sha256": "67901511d23c9ba42efa7ee69c7906a0ef8690560368d1414a2bef755599a42c"
     },
     "tests/test_prigm_checkpoint_followup.py": {
       "bytes": 24217,
@@ -928,20 +948,20 @@
       "sha256": "d5031f6ba34466915b28616c464abd45a24960ef0bc75f87c53697fd84620b69"
     },
     "tests/test_prigm_deadline_paper.py": {
-      "bytes": 52902,
-      "sha256": "7b7b7f378a049934860b6c59f3e98e479b517b9346c1044b2308e5d20f01ac09"
+      "bytes": 54479,
+      "sha256": "6dcebb86ca4d0494c0dbc887882093a9f944250b04f71613d4817405c3552e77"
     },
     "tests/test_prigm_documentation_source.py": {
-      "bytes": 4136,
-      "sha256": "4ac9c4f046709f8f50ab910d538e52e864374c6ce0a19a6649ce22a4e1d1cd9c"
+      "bytes": 10114,
+      "sha256": "8691bfa96822663618f98521f68e7fe7b14eeeb9553968d0978baf4ac1158ed5"
     },
     "tests/test_prigm_figures.py": {
-      "bytes": 17398,
-      "sha256": "5e2f2acf714c7ecb66e2ce6f798fcc32a74c4d8542bdeb86a5ee6dffe0e3cfa2"
+      "bytes": 21819,
+      "sha256": "8685886fe6fffa248858791efa1462a2dff5cd48f02d7c906e206d73d2949733"
     },
     "tests/test_prigm_fixed_final_figure.py": {
-      "bytes": 20141,
-      "sha256": "e9c44dca52cf97acabcfb1be3f5a3197f4ab0705c7dd159fb9662025518549ff"
+      "bytes": 20222,
+      "sha256": "f1cce8d1d78e22126057f82882b0bd21552bbe20bf066a7f22813e979453d423"
     },
     "tests/test_prigm_fixed_final_sensitivity.py": {
       "bytes": 20485,
@@ -961,11 +981,11 @@
     },
     "tests/test_prigm_illustration_evidence.py": {
       "bytes": 16112,
-      "sha256": "7d0a0de9c886cbbcc7d2741d5a03e81f2db39a53406147ca52e8a442347da0e3"
+      "sha256": "03055a524b2840265209c3fb766b627ba85ded62893f9761e3b78001a88f3aeb"
     },
     "tests/test_prigm_illustration_publication.py": {
-      "bytes": 9166,
-      "sha256": "b184e68961e2c8c866ba8686538749b9613a785058400d4c2440de55a6bb88e9"
+      "bytes": 11812,
+      "sha256": "c1af4bcbf6a9bdf86c655aede687f7961f8eb3534492eb73a0f7082b475af49d"
     },
     "tests/test_prigm_imputation_figure.py": {
       "bytes": 23241,
@@ -984,20 +1004,20 @@
       "sha256": "679bcf2ea7ef74c7cbe4685e8e58b8ec3f7100b537bcd20fa874cb688f616006"
     },
     "tests/test_prigm_operator_mechanism.py": {
-      "bytes": 25261,
-      "sha256": "1a0e4b6af9e314a9e589111f2506d4a5f50f23fcd03fc8c15dbb7e721f38bcd8"
+      "bytes": 24661,
+      "sha256": "99325fa7838f769b1ce8d9d943e506d203448e055c45e48234c49f469690c7b5"
     },
     "tests/test_prigm_oracle.py": {
       "bytes": 19073,
       "sha256": "df859ebe2a2b8d9158a7e7242e35ff12a904b64a9d0b29b10d2a7e013a298225"
     },
     "tests/test_prigm_package.py": {
-      "bytes": 103028,
-      "sha256": "189e637446d3f302cb5ebe0a2d70d27f3b54cba1031977732d0b89b914e03e9c"
+      "bytes": 104703,
+      "sha256": "dbff3b60bd719422ae1bac48340503253769c68a2a520b2ee1fca792c5b34ebc"
     },
     "tests/test_prigm_paper.py": {
-      "bytes": 147716,
-      "sha256": "f7469c76787479cbf118c544476d584fe879279cab78832c1ffc264f0148759f"
+      "bytes": 156240,
+      "sha256": "ff4e88763a3f2072aa3589a8cccb08fb02a6ed5185951426c7ab796a9321bb4d"
     },
     "tests/test_prigm_paper_evidence.py": {
       "bytes": 49129,
@@ -1008,8 +1028,8 @@
       "sha256": "ea7a7fd0af41c85df176e2e01f82f2d1183760b3ddabd29dc4fc683f50185fc9"
     },
     "tests/test_prigm_release_export.py": {
-      "bytes": 9741,
-      "sha256": "c4ced9f02432fb71b32abef4e53025b5db2d1a0363f10f32f59df569ada913a4"
+      "bytes": 13252,
+      "sha256": "28a2444c73830a21b66d6e319817778bf40af0c335c249386c5fc259b98b42a2"
     },
     "tests/test_prigm_replay.py": {
       "bytes": 16274,

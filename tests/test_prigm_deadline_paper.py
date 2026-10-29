@@ -127,10 +127,10 @@ def test_current_deadline_tables_and_prose_match_source_and_pdf(public_claims):
 def test_false_score_role_cannot_hide_before_valid_duplicate(public_claims, scope):
     tex, rendered, real, evidence = public_claims
     source = tex if scope == "source" else rendered
-    valid = "Conditional diffusion experiments compare"
+    valid = "This study compares"
     pattern = gate.clause_pattern(gate.prose_text(valid, source=True))
     assert len(re.findall(pattern, gate.prose_text(source, source=scope == "source"))) == 1
-    changed = "Conditional diffusion experiments compare mean predictions using the energy score. " + source
+    changed = "This study compares mean predictions using the energy score. " + source
     with pytest.raises((ValueError, ContractMismatch)):
         gate.deadline_claims(changed if scope == "source" else tex,
                              changed if scope == "PDF" else rendered, real, evidence)
@@ -144,10 +144,10 @@ def test_wrong_coverage_reference_is_rejected(public_claims, scope, alter_differ
     # Explicit positive before changing the reference or coverage difference.
     gate.deadline_claims(tex, rendered, real, evidence)
     if scope == "source":
-        pattern = r"In Table~\\ref\{tab:calibration\}, O-S's shortfall[\s\S]*?two percentage points\."
+        pattern = r"In Table~\\ref\{tab:calibration\}, O-S falls farther[\s\S]*?two percentage points\."
         original = tex
     else:
-        pattern = r"In\s+Table\s+\d+,\s+O-S['’]s\s+shortfall[\s\S]*?two\s+percentage\s+points\."
+        pattern = r"In\s+Table\s+\d+,\s+O-S\s+falls\s+farther[\s\S]*?two\s+percentage\s+points\."
         original = rendered
     matches = list(re.finditer(pattern, original))
     assert len(matches) == 1
@@ -160,7 +160,7 @@ def test_wrong_coverage_reference_is_rejected(public_claims, scope, alter_differ
         assert count == 1
     assert wrong != clause
     if alter_difference:
-        wrong, count = re.subn(r"\d+\.\d+(?=\s+percentage\s+points\s+larger)", "99.9", wrong, count=1)
+        wrong, count = re.subn(r"\d+\.\d+(?=\s+percentage\s+points)", "99.9", wrong, count=1)
         assert count == 1
     changed = original[:match.start()] + wrong + original[match.end():]
     if valid_duplicate:
@@ -173,12 +173,12 @@ def test_wrong_coverage_reference_is_rejected(public_claims, scope, alter_differ
 
 @pytest.mark.parametrize("scope", ["source", "PDF"])
 @pytest.mark.parametrize("before,after", [
-    ('fall short of nominal coverage', 'achieve nominal coverage'),
-    ('validation chooses the checkpoint', 'TEST chooses the checkpoint'),
-    ('the lowest mean score on the directly generated quantities', 'the highest mean score on the directly generated quantities'),
-    ('Its representation and training loss also change', 'Its representation changes but its training loss does not'),
-    ('with little change in energy score', 'with a large improvement in energy score'),
-    ('the subtracted term decreases more', 'the subtracted term decreases less'),
+    ('its prediction intervals cover too few measurements', 'its prediction intervals attain nominal coverage'),
+    ('choosing models by validation', 'choosing models by TEST'),
+    ('the lowest mean energy score', 'the highest mean energy score'),
+    ('its training objective also changes', 'its training objective stays the same'),
+    ('their mean energy score changes little', 'their mean energy score improves greatly'),
+    ('reduces the spread term by more', 'reduces the spread term by less'),
     ('regression uses more available measurements', 'regression uses fewer available measurements'),
     ('with raw and clipped VAL scores of', 'with clipped and raw VAL scores of'),
     ('the mean energy score first falls and then rises', 'the mean energy score first rises and then falls'),
@@ -192,19 +192,19 @@ def test_wrong_coverage_reference_is_rejected(public_claims, scope, alter_differ
     ('2.1873', '2.2873'),
     ('0.01648', '0.02648'),
     ('0.34407', '0.44407'),
-    ('the original coefficient gives the best mean score', 'the largest coefficient gives the best mean score'),
+    ('the original coefficient gives the lowest mean score', 'the largest coefficient gives the lowest mean score'),
     ('1.9515', '1.9525'),
     ('exploratory', 'confirmatory'),
-    ('computational cost differs even at equal update counts', 'computational cost is equal at equal update counts'),
-    ('score differences may reflect convergence or overfitting', 'score differences establish convergence and rule out overfitting'),
-    ('slightly smaller mean distance', 'slightly larger mean distance'),
-    ('a larger spread term', 'a smaller spread term'),
+    ('adds denoiser evaluations and hence computational cost at equal update counts', 'leaves computational cost equal at equal update counts'),
+    ('differences in score may reflect convergence or overfitting', 'differences in score establish convergence and rule out overfitting'),
+    ('is also slightly smaller', 'is also slightly larger'),
+    ('its larger spread term', 'its smaller spread term'),
     ('specified in advance', 'chosen after observing TEST scores'),
-    ('without choosing a checkpoint or coefficient from their scores', 'choosing a checkpoint or coefficient from their scores'),
-    ('whose increase accounts for most of the mean improvement', 'whose decrease accounts for most of the mean improvement'),
-    ('Further fits would be needed', 'Further fits would not be needed'),
-    ('Minimum displacement is not established', 'Minimum displacement is established'),
-    ('Its score difference cannot isolate the benefit of the additional context alone', 'Its score difference isolates the benefit of the additional context alone'),
+    ('without choosing a coefficient or an earlier model state from those scores', 'choosing a coefficient or an earlier model state from those scores'),
+    ('largely accounted for by its larger spread term', 'largely accounted for by a smaller spread term'),
+    ('its persistence across additional fits is untested', 'its persistence across additional fits is established'),
+    ('without a claim of minimum displacement', 'with a proof of minimum displacement'),
+    ('Its score difference compares procedures that differ in all three respects', 'Its score difference isolates the benefit of additional context'),
 ])
 def test_new_claims_reject_changed_numbers_and_scope(public_claims, scope, before, after):
     tex, rendered, real, evidence = public_claims
@@ -226,14 +226,14 @@ def test_new_claims_reject_changed_numbers_and_scope(public_claims, scope, befor
 def test_score_decomposition_figure_reference_is_bound(public_claims, scope):
     tex, rendered, real, evidence = public_claims
     if scope == "source":
-        before = r"improvement in Figure~\ref{fig:calibration}(a)"
-        after = r"improvement in Figure~\ref{fig:checkpoints}(a)"
+        before = r"Figure~\ref{fig:calibration}(a) separates these contributions"
+        after = r"Figure~\ref{fig:checkpoints}(a) separates these contributions"
         assert tex.count(before) == 1
         tex = tex.replace(before, after, 1)
     else:
         labels = re.findall(r"\\label\{(fig:[^}]+)\}", gate.strip_comments(tex))
         number = labels.index("fig:calibration") + 1
-        pattern = rf"(improvement\s+in\s+Figure\s+){number}(\s*\(a\))"
+        pattern = rf"(Figure\s+){number}(\s*\(a\)\s+separates\s+these\s+contributions)"
         rendered, count = re.subn(pattern, rf"\g<1>{number + 1}\g<2>", rendered)
         assert count == 1
     with pytest.raises(ValueError, match=scope + ": clause differs"):
@@ -244,13 +244,13 @@ def test_score_decomposition_figure_reference_is_bound(public_claims, scope):
 def test_bad_minimum_displacement_claim_cannot_hide_behind_valid_duplicate(public_claims, scope):
     tex, rendered, real, evidence = public_claims
     original = tex if scope == "source" else rendered
-    clause = "Minimum displacement is not established for this map."
+    clause = "The construction specifies a feasible adjustment, without a claim of minimum displacement."
     if scope == "PDF":
         matches = list(re.finditer(r"\s+".join(re.escape(word) for word in clause.split()), original))
         assert len(matches) == 1
         clause = matches[0][0]
     assert original.count(clause) == 1
-    damaged, count = re.subn(r"is\s+not\s+established", "is established", clause)
+    damaged, count = re.subn(r"without\s+a\s+claim", "with a proof", clause)
     assert count == 1
     changed = original.replace(clause, damaged, 1) + "\n" + clause
     with pytest.raises(ValueError, match=scope + ": missing or duplicate clause"):
@@ -1011,3 +1011,31 @@ def test_unclaimed_old_bundle_remains_valid_through_cli(bundle, capsys):
     assert gate.main(["--paper-dir", str(bundle["root"])]) == 0
     assert "OVERALL: PASS" in capsys.readouterr().out
     assert snapshot(bundle["root"]) == before
+
+
+
+@pytest.mark.parametrize("scope", ["source", "PDF"])
+@pytest.mark.parametrize("value", ["999", "-999", "NaN"])
+@pytest.mark.parametrize("valid_duplicate", [False, True])
+@pytest.mark.parametrize("label,prefix,ending", [
+    ("tab:operators", "For D, Table", "raw validation score."),
+    ("tab:calibration", "In Table", "two percentage points."),
+])
+def test_table_reference_slots_reject_malformed_values_and_valid_duplicates(
+        public_claims, scope, value, valid_duplicate, label, prefix, ending):
+    tex, rendered, real, evidence = public_claims
+    gate.deadline_claims(tex, rendered, real, evidence)
+    original = tex if scope == "source" else rendered
+    slot = re.escape(r"\ref{" + label + "}") if scope == "source" else r"\d+"
+    pattern = gate.clause_pattern(prefix) + r"[~\s]+(?P<slot>" + slot + r")[\s\S]*?" + gate.clause_pattern(ending)
+    matches = list(re.finditer(pattern, original))
+    assert len(matches) == 1
+    match = matches[0]
+    clause = match[0]
+    start, end = match.start("slot") - match.start(), match.end("slot") - match.start()
+    wrong = clause[:start] + value + clause[end:]
+    changed = original[:match.start()] + wrong + (" " + clause if valid_duplicate else "") + original[match.end():]
+    message = "missing or duplicate clause" if valid_duplicate else "clause differs"
+    with pytest.raises(ValueError, match=scope + ": " + message):
+        gate.deadline_claims(changed if scope == "source" else tex,
+                             changed if scope == "PDF" else rendered, real, evidence)

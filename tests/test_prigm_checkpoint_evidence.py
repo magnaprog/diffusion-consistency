@@ -374,7 +374,7 @@ def test_checkpoint_claims_accept_rendered_thousands_counts(checked_public):
 def test_checkpoint_claim_mutations_are_rejected(checked_public, change):
     source = (PAPER / "main.tex").read_text()
     if change == "contrast":
-        source = source.replace("changing their difference from $-0.0028$", "changing their difference from $+0.0028$", 1)
+        source = source.replace("changing O-S minus D from $-0.0028$", "changing O-S minus D from $+0.0028$", 1)
     elif change == "bootstrap_frequency":
         source = source.replace(r"61.0\% of resamples with 25 evaluations", r"71.0\% of resamples with 25 evaluations", 1)
     elif change == "image_swap":
@@ -383,7 +383,7 @@ def test_checkpoint_claim_mutations_are_rejected(checked_public, change):
         source = source.replace("figures/calibration/fig_calibration.pdf", "figures/checkpoints/fig_checkpoints.pdf")
         source = source.replace("CHECKPOINT_IMAGE", "figures/calibration/fig_calibration.pdf")
     else:
-        source = source.replace("both these choices and the evaluation count are fixed before additional TEST samples are generated.", "", 1)
+        source = source.replace("Their validation scores determine the model choices before additional TEST samples are generated.", "", 1)
     assert source != (PAPER / "main.tex").read_text()
     with pytest.raises(ERRORS):
         camera.checkpoint_claims(source, g.prose_text(source, source=True), checked_public)

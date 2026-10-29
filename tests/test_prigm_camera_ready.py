@@ -210,24 +210,24 @@ def test_legitimate_repeated_seed_mentions_do_not_duplicate_claim_anchors(public
 
 @pytest.mark.parametrize("scope", ["source", "PDF"])
 @pytest.mark.parametrize("before,after", [
-    ("49.0\\% of observations lie below G5's", "49.1\\% of observations lie below G5's"),
-    ('G5 decreases both distance', 'G5 increases both distance'),
+    ("49.0\\% of observations fall below G5's", "49.1\\% of observations fall below G5's"),
+    ('G5 reduces both distance', 'G5 increases both distance'),
     ('the larger increase in spread', 'the larger increase in distance'),
-    ('Both patterns lower the score because spread is subtracted', 'Both patterns lower the score because spread is added'),
-    ('missed observations lie predominantly below the intervals at seeds 7 and 13', 'missed observations lie predominantly above the intervals at seeds 7 and 13'),
+    ('lowering the score', 'raising the score'),
+    ('errors are predominantly below the intervals at seeds 7 and 13', 'errors are predominantly above the intervals at seeds 7 and 13'),
     ('37.7\\% below', '37.8\\% below'),
     ('by 38.4 percentage points', 'by 38.5 percentage points'),
     ('the fraction below exceeds the fraction above by', 'the fraction above exceeds the fraction below by'),
-    ('It cannot identify a training mechanism', 'It identifies a training mechanism'),
+    ('their separate effects on learning remain unresolved', 'their separate effects on learning are established'),
     ('$[36.2,40.6]$', '$[36.2,40.7]$'),
     ('covers 98.1\\%', 'covers 98.2\\%'),
-    ('Each of 10{,}000 resamples', 'Each of 1{,}000 resamples'),
-    ('on the same sampled years', 'on different sampled years'),
-    ('retains every occurrence of a repeated year', 'discards repeated years'),
-    ('it excludes variation from new training seeds or a new checkpoint choice', 'it includes variation from new training seeds or a new checkpoint choice'),
-    ('half the mean Euclidean distance', 'one quarter of the mean Euclidean distance'),
+    ('using 10{,}000 resamples', 'using 1{,}000 resamples'),
+    ('the same years for both fractions', 'different years for both fractions'),
+    ('Repeated occurrences of each year retain their weight', 'Repeated occurrences of each year lose their weight'),
+    ('new fits or new checkpoint choices would add other sources of uncertainty', 'new fits or new checkpoint choices are included in these intervals'),
+    ('half the mean distance between distinct predictions', 'one quarter of the mean distance between distinct predictions'),
     ('after the original results were available', 'before the original results were available'),
-    ('using diffusion checkpoints selected by raw validation score', 'using diffusion checkpoints selected by raw TEST score'),
+    ('checkpoints that minimize raw validation score', 'checkpoints that minimize raw TEST score'),
 ])
 def test_changed_calibration_claim_rejected_in_either_scope(public_records, scope, before, after):
     report, _, _, figure = public_records
@@ -246,7 +246,7 @@ def test_changed_calibration_claim_rejected_in_either_scope(public_records, scop
 @pytest.mark.parametrize("scope", ["source", "PDF"])
 @pytest.mark.parametrize("replacement", ["-49.0", "+49.1", "NaN"])
 @pytest.mark.parametrize("clause,value", [
-    (r"Averaged over the three fits, 49.0\% of observations lie below G5's $v_s$ intervals and 10.5\% above them.", "49.0"),
+    (r"Across the three fits, 49.0\% of observations fall below G5's $v_s$ intervals and 10.5\% above them.", "49.0"),
     (r"Gaussian regression covers 98.1\% of $v_s$ observations, with 0.6\% below and 1.2\% above its intervals.", "98.1"),
 ])
 def test_bad_tail_percentage_cannot_hide_behind_valid_duplicate(
@@ -291,8 +291,9 @@ def test_swapped_images_cannot_keep_calibration_caption(public_records):
 def test_reversed_seed_dot_order_is_rejected(public_records, scope):
     report, _, _, figure = public_records
     tex, rendered = manuscript()
-    before = "give seeds 7, 13 and 42"
-    after = "give seeds 42, 13 and 7"
+    camera.calibration_claims(tex, rendered, report, figure)
+    before = "Gray dots show seeds 7, 13 and 42 from left to right."
+    after = "Gray dots show seeds 42, 13 and 7 from left to right."
     if scope == "source":
         assert before in tex
         tex = tex.replace(before, after)
@@ -343,19 +344,19 @@ def test_checkpoint_clauses_and_rendered_thousands_counts(checkpoint_claim_recor
     ('all three seeds at the last two counts', 'all three seeds at the first two counts'),
     ('score by 0.0945', 'score by 0.0946'),
     ("O-S's by 0.0419", "O-S's by 0.0420"),
-    ('changing their difference from $-0.0028$', 'changing their difference from $+0.0028$'),
+    ('changing O-S minus D from $-0.0028$', 'changing O-S minus D from $+0.0028$'),
     ('61.0\\% of resamples', '61.1\\% of resamples'),
     ('every resample under either evaluation count', 'some resamples under either evaluation count'),
-    ('both these choices and the evaluation count are fixed before additional TEST samples are generated.', 'both these choices and the evaluation count are fixed after additional TEST samples are generated.'),
-    ('fixed before additional TEST samples are generated', 'fixed after additional TEST samples are generated'),
-    ('This calculation leaves the roles of regularization and overfitting unresolved', 'This calculation establishes the roles of regularization and overfitting'),
+    ('Their validation scores determine the model choices before additional TEST samples are generated.', 'Their validation scores determine the model choices after additional TEST samples are generated.'),
+    ('reuse the initial noise from the original ensembles', 'replace the initial noise from the original ensembles'),
+    ('Establishing whether regularization or overfitting causes this pattern is a separate empirical question', 'This calculation establishes whether regularization or overfitting causes this pattern'),
     ('contributes both validation months', 'contributes one validation month'),
-    ('Each occurrence of a sampled year', 'One occurrence of each sampled year'),
-    ('every checkpoint uses the same resampled years', 'every checkpoint uses different resampled years'),
-    ('The model weights and draws remain constant', 'The model weights and draws change'),
-    ('Variation under fresh sampling noise and performance on a new population remain undetermined', 'Variation under fresh sampling noise and performance on a new population are determined'),
-    ('crosses mark P50', 'crosses mark P25'),
-    ('evaluates choices already made on VAL', 'evaluates choices made using TEST'),
+    ('including repeated occurrences', 'excluding repeated occurrences'),
+    ('all checkpoints use the same resampled years', 'all checkpoints use different resampled years'),
+    ('With weights and samples held constant', 'With weights and samples varying'),
+    ('measure sensitivity to the years represented in validation', 'establish performance on a new population'),
+    ('crosses mark the choice with 50, P50', 'crosses mark the choice with 25, P25'),
+    ('model choice precedes the additional TEST analysis', 'model choice uses the additional TEST analysis'),
 ])
 def test_revised_checkpoint_clauses_reject_changes(checkpoint_claim_records, scope, before, after):
     tex, rendered = manuscript()
@@ -372,9 +373,9 @@ def test_revised_checkpoint_clauses_reject_changes(checkpoint_claim_records, sco
 
 @pytest.mark.parametrize("scope", ["source", "PDF"])
 @pytest.mark.parametrize("kind,clause,old,new", [
-    ("checkpoint", "both these choices and the evaluation count are fixed before additional TEST samples are generated.", "fixed before", "fixed after"),
-    ("calibration", "At seed 13, G5 decreases both distance to the measurements and spread; the larger decrease in distance outweighs the loss of spread.", "G5 decreases", "G5 increases"),
-    ("calibration", "At seed 42, both increase; the larger increase in spread outweighs the greater distance to the measurements. Both patterns lower the score because spread is subtracted.", "both increase", "both decrease"),
+    ('checkpoint', 'validation ensembles with 50 evaluations reuse the initial noise from the original ensembles with 25. Their validation scores determine the model choices before additional TEST samples are generated.', 'before', 'after'),
+    ('calibration', 'At seed 13, G5 reduces both distance to the measurements and spread, with the larger decrease in distance lowering the score.', 'G5 reduces', 'G5 increases'),
+    ('calibration', 'At seed 42, both terms increase, and the larger increase in spread lowers the score.', 'both terms increase', 'both terms decrease'),
 ])
 def test_reworded_claim_cannot_hide_behind_valid_duplicate(
         public_records, checkpoint_claim_records, scope, kind, clause, old, new):
@@ -394,3 +395,66 @@ def test_reworded_claim_cannot_hide_behind_valid_duplicate(
         else:
             report, _, _, figure = public_records
             camera.calibration_claims(tex, rendered, report, figure)
+
+
+@pytest.mark.parametrize("scope", ["source", "PDF"])
+@pytest.mark.parametrize("negative", [False, True])
+@pytest.mark.parametrize("valid_duplicate", [False, True])
+@pytest.mark.parametrize("kind,clause,old,new", [
+    ("calibration", "At seed 13, G5 reduces both distance to the measurements and spread, with the larger decrease in distance lowering the score.", "13", "14"),
+    ("calibration", "At seed 42, both terms increase, and the larger increase in spread lowers the score.", "42", "43"),
+    ("checkpoint", r"In 10{,}000 resamples of the twenty years, D at seed 7 chooses update 9{,}560 in 61.0\% of resamples with 25 evaluations and 71.5\% with 50; the other resamples choose the final update.", "10{,}000", "10{,}001"),
+    ("checkpoint", "D at seeds 13 and 42 retains its respective earlier choice in every resample under either evaluation count.", "13", "14"),
+])
+def test_seed_and_count_anchors_reject_wrong_values_with_valid_decoys(
+        public_records, checkpoint_claim_records, scope, valid_duplicate, kind, clause, old, new, negative):
+    tex, rendered = manuscript()
+    report, _, _, figure = public_records
+    def check(source, pdf):
+        if kind == "calibration":
+            camera.calibration_claims(source, pdf, report, figure)
+        else:
+            camera.checkpoint_claims(source, pdf, checkpoint_claim_records)
+    check(tex, rendered)
+    if negative:
+        new = "-" + new
+    if scope == "PDF":
+        clause, old, new = (verifier.prose_text(value, source=True) for value in (clause, old, new))
+    original = tex if scope == "source" else rendered
+    assert original.count(clause) == 1 and clause.count(old) == 1
+    changed = original.replace(clause, clause.replace(old, new, 1), 1)
+    if valid_duplicate:
+        changed += "\n" + clause
+    message = "missing or duplicate clause" if valid_duplicate else "clause differs"
+    with pytest.raises(ValueError, match=scope + ": " + message):
+        check(changed if scope == "source" else tex, changed if scope == "PDF" else rendered)
+
+
+
+@pytest.mark.parametrize("scope", ["source", "PDF"])
+@pytest.mark.parametrize("value", ["999", "-999", "NaN"])
+@pytest.mark.parametrize("valid_duplicate", [False, True])
+@pytest.mark.parametrize("kind,clause,slot", [
+    ("calibration", r"Across the three fits, 49.0\% of observations fall below G5's $v_s$ intervals and 10.5\% above them.", "three"),
+    ("checkpoint", "All six validation choices agree between 25 and 50 evaluations for these fits and initial noise.", "six"),
+    ("checkpoint_update", r"at the five common update counts, mean TEST differences for O-S minus D are $-0.1238$, $0.0490$, $-0.0470$, $-0.0993$, and $-0.0554$.", "five"),
+])
+def test_word_count_slots_reject_malformed_values_and_valid_duplicates(
+        public_records, checkpoint_claim_records, scope, value, valid_duplicate, kind, clause, slot):
+    tex, rendered = manuscript()
+    report, _, _, figure = public_records
+    def check(source, pdf):
+        if kind == "calibration":
+            camera.calibration_claims(source, pdf, report, figure)
+        else:
+            camera.checkpoint_claims(source, pdf, checkpoint_claim_records)
+    check(tex, rendered)
+    if scope == "PDF":
+        clause, slot = verifier.prose_text(clause, source=True), verifier.prose_text(slot, source=True)
+    original = tex if scope == "source" else rendered
+    assert original.count(clause) == 1 and clause.count(slot) == 1
+    wrong = clause.replace(slot, value, 1)
+    changed = original.replace(clause, wrong + (" " + clause if valid_duplicate else ""), 1)
+    message = "missing or duplicate clause" if valid_duplicate else "clause differs"
+    with pytest.raises(ValueError, match=scope + ": " + message):
+        check(changed if scope == "source" else tex, changed if scope == "PDF" else rendered)

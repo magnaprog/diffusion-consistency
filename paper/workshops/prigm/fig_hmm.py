@@ -1,7 +1,8 @@
-"""Plot two comparisons for a hidden Markov model with an exact conditional law.
+"""Plot residuals and scores for a hidden Markov model with an exact conditional law.
 
 The first subplot compares denoiser outputs with conditional draws on repeated
-contexts. The second evaluates generated ensembles on 288 windows. Its line
+contexts; the adjacent subplot shows their mean absolute residual. The bottom
+subplot evaluates generated ensembles on 288 windows. Its line
 uses exact_reference.mean_energy, a different quantity from the conditional
 expected score in the first subplot. Both are finite Monte Carlo estimates.
 """
@@ -71,11 +72,11 @@ def _count(value, expected, name):
         raise ValueError(f"{name} must equal {expected}")
 
 
-def _mean_matches(value, scores, name):
+def _mean_matches(value, scores, name, *, abs_tol=1e-12):
     _finite(value, name)
     for score in scores:
         _finite(score, name)
-    if not math.isclose(value, math.fsum(scores) / len(scores), rel_tol=1e-12, abs_tol=1e-12):
+    if not math.isclose(value, math.fsum(scores) / len(scores), rel_tol=1e-12, abs_tol=abs_tol):
         raise ValueError(f"{name} does not match its individual records")
 
 
@@ -187,7 +188,11 @@ def validate_evidence(hmm, oracle):
             ("mean_reference_self_energy_mc", "reference_self_energy_mc"),
             ("mean_abs_r_star", "mean_abs_r_star"),
         ):
-            _mean_matches(summary[field], [row[individual] for row in group], f"context_by_t.{t}.{field}")
+            _mean_matches(summary[field], [row[individual] for row in group],
+                          f"context_by_t.{t}.{field}",
+                          abs_tol=0.0 if field == "mean_abs_r_star" else 1e-12)
+        if summary["mean_abs_r_star"] <= 0 or any(row["mean_abs_r_star"] < 0 for row in group):
+            raise ValueError("residuals must be nonnegative with a positive mean for the logarithmic axis")
         context_rows.append({"t": t, "n": summary["n"],
                              "mean_es_vs_ref": summary["mean_es_vs_ref"],
                              "mean_reference_self_energy_mc": summary["mean_reference_self_energy_mc"]})
@@ -195,32 +200,48 @@ def validate_evidence(hmm, oracle):
     return context_rows, sampler_rows, reference, shared, residuals
 
 
-def plot_evidence(context_rows, sampler_rows, reference):
+def plot_evidence(context_rows, sampler_rows, reference, residuals):
+    t = [row["t"] for row in context_rows]
+    residual_values = [_finite(residuals[str(step)], "mean_abs_r_star") for step in t]
+    if any(value <= 0 for value in residual_values):
+        raise ValueError("mean absolute residual must be positive for the logarithmic axis")
     with plt.rc_context(STYLE):
-        fig, axes = plt.subplots(1, 2, figsize=(5.5, 2.8))
-        fig.subplots_adjust(left=0.12, right=0.99, top=0.87, bottom=0.36, wspace=0.4)
-        t = [row["t"] for row in context_rows]
+        fig = plt.figure(figsize=(5.5, 5.0))
+        grid = fig.add_gridspec(2, 2, hspace=1.1, wspace=0.48)
+        axes = (fig.add_subplot(grid[0, 0]), fig.add_subplot(grid[0, 1]),
+                fig.add_subplot(grid[1, :]))
+        fig.subplots_adjust(left=0.13, right=0.99, top=0.93, bottom=0.18)
         # Markers only: no interpolation or fitted trend between measured budgets.
         axes[0].plot(t, [row["mean_es_vs_ref"] for row in context_rows], "s",
                      color=COLORS[2], markersize=4, label="Denoising estimate")
         axes[0].plot(t, [row["mean_reference_self_energy_mc"] for row in context_rows], "o",
                      color=COLORS[3], markerfacecolor="none", markersize=7,
-                     label="Expected conditional score")
+                     label="Exact conditional samples")
         axes[0].set_xticks(t)
         axes[0].set_xlabel("Corruption timestep $t$")
         axes[0].set_title("(a) Denoising", loc="left", fontsize=8)
+        axes[1].plot(t, residual_values, "s", color=COLORS[2], markersize=4)
+        axes[1].set_yscale("log")
+        axes[1].set_xticks(t)
+        axes[1].set_xlabel("Corruption timestep $t$")
+        axes[1].set_ylabel(r"Mean $|R_{\mathrm{obs}}|$ (HMM units)")
+        axes[1].set_title("(b) Residual", loc="left", fontsize=8)
+        mantissa, exponent = f"{residual_values[-1]:.2e}".split("e")
+        axes[1].annotate(rf"${mantissa}\times 10^{{{int(exponent)}}}$", (t[-1], residual_values[-1]),
+                         xytext=(-4, -11), textcoords="offset points", ha="right", fontsize=7)
         budgets = [row["denoiser_evaluations_per_draw"] for row in sampler_rows]
-        axes[1].plot(budgets, [row["mean_energy"] for row in sampler_rows], "s",
+        axes[2].plot(budgets, [row["mean_energy"] for row in sampler_rows], "s",
                      color=COLORS[2], markersize=4, label="DDIM estimates")
-        axes[1].axhline(reference["mean_energy"], color=COLORS[3], linestyle="--",
-                       label="Exact conditional draws")
-        axes[1].set_xticks(budgets)
-        axes[1].set_xlabel("Denoiser evaluations")
-        axes[1].set_title("(b) Sampling", loc="left", fontsize=8)
-        for ax in axes:
+        axes[2].axhline(reference["mean_energy"], color=COLORS[3], linestyle="--",
+                       label="Exact conditional samples")
+        axes[2].set_xticks(budgets)
+        axes[2].set_xlabel("Denoiser evaluations")
+        axes[2].set_title("(c) Sampling", loc="left", fontsize=8)
+        for ax in (axes[0], axes[2]):
             ax.set_ylabel("Mean energy score")
             ax.legend(loc="upper center", bbox_to_anchor=(0.5, -0.36), fontsize=7,
                       frameon=False, handlelength=2)
+        for ax in axes:
             ax.spines[["top", "right"]].set_visible(False)
             ax.margins(x=0.1, y=0.15)
     return fig
@@ -254,7 +275,7 @@ def main(argv=None) -> int:
         oracle, oracle_hash = load_evidence(oracle_path, args.oracle_sha256)
         context_rows, sampler_rows, reference, shared, residuals = validate_evidence(hmm, oracle)
         manifest = {
-            "schema_version": 1, "figure": "fig_hmm",
+            "schema_version": 2, "figure": "fig_hmm",
             "source": {"path": source.name, "sha256": source_hash},
             "style": {"path": style.name, "sha256": style_hash},
             "inputs": {
@@ -265,14 +286,19 @@ def main(argv=None) -> int:
             "boundary_law": hmm["boundary_law"], "conditioning": hmm["conditioning"],
             "verified_common_source_hashes": {name: hmm["source_hashes"][name] for name in shared},
             "hmm_n_context": hmm["n_context"], "hmm_n_paths": hmm["n_paths"],
-            "plotted_rows": {"panel_a_context": context_rows, "panel_b_samplers": sampler_rows,
-                             "panel_b_horizontal_reference": reference},
-            "unplotted_context_mean_abs_r_star": residuals,
-            "score_note": "Panel (a) uses independent context reference draws. Panel (b) uses final samples scored against held-out targets; its line is exact_reference.mean_energy, not reference_self_energy_mc. Monte Carlo comparisons at measured budgets only.",
+            "plotted_rows": {"panel_a_context": context_rows,
+                             "panel_b_context_residuals": [
+                                 {"t": row["t"], "n": row["n"],
+                                  "mean_abs_r_star": residuals[str(row["t"])]}
+                                 for row in context_rows],
+                             "panel_c_samplers": sampler_rows,
+                             "panel_c_horizontal_reference": reference},
+            "score_note": "Panels (a,b) use the same 36 cases at each timestep. Panel (a) uses independent context reference draws. Panel (c) uses final samples on 288 windows; its line is exact_reference.mean_energy, not reference_self_energy_mc. All scores are finite Monte Carlo estimates.",
+            "residual_note": "Panel (b) plots the validated mean absolute residual on a logarithmic axis, without a floor or zero reference. The estimator uses one denoiser evaluation at t=1 and two at the other timesteps. This is an absolute residual, not the squared training penalty.",
             "matplotlib_version": matplotlib.__version__, "backend": "Agg", "output_sha256": {},
         }
         with plt.rc_context(STYLE):
-            fig = plot_evidence(context_rows, sampler_rows, reference)
+            fig = plot_evidence(context_rows, sampler_rows, reference, residuals)
             try:
                 out.mkdir()
                 for suffix in ("pdf", "png"):
