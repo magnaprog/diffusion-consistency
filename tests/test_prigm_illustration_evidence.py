@@ -121,6 +121,7 @@ def test_committed_evidence(observations):
 
 
 @pytest.mark.parametrize("keys,value", [
+    (["case_labels", "120"], "Wind · 3 Aug 2010"),
     (["cases", 0, "y_limits", "D", 0], -99.),
     (["cases", 1, "x_limits", 1], 70),
     (["cases", 0, "y_limits", "full_flank_gaussian", 0], 0.),
@@ -139,10 +140,16 @@ def test_independent_pins_are_literal():
         EXCERPT: "f3b270d52ea52088fa84414fcb77b6954624913ed474618be245de417034a1cc",
         PROVENANCE: "4416bd1c76aa849de65595e445edc09d5230f2e0bfd2afc75c30c888697c3c66",
         FIXED: "5bd0176437a707c6c3f800103dc6d6b2db08a1905391c6633bb4b195de14d8fb",
-        CASE: "5d2fbf52337f17d0722cfe19d6c1c975ae1ac4746832e50bc1cbb3f842e1b1f1",
-        CASE.replace("120", "360"): "d5823fe76c1deecde13210b32f87ada619716079ac36d12ba1a3a2bbcf3d236f",
-        "figures/imputation/detail/fig_imputation.manifest.json": "29802ad07eebd26ab31262441e7441aa78f5e3492e54bd4677a76d601c4d4a40",
+        CASE: "e21aeedb7d47ca127c1c259361b273236472f8043685d0264edf61be87c014b2",
+        CASE.replace("120", "360"): "2e4a7d3255eafac2bcdb5ffe4f7d61116bfd6d51fd152c80bfbb2d998ff42367",
+        "figures/imputation/detail/fig_imputation.manifest.json": "e92c6de66f37090e6989d05ece25c7fdd53b38cd82a05eab5dec93c20c76972e",
     }
+
+
+def test_case_display_label_must_match_the_audited_case(paper, observations, unpinned):
+    mutate_json(paper, CASE, ["case_label"], "Wind · 3 August 2010")
+    with pytest.raises(ERRORS, match="case_label"):
+        illustrations.validate_illustrations(paper, observations)
 
 
 @pytest.mark.parametrize("name", list(illustrations.PINS))

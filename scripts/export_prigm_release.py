@@ -84,6 +84,7 @@ prigm/toy.py
 prigm/toy_eval.py
 prigm/toy_windows.py
 prigm/train.py
+scripts/analyze_prigm_checkpoint_reselection.py
 scripts/export_prigm_release.py
 scripts/package_prigm_arxiv.py
 scripts/package_prigm_paper.py
@@ -98,6 +99,7 @@ tests/test_prigm_calibration_figure.py
 tests/test_prigm_camera_ready.py
 tests/test_prigm_checkpoint_evidence.py
 tests/test_prigm_checkpoint_followup.py
+tests/test_prigm_checkpoint_reselection.py
 tests/test_prigm_comparison.py
 tests/test_prigm_coordinator.py
 tests/test_prigm_core.py
@@ -126,6 +128,7 @@ tests/test_prigm_recovery.py
 tests/test_prigm_release_export.py
 tests/test_prigm_replay.py
 tests/test_prigm_sample_excerpt.py
+tests/test_prigm_scientific_argument.py
 tests/test_prigm_statistics.py
 tests/test_prigm_tail_calibration.py
 tests/test_prigm_toy_evidence.py
@@ -139,7 +142,7 @@ README = """# Diffusion consistency
 
 Code and public evidence for **Residual Penalties Versus Algebraic Completion In Conditional Diffusion**, accepted at the 2nd Workshop on Principles of Generative Modeling, NeurIPS 2026.
 
-Six statistics of the solar wind magnetic field obey an exact algebraic identity. The study asks whether enforcing that identity improves conditional diffusion's predictions for an hour of withheld measurements. It compares a residual penalty, generating five statistics and deriving the sixth, and clipping generated values to satisfy the constraints on these statistics. These comparisons distinguish algebraic consistency from the accuracy of the predictive distribution. The [paper](paper/workshops/prigm/main.pdf) describes the methods, results and limitations; its [TeX source](paper/workshops/prigm/main.tex) is included.
+Six magnetic quantities computed from five consecutive OMNI vector averages, each over one minute, obey an exact algebraic identity. The study asks whether enforcing that identity improves conditional diffusion predictions for a withheld hour, using measurements before and after it. It compares a residual penalty, generating five statistics and deriving the sixth, and clipping generated values to satisfy the constraints on these statistics. These comparisons distinguish algebraic consistency from the accuracy of the predictive distribution. The [paper](paper/workshops/prigm/main.pdf) describes the methods, results and limitations; its [TeX source](paper/workshops/prigm/main.tex) is included.
 
 The [release guide](docs/prigm_release.md) covers installation, CPU tests, evidence verification, data reconstruction and paper builds. The public evidence includes TEST observations, numerical results, toy arrays, selected Gaussian predictions and inputs for the figures. Neural checkpoints, complete neural prediction sets, TRAIN/VAL arrays and raw OMNI files are not included, so the available checks reproduce only part of the experiments. The original three training seeds and earlier exposure to TEST limit the conclusions as stated in the paper.
 
@@ -154,7 +157,8 @@ AGENTS = """# Working on this release
 Read [the release guide](docs/prigm_release.md) before changing code or the paper.
 Before changing a producer recorded in frozen evidence, read
 [the source provenance record](reproducibility/accepted_source/README.md).
-Also retain the later [documentation revisions](reproducibility/documentation_source/README.md).
+Also retain the [earlier documentation revisions](reproducibility/documentation_source/README.md)
+and the [October 29 revision](reproducibility/documentation_revisions/2026-10-29/README.md).
 Preserve historical evidence, original source snapshots, and their hashes.
 New experiments need separate output directories and provenance.
 
@@ -231,6 +235,8 @@ def collect(root):
             continue
         path = root / name if name == ".gitignore" else paper_package.inside(root, name)
         files[name], _ = paper_package.read_source(path)
+    if paper_package.RESELECTION_RESULT in paper_files:
+        paper_package.checkpoint_reselection_bindings(paper_files, files)
     if files["LICENSE"] != paper_files["LICENSE"]:
         raise ValueError("paper and release licenses differ")
     if not files[f"{PAPER}/main.pdf"].startswith(b"%PDF-"):

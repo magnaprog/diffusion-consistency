@@ -127,10 +127,10 @@ def test_current_deadline_tables_and_prose_match_source_and_pdf(public_claims):
 def test_false_score_role_cannot_hide_before_valid_duplicate(public_claims, scope):
     tex, rendered, real, evidence = public_claims
     source = tex if scope == "source" else rendered
-    valid = "This study compares"
+    valid = "Conditional diffusion experiments"
     pattern = gate.clause_pattern(gate.prose_text(valid, source=True))
     assert len(re.findall(pattern, gate.prose_text(source, source=scope == "source"))) == 1
-    changed = "This study compares mean predictions using the energy score. " + source
+    changed = "Conditional diffusion experiments compare mean predictions using the energy score. " + source
     with pytest.raises((ValueError, ContractMismatch)):
         gate.deadline_claims(changed if scope == "source" else tex,
                              changed if scope == "PDF" else rendered, real, evidence)
@@ -173,10 +173,11 @@ def test_wrong_coverage_reference_is_rejected(public_claims, scope, alter_differ
 
 @pytest.mark.parametrize("scope", ["source", "PDF"])
 @pytest.mark.parametrize("before,after", [
-    ('its prediction intervals cover too few measurements', 'its prediction intervals attain nominal coverage'),
-    ('choosing models by validation', 'choosing models by TEST'),
+    ('Its intervals still cover too few measurements', 'Its intervals attain nominal coverage'),
+    ('when validation chooses the model', 'when TEST chooses the model'),
     ('the lowest mean energy score', 'the highest mean energy score'),
-    ('its training objective also changes', 'its training objective stays the same'),
+    ('with changes to both representation and loss', 'with no change to representation or loss'),
+    ('generation in fewer coordinates, and transformation of existing samples', 'generation in fewer coordinates, with no transformation of existing samples'),
     ('their mean energy score changes little', 'their mean energy score improves greatly'),
     ('reduces the spread term by more', 'reduces the spread term by less'),
     ('regression uses more available measurements', 'regression uses fewer available measurements'),
@@ -195,7 +196,7 @@ def test_wrong_coverage_reference_is_rejected(public_claims, scope, alter_differ
     ('the original coefficient gives the lowest mean score', 'the largest coefficient gives the lowest mean score'),
     ('1.9515', '1.9525'),
     ('exploratory', 'confirmatory'),
-    ('adds denoiser evaluations and hence computational cost at equal update counts', 'leaves computational cost equal at equal update counts'),
+    ('adds denoiser evaluations and computational cost', 'leaves computational cost equal at equal update counts'),
     ('differences in score may reflect convergence or overfitting', 'differences in score establish convergence and rule out overfitting'),
     ('is also slightly smaller', 'is also slightly larger'),
     ('its larger spread term', 'its smaller spread term'),

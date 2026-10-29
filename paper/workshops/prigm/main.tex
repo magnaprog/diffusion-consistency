@@ -34,14 +34,16 @@
 \maketitle
 
 \begin{abstract}
-Missing solar wind measurements leave uncertainty in both the mean magnetic field and its fluctuations. An exact variance identity connects these quantities while allowing many conditional distributions. This study compares a residual penalty during diffusion training, algebraic completion of one variable, and clipping of samples to satisfy the moment constraints. The penalty's benefit depends on the stage of training: choosing models by validation largely removes the mean improvement seen at the final update. The model that generates fewer variables has the lowest mean energy score, though its prediction intervals cover too few measurements and its training objective also changes. Clipping can worsen the score as it reduces ensemble spread. In a problem with a known conditional distribution, an exact denoiser gives small residuals even when the sampling approximation is inaccurate. These comparisons distinguish the algebraic relation between magnetic quantities from the statistical task of assigning probabilities to their possible values.
+Missing solar wind measurements leave uncertainty in both the mean magnetic field and its fluctuations. These quantities obey an exact variance identity. Conditional diffusion experiments examine how enforcing this identity changes the predicted distribution. A residual penalty improves the score at the final training update, but most of its mean advantage disappears when validation chooses the model. Generating fewer variables and completing the rest algebraically gives the lowest mean energy score among the methods tested, with changes to both representation and loss. Its intervals still cover too few measurements. Clipping existing samples can worsen the score through a loss of ensemble spread. In an example with a known conditional distribution, a short sampling approximation using an exact denoiser gives small residuals but inaccurate probabilities. These comparisons connect constraint enforcement to its effects during training and sampling, showing how algebraic consistency can coexist with errors in predictive uncertainty.
 \end{abstract}
 
 \section{Introduction}
 
-Missing solar wind measurements complicate estimates of magnetic turbulence \citep{wrench2022statistics}. A small mean field can result from cancellation between large vectors pointing in different directions. The vector mean alone leaves open how much the field fluctuated during the missing interval. Here, conditional diffusion infers the joint distribution of six magnetic statistics for a missing hour, using measurements before and after it.\footnote{Available at: \url{https://github.com/magnaprog/diffusion-consistency}}
+Missing solar wind measurements complicate estimates of magnetic turbulence \citep{wrench2022statistics}. Large vectors pointing in different directions can have a small mean, so reconstructing the mean field leaves its fluctuations uncertain. Here, conditional diffusion infers the joint distribution of six magnetic statistics throughout a missing hour, using measurements before and after it. They describe the mean field, magnitude and variances in successive bins of five minutes.\footnote{Available at: \url{https://github.com/magnaprog/diffusion-consistency}}
 
-An exact variance identity determines one statistic from the other five. It holds for arbitrary vectors, independently of plasma dynamics. Many conditional distributions satisfy this relation. Conditional diffusion \citep{tashiro2021csdi} supplies the generator, and Physics-Informed Diffusion Models \citep{bastek2025pidm} supply the residual objective and sampling approximation. Earlier studies examine residual minimization and distribution matching \citep{baldan2025physics}, or construct outputs satisfying algebraic constraints \citep{beucler2021constraints}. Here, comparisons separate a penalty during training, generation in fewer coordinates, and transformation of existing samples. Several stages of training show how model choice affects their apparent benefit.
+An exact variance identity determines one statistic from the other five. It holds for arbitrary vectors, independently of plasma dynamics, and allows many conditional distributions. Uncertainty complicates its use during training: the exact conditional mean can have a nonzero residual even though every realization satisfies the identity.
+
+The experiments use conditional diffusion \citep{tashiro2021csdi} with the residual objective and sampling approximation of Physics-Informed Diffusion Models \citep{bastek2025pidm}. Earlier work studies residual minimization and distribution matching \citep{baldan2025physics}, or constructs outputs satisfying algebraic constraints \citep{beucler2021constraints}. Here, the comparisons distinguish a penalty during training, generation in fewer coordinates, and transformation of existing samples. Several training stages and an example with a known conditional distribution reveal how these operations affect consistency and predictive accuracy.
 
 
 
@@ -58,7 +60,7 @@ The variances describe fluctuations in magnitude and in the vector, respectively
  R_{\mathrm{obs}}(z)=m^2+v_s-\|\mu\|^2-v_v=0.
  \label{eq:identity}
 \end{equation}
-Omitting the variances gives $R_{\mathrm{inst}}=m^2-\|\mu\|^2$. This quantity measures directional cancellation, so penalizing it favors vectors pointing in the same direction. It vanishes when all nonzero vectors share a direction, even if their magnitudes differ.
+Omitting the variances gives $R_{\mathrm{inst}}=m^2-\|\mu\|^2$. For realizable statistics, it measures directional cancellation, weighted by field amplitude. It vanishes when all nonzero vectors share a direction, even if their magnitudes differ. Reducing amplitudes while retaining their directions can also lower this residual.
 
 Write $r=\|\mu\|$. Five vectors in three dimensions, including possible zero vectors, can realize these statistics exactly when
 \begin{equation}
@@ -92,14 +94,14 @@ For standardized state $u$ in the missing hour, the training objective adapts \c
 \end{equation}
 Here $\hat u_0$ estimates the original signal. Two denoiser evaluations give $z^*_{0,k}$ in physical units, except at $t=1$, where the first estimate is reused. The data weight is $w_t=\min(\operatorname{SNR}_t,5)$; $\Sigma_t$ is the diffusion posterior variance, with $\Sigma_1:=\Sigma_2$. The scale $B_{\mathrm{ref}}^2$ averages $m^2+v_s$ over distinct training bins. A cosine schedule uses 100 steps \citep{nichol2021improved}. D and G5 use $c_R=0$; I-S and O-S use $c_R=0.0005$.
 
-Each method uses three training seeds and 29{,}636 parameter updates, saving five model states, or checkpoints, per seed (Appendix~\ref{app:protocol}). The residual term adds denoiser evaluations and hence computational cost at equal update counts. The test period had been examined during earlier development. The comparison retains the original settings and penalty coefficient, without further tuning on that period.
+Three training seeds and five checkpoints per seed span the same update counts for each method (Appendix~\ref{app:protocol}). The penalty adds denoiser evaluations and computational cost. The test period had been examined during earlier development; the comparison retains the original settings and penalty coefficient without further tuning on that period.
 
-\paragraph{Scores and uncertainty.} The energy score evaluates the joint predictive distribution through Euclidean distances \citep{gneiting2007strictly}; lower scores are better. Its primary coordinates are $(\mu_x,\mu_y,\mu_z,m,v_s)$ at twelve hidden positions, standardized using training data. For $K$ samples, the unbiased estimate is their mean distance to the withheld values minus half their mean separation over the $K(K-1)$ ordered pairs of distinct members. This comparison balances proximity to the measurements with ensemble spread. Scores give equal weight to each month. The continuous ranked probability score, interval coverage and width assess individual coordinates (Appendix~\ref{app:protocol}).
+\paragraph{Scores and uncertainty.} The energy score measures joint predictive accuracy through Euclidean distances; lower scores are better \citep{gneiting2007strictly}. The primary score uses $(\mu_x,\mu_y,\mu_z,m,v_s)$ at twelve hidden positions after TRAIN standardization. For $K$ independent samples, its unbiased estimate subtracts half their mean distance over $K(K-1)$ ordered pairs of distinct members from their mean distance to the withheld values. These terms assess proximity to measurements and ensemble spread. Monthly means receive equal weight. Continuous ranked probability scores, interval coverage and width assess individual coordinates (Appendix~\ref{app:protocol}).
 Diffusion results average three training seeds, with coverage calculated separately for each ensemble. Intervals for score differences resample years or consecutive groups of two years, with replacement and common resamples for both methods. They describe temporal variation for the existing fits and samples. Subgroups defined by withheld outcomes are retrospective.
 
 \paragraph{Model selection and baselines.} Validation compares ensembles of 39 samples from 25 denoising diffusion implicit model (DDIM) evaluations with $\eta=0$ \citep{song2021ddim}. It minimizes the energy score with equal month weights, choosing checkpoints separately before and after clipping; ties favor the earlier state. Test ensembles use 39 samples and 50 evaluations.
 
-Linear interpolation joins the measurements adjacent to the missing hour; persistence repeats the preceding bin. Gaussian interpolation adds a residual vector whose mean and covariance come from TRAIN, with covariance shrinkage $\rho=0$. Gaussian regression uses the full available context and a constant residual covariance, then derives $v_v$. Validation chooses its ridge and covariance shrinkage parameters before TEST (Appendix~\ref{app:extension}).
+Linear interpolation joins the adjacent measurements; persistence repeats the preceding bin. Gaussian interpolation adds a residual fit on TRAIN with covariance shrinkage $\rho=0$. Gaussian regression uses the full available context and a common residual covariance, then derives $v_v$; validation chooses its ridge and covariance shrinkage parameters (Appendix~\ref{app:extension}).
 
 \begin{table}[!b]
 \centering
@@ -122,9 +124,11 @@ Gaussian regression & 1.935 & 2.035 & 94.0 & 93.5 & 0.000 & 74.6 \\
 \end{tabular}
 \end{table}
 
-\subsection{Test results}
+\section{Results and interpretation}
 
-Adding the identity penalty changes the mean energy score little after validation chooses the model (Table~\ref{tab:main}). O-S minus D is $-0.0028$, with a 95\% interval of $[-0.0346,0.0242]$ from resampling years. Relative intervals from both resampling schemes lie within the original $\pm2\%$ comparison range for these three fits. G5 has the lowest mean score: O-S minus G5 is 0.1002, with interval $[0.0712,0.1391]$ from resampling years. Both comparisons reverse sign across seeds. Most of G5's mean improvement over D comes from the spread term in the score, with different contributions at each seed (Figure~\ref{fig:calibration}). Its intervals still cover too few measurements, and nearly half of its raw bins fail the moment inequalities. The gain concerns a different representation and training loss; deriving $v_v$ from otherwise identical samples would leave the primary score intact.
+Validation leaves little mean score difference between O-S and D (Table~\ref{tab:main}, Figure~\ref{fig:overview}a). O-S minus D is $-0.0028$, with a 95\% interval of $[-0.0346,0.0242]$ from resampling years. Relative intervals from both resampling schemes lie within the original $\pm2\%$ comparison range for these three fits. At the final update, however, O-S with the original coefficient has a lower raw score than D for all three seeds. Validation favors earlier D models, reducing this mean advantage.
+
+G5 has the lowest mean primary score: O-S minus G5 is 0.1002, with interval $[0.0712,0.1391]$ from resampling years. Both the O-S/D and O-S/G5 comparisons reverse sign across seeds. Most of G5's mean improvement over D comes from the spread term in the score, with different contributions at each seed (Figure~\ref{fig:calibration}). Its intervals still cover too few measurements, especially for variance in field magnitude (Figure~\ref{fig:overview}b), and nearly half of its raw bins fail the moment inequalities. The lower score concerns a different representation and training loss. Algebraic completion alone preserves the other five quantities, so deriving $v_v$ from the same samples would leave their primary score intact.
 
 
 
@@ -133,22 +137,18 @@ The effect of clipping depends on how far it moves the samples and how it change
 \par
 \end{samepage}
 
-At the final update, O-S with the original coefficient has a lower raw score than D for all three seeds. Validation often favors earlier models, reducing this mean advantage. Doubling validation DDIM evaluations from 25 to 50 preserves all six raw D/O-S choices (Appendix~\ref{app:checkpoints}). Thus, the comparison still depends on training stage when validation and TEST use equal sampling effort. Table~\ref{tab:fixedfinal} compares penalty strengths at the final update.
-
-\subsection{An exact denoiser example}
-
-An exact denoiser isolates error in the sampling approximation (Figure~\ref{fig:hmm}). For a stationary hidden Markov model, it integrates over the unknown switching probability. Across 36 replicate contexts at $t=100$, two evaluations give mean absolute $R_{\mathrm{obs}}=4.17\times10^{-5}$ in HMM units, yet energy score 6.958 versus 4.164 for independent exact conditional samples. On a separate set of 288 windows, two evaluations again give a poor score, while 25, 50, or 100 DDIM evaluations approach the exact conditional ensemble (Table~\ref{tab:oracle}). The example tests the residual estimator used during training; the full sampler can be more accurate. These estimates have finite sampling error.
+An exact denoiser isolates error in the sampling approximation (Figure~\ref{fig:hmm}). In a stationary hidden Markov model, it integrates over the unknown switching probability. New hidden paths and forward noise for each available context give a distribution of estimates. Across 36 cases at $t=100$, two evaluations give mean absolute $R_{\mathrm{obs}}=4.17\times10^{-5}$ in HMM units, yet energy score 6.958 versus 4.164 for independent exact conditional samples. Separately, DDIM sampling on 288 windows gives a poor score with two evaluations and scores close to that of the exact conditional ensemble with 25, 50, or 100 (Table~\ref{tab:oracle}). The residual estimate used in training and the full sampler have different accuracy here. All scores have finite sampling error.
 
 \begin{figure}[t]
  \centering
- \includegraphics[width=0.90\linewidth]{figures/operator/fig_operator.pdf}
-\caption{Clipping samples from models chosen by raw validation score. (a) Mean displacement in 60 standardized coordinates on a logarithmic axis. Blue circles show individual fits; purple diamonds show their mean or one Gaussian ensemble. (b) Solid bars show the change in distance to withheld values; striped bars show the change in the negative spread term. Their sum, the energy score change, appears as purple diamonds. The symmetric logarithmic axis is linear inside $\pm0.005$. Clipping changes D's score by $-0.0064$; choosing another checkpoint adds $-0.0118$.}
- \label{fig:operator}
+ \includegraphics[width=\linewidth]{figures/overview/fig_overview.pdf}
+ \caption{Model choice and predictive uncertainty. (a) O-S minus D energy score at the final update and at the checkpoints chosen independently by raw validation score. Symbols distinguish the three training seeds; diamonds show their mean. Negative values favor O-S. Validation with 25 or 50 evaluations chooses the same six checkpoints. (b) Raw nominal 90\% interval coverage for each magnetic quantity. Large filled markers average three diffusion fits; small open circles show individual fits. Gaussian regression uses one ensemble per window. The dashed line marks 90\%. Scores and coverage give equal weight to months; coverage also averages the twelve hidden positions.}
+ \label{fig:overview}
 \end{figure}
 
 \section{Conclusion}
 
-The moment constraints define possible magnetic statistics; the model learns their probabilities. The penalty comparison depends on the stage of training, while G5's score improvement accompanies undercoverage and changes to both representation and loss. Clipping and the exact-denoiser example show directly why a small residual can accompany an inaccurate distribution. Scores, coverage and algebraic checks answer different questions about a reconstruction. The empirical ranking concerns three seeds and hours masked in complete records from a test period examined earlier. Naturally missing records, later years and other interval lengths offer tests of how far that ranking extends.
+Algebraic constraints describe each possible realization; conditional prediction assigns probabilities to those realizations. The comparisons connect the effect of enforcing an identity to changes in training, representation and sampling. G5's lower score accompanies undercoverage, while clipping and the exact denoiser example show why a small residual can accompany an inaccurate distribution. Evaluating these operations involves both the moment relations and the uncertainty they produce. The empirical ranking concerns three seeds and hours masked in complete records from a test period examined earlier. Naturally missing records, later years and other interval lengths would test how far that ranking extends.
 
 \clearpage
 \begin{ack}
@@ -171,14 +171,14 @@ The common quantity $Q=m^2+v_s=\|\mu\|^2+v_v$ is the mean squared magnitude of t
 
 Averaging $Q$ across consecutive bins preserves the mean squared magnitude over the combined interval. This property also holds numerically for all 97{,}699 eligible intervals of 15 minutes that begin on a UTC quarter hour within the union of training windows: the calculation from three bins differs from that using the original fifteen vectors by at most $9.09\times10^{-13}\,\mathrm{nT}^2$. Replacing each bin by its mean vector discards its vector variance and reduces the result by $0.8943\,\mathrm{nT}^2$ on average.
 
-\section{Data sources and selection}
+\section{OMNI measurements and evaluation sample}
 \label{app:quality}
 
 
 
 The magnetic inputs are the vector components in geocentric solar ecliptic coordinates, GSE. Their norms define the magnitudes used here, which can differ from NASA's separately supplied average field magnitude. Before bins of five minutes are formed, data checks exclude nonfinite entries and fill values from the OMNI specification. They verify integer calendar fields, unique timestamps in chronological order and one spacecraft throughout each window. The study applies no additional amplitude threshold or removal of spikes according to the values subsequently withheld.
 
-OMNI first estimates arrival times and forms weighted magnetic averages for each minute. Neighboring output minutes can share underlying measurements, and propagation normals depend on nearby magnetic observations. The study masks the resulting record, retaining any influence of the hidden interval on those earlier estimates. NASA also keeps data whose predicted arrival order differs from their order at the spacecraft and describes the resulting mixing of plasma regions \citep[Sections 3a--3c and Appendix 5]{papitashvili2020omni}. Every window uses one spacecraft, while propagation can still change the ordering of its records. Cancellation between field directions, variance and changes at the edges of a missing interval can reflect both this processing and solar wind variability.
+OMNI first estimates arrival times and forms weighted magnetic averages for each minute. Neighboring output minutes can share underlying measurements, and propagation normals depend on nearby magnetic observations. The study masks the resulting record, retaining any influence of the hidden interval on those earlier estimates. NASA also keeps data whose predicted arrival order differs from their order at the spacecraft and describes the resulting mixing of plasma regions \citep[Sections 3a--3c and Appendix 5]{papitashvili2020omni}. Every window uses one spacecraft, while propagation can still change the ordering of its records. Cancellation between field directions, variance and changes at the edges of a missing interval can reflect both this processing and solar wind variability. The prediction intervals describe uncertainty about the withheld processed values, treating the instrument measurements and arrival-time estimates as given.
 
 Which intervals remain complete depends on propagation as well as solar wind conditions. Magnetic records may be omitted when suitable plasma velocities are missing or when a long interval with little field variation gives no acceptable phase front normal. Consequently, completeness is an ambiguous indicator of quiet or disturbed solar wind. NASA chooses among spacecraft in segments of three hours using coverage, spatial separation and continuity of source, with a preference for Wind from 2020 onward \citep[Appendix 6]{papitashvili2020omni}. Thus, comparisons between spacecraft combine differences in instruments, dates and processing. The experiments use the original downloaded OMNI records.
 
@@ -188,7 +188,7 @@ The completeness criteria retain 122{,}309 of the 957{,}720 possible training st
 
 Within each month, evaluation forms complete, nonoverlapping windows of four hours in chronological order. From $N$ windows, $q=\min(N,q_0)$ are retained at indices $\lfloor(j+0.5)N/q\rfloor$ for $j=0,\ldots,q-1$, with $q_0=8$ for VAL and $q_0=12$ for TEST. The indices spread the evaluation windows across this sequence, and the quota limits differences in monthly sample counts. Eligibility still depends on completeness.
 
-\section{Model training, sample generation, and scoring}
+\section{Diffusion training and evaluation}
 \label{app:protocol}
 
 The four methods each have three fits, allowing comparisons across training seeds at the same update counts. Each fit receives 29{,}636 optimizer updates with batches of 128, using one batch gradient per update. This corresponds to 31 passes through the training data, including the shorter batch at the end of each pass.
@@ -227,7 +227,7 @@ The original superiority criterion compares raw O-S with raw D, raw G5, and D an
 
 For O-S minus D, resampling groups of two consecutive years gives an interval of $[-0.0345,0.0233]$. The intervals describe temporal variation separately for each comparison, conditional on the existing fits and draws. They omit adjustment for multiple comparisons and variation from new training seeds.
 
-\subsection{Scores during training and the number of sampling steps}
+\subsection{Training stage and checkpoint choice}
 \label{app:checkpoints}
 
 Validation originally used fewer denoiser evaluations than TEST. The checkpoint analysis asks whether that difference affects model choice. It evaluates all five states of D and O-S at each training seed, using the original weights, windows, 39 samples and evaluation seed 7. Thirty validation ensembles with 50 evaluations reuse the initial noise from the original ensembles with 25. Their validation scores determine the model choices before additional TEST samples are generated. TEST then evaluates all thirty model states with 50 evaluations (Figure~\ref{fig:checkpoints}). This analysis still concerns the test period examined earlier.
@@ -240,6 +240,8 @@ All six validation choices agree between 25 and 50 evaluations for these fits an
 Validation chooses an earlier D checkpoint for every seed, but the final O-S checkpoint for seeds 7 and 13. Moving all fits to the final update raises D's mean TEST score by 0.0945 and O-S's by 0.0419, changing O-S minus D from $-0.0028$ to $-0.0554$. The larger increase for D explains the arithmetic change in their difference. Establishing whether regularization or overfitting causes this pattern is a separate empirical question.
 
 Model choice can also depend on which years appear in validation. In 10{,}000 resamples of the twenty years, D at seed 7 chooses update 9{,}560 in 61.0\% of resamples with 25 evaluations and 71.5\% with 50; the other resamples choose the final update. D at seeds 13 and 42 retains its respective earlier choice in every resample under either evaluation count. Each sampled year contributes both validation months, including repeated occurrences, and all checkpoints use the same resampled years. With weights and samples held constant, these frequencies measure sensitivity to the years represented in validation.
+
+Repeating checkpoint choice also tests whether this sensitivity changes the O-S/D comparison. In 10{,}000 resamples at seed 7003, the same year multiplicities weight validation and TEST. Validation with 50 evaluations chooses each fit's checkpoint anew, with ties favoring the earlier update. The 2.5th and 97.5th percentiles of O-S minus D are $[-0.0336,0.0246]$, close to $[-0.0346,0.0242]$ when the original choices are retained in the same resamples. Thus, allowing model choice to vary preserves the small aggregate difference in this exercise. Both calculations condition on the existing fits and samples; uncertainty from retraining and nominal coverage under temporal dependence remain outside this sensitivity check.
 
 \begin{figure}[t]
  \centering
@@ -333,12 +335,12 @@ The two comparisons separate the estimate used in the training loss from the dis
 
 Discreteness also matters for interval coverage. The exact conditional ensembles in Table~\ref{tab:oracle} give coverage of 100.0\% and 97.49\% under the nominal 90\% and 50\% conventions, with mean widths 1.4581 and 1.3485 in standardized coordinates. The intervals include their endpoints, so tied values can raise coverage above the values expected for a continuous distribution. This explains why the nominal percentages alone would mischaracterize calibration in this toy.
 
-\section{Variation across seeds, interval coverage, and alternative scores}
+\section{Prediction scores and interval coverage}
 \label{app:details}
 
 Here and in Appendix~\ref{app:strata}, Gaussian denotes interpolation with a Gaussian residual fit on TRAIN. Gaussian regression instead uses the wider available context; Table~\ref{tab:main} and Appendix~\ref{app:extension} present that model separately.
 
-The primary energy score evaluates the joint prediction for the missing hour. Each of the five quantities is centered and divided by its TRAIN scale, placing field components and mean magnitude in nT and scalar variance in nT$^2$ on a common dimensionless scale. Combining twelve positions gives 60 coordinates. The score is the mean distance from predictions to the withheld record, less half the mean distance between distinct predictions. The first term measures proximity to the record and the second accounts for predictive spread; their difference determines the score. Its population expectation is minimized by the true conditional distribution \citep{gneiting2007strictly}. Despite its name, this statistical score is distinct from magnetic energy density.
+The primary energy score evaluates the joint prediction for the missing hour in 60 coordinates. Subtracting each quantity's TRAIN mean and dividing by its TRAIN scale makes field values in nT and scalar variance in nT$^2$ dimensionless. The score combines distance to the withheld record with separation between predictions, as defined in the main text. The true conditional distribution minimizes its population expectation \citep{gneiting2007strictly}. The term ``energy score'' denotes this statistical criterion; magnetic energy density is a separate physical quantity assessed below.
 
 Each seed in Table~\ref{tab:seeds} corresponds to one training run. All runs reach the common final update, while validation chooses the checkpoint used for prediction. It makes this choice separately for raw predictions and predictions after clipping. Coverage is calculated from each model's own ensemble before averaging across seeds.
 
@@ -470,12 +472,12 @@ Persistence & 0.1 & 0.2 & 0.1 & 0.0 & 0.0 \\
 \begin{samepage}
 Changing the coordinates in the score changes the question it asks. The vector score in Table~\ref{tab:alternative} uses 36 standardized coordinates; adding $m$, $v_s$ and $v_v$ gives 72. Although $v_v$ follows from the other quantities for realizable statistics, including it changes distances and the relative influence of errors. The resulting scores have different scales and can rank methods differently. Gaussian interpolation has a lower mean vector score than D, I-S and O-S. G5 has the lowest mean primary score over five quantities, while its rank changes when $v_v$ enters the score.
 
-The magnetic energy calculation gives a physical interpretation to a different aspect of the prediction. For realizable statistics, $m^2+v_s$ equals the mean squared magnitude of the five vector averages, each over one minute. Conversion to T$^2$ and division by $2\mu_0$ give the magnetic energy density represented by those averages; variation within the original minute averages is absent. Each predicted sequence supplies one mean density over the missing hour, and CRPS evaluates the resulting scalar ensemble. CRPS and interval width have units of J\,m$^{-3}$, shown as multiples of $10^{-12}$ in Table~\ref{tab:alternative}. Raw Gaussian interpolation has the lowest CRPS for this quantity among the procedures in that table. Clipping brings the moments into the ranges in Equation~\ref{eq:support} to rounding tolerance, but its effect on the score depends on how the predictive distribution changes.
+The magnetic energy calculation assesses a different aspect of the prediction. For realizable statistics, $m^2+v_s$ equals the mean squared magnitude of the five vector averages, each over one minute. Conversion to T$^2$ and division by $2\mu_0$ give the magnetic energy density represented by those averages; variation within the original minute averages is absent. The same scalar transformation is applied to every predicted bin and averaged over the missing hour for each ensemble member. CRPS compares this scalar ensemble with the energy density of the withheld record. Interpreting each predicted value as the energy density of vectors with the other predicted moments depends on their joint realizability. CRPS and interval width have units of J\,m$^{-3}$, shown as multiples of $10^{-12}$ in Table~\ref{tab:alternative}. Raw Gaussian interpolation has the lowest CRPS for this quantity among the procedures in that table. Clipping brings the moments into the ranges in Equation~\ref{eq:support} to rounding tolerance, but its effect on the score depends on how the predictive distribution changes.
 \end{samepage}
 
 \begin{table}[ht]
 \centering
-\caption{Scores for alternative magnetic quantities. The vector and six-coordinate energy scores use 36 and 72 standardized coordinates. The last three columns assess the mean magnetic energy density over the missing hour, computed for each ensemble member from $m^2+v_s$. This quantity retains the energy represented by vector averages over one minute and excludes variation within those averages. Continuous ranked probability score and interval width are in $10^{-12}$ J\,m$^{-3}$; coverage is in percent. Validation chooses model states separately for raw and clipped diffusion predictions. Gaussian denotes Gaussian interpolation.}
+\caption{Scores for alternative magnetic quantities. The vector and six-coordinate energy scores use 36 and 72 standardized coordinates. The last three columns assess the mean magnetic energy density over the missing hour, computed for each ensemble member from $m^2+v_s$. This quantity retains the energy represented by vector averages over one minute and excludes variation within those averages. Raw rows evaluate the same scalar even when the other predicted moments are inconsistent. Continuous ranked probability score and interval width are in $10^{-12}$ J\,m$^{-3}$; coverage is in percent. Validation chooses model states separately for raw and clipped diffusion predictions. Gaussian denotes Gaussian interpolation.}
 \label{tab:alternative}
 \setlength{\tabcolsep}{4pt}
 \begin{tabular}{@{}lrrrrr@{}}
@@ -685,6 +687,13 @@ For D, Table~\ref{tab:operators} attributes an energy score change of $-0.00637$
 
 \end{samepage}
 
+\begin{figure}[t]
+ \centering
+ \includegraphics[width=0.90\linewidth]{figures/operator/fig_operator.pdf}
+\caption{Clipping samples from models chosen by raw validation score. (a) Mean displacement in 60 standardized coordinates on a logarithmic axis. Blue circles show individual fits; purple diamonds show their mean or one Gaussian ensemble. (b) Solid bars show the change in distance to withheld values; striped bars show the change in the negative spread term. Their sum, the energy score change, appears as purple diamonds. The symmetric logarithmic axis is linear inside $\pm0.005$. Clipping changes D's score by $-0.0064$; choosing another checkpoint adds $-0.0118$.}
+ \label{fig:operator}
+\end{figure}
+
 \subsection{Multivariate Gaussian regression}
 
 Gaussian regression uses the measurements before and after the missing hour to estimate departures from interpolation. Its input $X$ contains all 216 standardized available coordinates; $Y$ contains the 60 primary residuals from interpolation between bins 17 and 30, divided by the corresponding TRAIN scales. Fitting $W$ and an unpenalized intercept $b$ on TRAIN minimizes $\|Y-XW-b\|_F^2/N+\lambda\|W\|_F^2$, with equal weight for all 122{,}309 overlapping windows.
@@ -754,17 +763,17 @@ At the original coefficient, O-S has a lower energy score than D at the end of a
 
 \section{Related work on physical constraints in prediction and generation}
 
-Solar wind reconstruction can address different quantities. Gaussian process regression estimates upstream plasma and magnetic conditions at Mars between MAVEN observations, with uncertainty that reflects the available sampling \citep{azari2024virtual}. For incomplete magnetic records, feedforward networks estimate second-order structure functions directly \citep{wrench2022statistics}. Diffusion has also been used to generate future coronal EUV images conditional on earlier images \citep{francisco2024corona}. Here, the predicted object is the joint distribution of magnetic moments throughout a missing hour, conditional on measurements before and after it.
+Solar wind reconstruction can address different quantities. Gaussian process regression estimates upstream plasma and magnetic conditions at Mars between MAVEN observations, with uncertainty that depends on the available sampling \citep{azari2024virtual}. For incomplete magnetic records, feedforward networks estimate second-order structure functions directly, describing variation across time separations \citep{wrench2022statistics}. Diffusion has also been used to generate future coronal EUV images conditional on earlier images \citep{francisco2024corona}. Here, prediction concerns the joint distribution of magnetic moments throughout a missing hour, conditional on measurements before and after it. The moments retain fluctuation amplitudes in each bin while leaving the ordering of its minute vectors unspecified.
 
 \citet[Section 3.3 and Appendix A.6.1]{bastek2025pidm} distinguish a residual at the denoiser mean from a residual at a sample, and demonstrate collapse when training uses the residual alone. Using an exact denoiser in the HMM makes it possible to examine the approximation from two denoiser evaluations without error from learning the denoiser. The solar wind experiments address the related question through comparisons across training stages and through algebraic completion or clipping of the same samples. The predictive score measures the distributional effect of those operations separately from their effect on the residual.
 
 Algebraic completion also appears in physical emulators that produce one prediction for each input. \citet{beucler2021constraints} compare training on all outputs, including those from conservation layers, with training only on direct outputs and completing the rest algebraically. G5 applies the latter construction to a conditional generator, with changes to both its generated representation and training loss. Deriving $v_v$ after sampling preserves the primary score because that score uses the other five quantities. In climate downscaling, exact aggregation and nonnegativity impose distinct constraints, and predictive accuracy requires separate assessment \citep{harder2023hard}.
 
-PGDM downscales land surface temperature and compares arithmetic averaging with the fourth root of the mean fourth power of temperature \citep{zhang2025pgdm}. The latter rule neglects variation in emissivity. PGDM conditions on geophysical variables, trains with MSE, and measures error in physical consistency during evaluation.
+Nonlinear aggregation also enters physical observation models. In land surface temperature downscaling, PGDM compares arithmetic averaging with the fourth root of the mean fourth power of temperature \citep{zhang2025pgdm}. The latter rule neglects variation in emissivity. PGDM conditions on geophysical variables, trains with MSE, and measures error in physical consistency during evaluation.
 
 WIND uses diffusion forcing for pretraining and moment matching for posterior guidance to reconstruct weather trajectories from observations that include spatial and temporal averages \citep{aich2026wind}. For guidance, the clean state conditional on the noisy state is approximated by a Gaussian. Its covariance is then propagated through a local linearization of the observation operator. PGDM and WIND place aggregation in the observation model, with training and inference that differ from the residual penalty examined here.
 
-PILD models residuals with a Laplace likelihood whose scale adapts to their magnitude. For conditional tasks, PILD aligns representations with the output of an encoder whose weights remain fixed during diffusion training \citep{zeng2026pild}. To adjust the scale, it approximates conditional moments of residual magnitude from minibatch statistics with exponential averaging. Inference uses two denoiser evaluations, compared with 50 here.
+The weight given to a residual can also adapt during training. PILD models residuals with a Laplace likelihood whose scale depends on their magnitude. For conditional tasks, it aligns representations with the output of an encoder whose weights remain fixed during diffusion training \citep{zeng2026pild}. The scale calculation approximates conditional moments of residual magnitude from minibatch statistics with exponential averaging. Inference uses two denoiser evaluations, compared with 50 here.
 
 Physics-Based Flow Matching integrates the flow to $t=1$ before evaluating residuals and combines gradients of the flow matching and residual losses through ConFIG \citep{baldan2025physics}. The present experiment keeps $c_R$ constant throughout training; adaptive objectives and gradient combinations fall outside its scope.
 

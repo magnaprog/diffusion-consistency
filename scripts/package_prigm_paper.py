@@ -66,6 +66,10 @@ CALIBRATION_FIGURE = "figures/calibration/fig_calibration.pdf"
 CHECKPOINT_FILES = {"MANIFEST.json", "PROTOCOL.json", "SCOPE.json", "SELECTION.json",
                     "SAVED_VAL25.json", "SUMMARY.json"}
 CHECKPOINT_FIGURE = "figures/checkpoints/fig_checkpoints.pdf"
+OVERVIEW_FIGURE = "figures/overview/fig_overview.pdf"
+RESELECTION_RESULT = "evidence/followup/checkpoint_reselection.json"
+RESELECTION_SOURCES = ("scripts/analyze_prigm_checkpoint_reselection.py",
+                       "prigm/scoring.py", "prigm/select.py", "prigm/config.py")
 CALIBRATION_TRANSFORMATION = (
     "Only summary.input_sha256 keys: replace the original-study root prefix with original-study/ "
     "and the accepted-evidence root prefix with accepted-evidence/. All other parsed summary "
@@ -315,6 +319,8 @@ def evidence_names(root):
         groups["imputation"] = IMPUTATION_FILES
     if os.path.lexists(root / "evidence/followup"):
         groups["followup"] = {"calibration", "checkpoints"}
+        if os.path.lexists(root / RESELECTION_RESULT):
+            groups["followup"].add("checkpoint_reselection.json")
         groups["followup/calibration"] = CALIBRATION_FILES
         groups["followup/checkpoints"] = CHECKPOINT_FILES
     directory = inside(root, "evidence")
@@ -508,6 +514,28 @@ def checkpoint_bindings(files):
             raise ValueError("checkpoint environment alias mismatch")
 
 
+def checkpoint_reselection_bindings(files, sources):
+    """Bind the new sensitivity record to its input and actual source bytes.
+
+    The scientific gate separately recomputes the selection and resampling.
+    Historical checkpoint and calibration manifests remain unchanged.
+    """
+    record = check_json(files[RESELECTION_RESULT], RESELECTION_RESULT)
+    expected_fields = {"schema_version", "analysis", "scope", "limits", "procedure",
+                       "original_choices", "observed_TEST", "fixed_selection", "reselected",
+                       "selection_counts", "input", "source", "helper_sha256"}
+    source, *helpers = RESELECTION_SOURCES
+    input_name = "evidence/followup/checkpoints/SUMMARY.json"
+    if (set(record) != expected_fields or type(record["schema_version"]) is not int
+            or record["schema_version"] != 1
+            or record["analysis"] != "checkpoint_reselection_existing_scores"
+            or record["input"] != {"path": "paper/workshops/prigm/" + input_name,
+                                   "sha256": digest(files[input_name])}
+            or record["source"] != {"path": source, "sha256": digest(sources[source])}
+            or record["helper_sha256"] != {name: digest(sources[name]) for name in helpers}):
+        raise ValueError("checkpoint reselection schema/source/input mismatch")
+
+
 def checkpoint_figure_bindings(manifest, files):
     prefix = "evidence/followup/checkpoints/"
     provenance = check_json(files[prefix + "MANIFEST.json"], prefix + "MANIFEST.json")
@@ -537,6 +565,83 @@ def checkpoint_figure_bindings(manifest, files):
                 or not np.isfinite(values).all() or not np.isfinite(original).all()
                 or not np.allclose(values, original, rtol=0, atol=1e-12)):
             raise ValueError("checkpoint plotted curves differ from evidence")
+
+
+def overview_figure_bindings(manifest, files):
+    """Compare overview coordinates with the existing public numerical records."""
+    prefix = "evidence/followup/checkpoints/"
+    summary = check_json(files[prefix + "SUMMARY.json"], "checkpoint summary")
+    provenance = check_json(files[prefix + "MANIFEST.json"], "checkpoint provenance")
+    calibration_path = "evidence/followup/calibration/summary.json"
+    calibration = check_json(files[calibration_path], "calibration summary")
+    inputs = {name: prefix + name for name in CHECKPOINT_FILES}
+    inputs["calibration"] = calibration_path
+    methods = ["D", "O-S", "G5", "full_flank_gaussian"]
+    seeds, updates = [7, 13, 42], [2868, 9560, 16252, 22944, 29636]
+    if (manifest["inputs"] != {key: {"path": name, "sha256": digest(files[name])}
+                               for key, name in inputs.items()}
+            or manifest["dependency_sources"] != {
+                key: {"path": name, "sha256": digest(files[name])}
+                for key, name in (("checkpoints", "fig_checkpoints.py"),
+                                  ("calibration", "fig_calibration.py"))}
+            or manifest["protocol_sha256"] != provenance["source_protocol_sha256"]
+            or manifest["scope_sha256"] != provenance["source_scope_sha256"]
+            or manifest["calibration_provenance"] != {
+                key: calibration[key] for key in ("bootstrap", "per_window_sha256")}
+            or manifest["channels"] != ["mu_x", "mu_y", "mu_z", "m", "v_s"]
+            or manifest["channels"] != calibration["channels"]
+            or manifest["method_order"] != methods
+            or manifest["interval_order_statistics"] != [2, 38]
+            or manifest["n_draws"] != 39 or manifest["n_windows"] != 480
+            or manifest["coverage_reference"]["percent"] != 90
+            or manifest["pointwise_intervals_plotted"] is not False):
+        raise ValueError("overview figure input/source/scope mismatch")
+
+    def coordinates(actual, expected):
+        values, original = np.asarray(actual), np.asarray(expected)
+        if (values.shape != original.shape or values.dtype.kind not in "iuf"
+                or original.dtype.kind not in "iuf"
+                or not np.isfinite(values).all() or not np.isfinite(original).all()
+                or not np.allclose(values, original, rtol=0, atol=1e-12)):
+            raise ValueError("overview plotted coordinates differ from evidence")
+
+    a = manifest["panel_a"]
+    policies = summary["policies"]
+    models = {f"{arm}_s{seed}" for arm in ("D", "O-S") for seed in seeds}
+    if (set(a) != {"policy_order", "x", "seeds", "score_by_arm", "seedwise", "mean",
+                   "policies", "validation_choices_agree"}
+            or a["policy_order"] != ["F", "P25"] or a["seeds"] != seeds
+            or a["policies"] != policies or set(policies) != models
+            or set(a["score_by_arm"]) != {"D", "O-S"}
+            or any(row["P25"] != row["P50"] or row["F"] != updates[-1]
+                   for row in policies.values())
+            or a["validation_choices_agree"] is not True):
+        raise ValueError("overview checkpoint policy/model mismatch")
+    coordinates(a["x"], [0, 1])
+    scores = {}
+    for arm in ("D", "O-S"):
+        scores[arm] = np.array([[summary["curves"]["TEST"][f"{arm}_s{seed}"][
+            updates.index(policies[f"{arm}_s{seed}"][policy])]
+            for policy in ("F", "P25")] for seed in seeds])
+        coordinates(a["score_by_arm"][arm], scores[arm])
+    differences = scores["O-S"] - scores["D"]
+    coordinates(a["seedwise"], differences)
+    coordinates(a["mean"], differences.mean(axis=0))
+    if set(manifest["panel_b"]) != set(methods):
+        raise ValueError("overview coverage method inventory mismatch")
+    for index, method in enumerate(methods):
+        row, original = manifest["panel_b"][method], calibration["methods"][method]
+        expected_seeds = [None] if method == "full_flank_gaussian" else seeds
+        if (set(row) != {"fixed_model_seeds", "mean_percent", "model_means_percent", "y", "individual_y"}
+                or row["fixed_model_seeds"] != expected_seeds
+                or row["fixed_model_seeds"] != original["fixed_model_seeds"]):
+            raise ValueError("overview coverage seed inventory mismatch")
+        coordinates(row["mean_percent"], 100 * np.asarray(original["mean"])[:, 1])
+        coordinates(row["model_means_percent"], 100 * np.asarray(original["model_means"])[:, :, 1])
+        positions = np.arange(5) + (index - 1.5) * .15
+        coordinates(row["y"], positions)
+        coordinates(row["individual_y"], [(positions + (s - 1) * .028).tolist()
+                    for s in range(3)] if len(expected_seeds) == 3 else [])
 
 
 def learned_bindings(files):
@@ -756,6 +861,9 @@ def collect(root):
     deadline_bindings(files)
     calibration_bindings(files)
     checkpoint_bindings(files)
+    if RESELECTION_RESULT in files:
+        checkpoint_reselection_bindings(files, {
+            name: read_source(inside(REPO, name))[0] for name in RESELECTION_SOURCES})
     has_followup = "evidence/followup/calibration/MANIFEST.json" in files
     pending, seen, figures, declarations = ["main.tex"], set(), set(), []
     while pending:
@@ -770,7 +878,7 @@ def collect(root):
                 raise ValueError("new deadline claims require evidence/deadline")
         if "tab:fixedfinal" in text and "evidence/deadline/fixed-final.json" not in files:
             raise ValueError("fixed-final claims require evidence/deadline/fixed-final.json")
-        if any(label in text for label in ("fig:calibration", "fig:checkpoints", "app:checkpoints")) and not has_followup:
+        if any(label in text for label in ("fig:calibration", "fig:checkpoints", "app:checkpoints", "fig:overview")) and not has_followup:
             raise ValueError("follow-up claims require evidence/followup")
         stripped = (text.replace(NOTICE_ANONYMOUS, "").replace(NOTICE_CAMERA_READY, "")
                          .replace(NATBIB_OPTIONS, ""))
@@ -794,7 +902,7 @@ def collect(root):
             elif command == "includegraphics":
                 allowed = {"figures/hmm/fig_hmm.pdf", "figures/audit/fig_audit.pdf", OPERATOR_FIGURE} | ILLUSTRATION_FIGURES
                 if has_followup:
-                    allowed.update((CALIBRATION_FIGURE, CHECKPOINT_FIGURE))
+                    allowed.update((CALIBRATION_FIGURE, CHECKPOINT_FIGURE, OVERVIEW_FIGURE))
                 if target not in allowed:
                     raise ValueError(f"undeclared or ambiguous figure: {target}")
                 if options and re.search(r"\b(?:draft|type|ext|read|command)\b", options):
@@ -893,6 +1001,10 @@ def collect(root):
             calibration_figure_bindings(manifest, files)
         elif figure == CHECKPOINT_FIGURE:
             checkpoint_figure_bindings(manifest, files)
+        elif figure == OVERVIEW_FIGURE:
+            for name in ("fig_checkpoints.py", "fig_calibration.py"):
+                add(name)
+            overview_figure_bindings(manifest, files)
         if "toy_eval_sha256" in manifest and manifest["toy_eval_sha256"] not in {
                 digest(files[n]) for n in evidence if n.endswith(".npz")}:
             raise ValueError("figure toy NPZ SHA256 mismatch")

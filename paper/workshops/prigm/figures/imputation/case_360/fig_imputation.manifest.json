@@ -3,7 +3,7 @@
   "figure": "fig_imputation",
   "source": {
     "path": "fig_imputation.py",
-    "sha256": "ed2002fa616cf86bb1f5e05ab3f0e95a266ef4e4780546c7654c1a8b91335869"
+    "sha256": "4bdf21b8f4d16846814b781b807849288c99b53badd632bb6413b2bf7fe6afdd"
   },
   "style": {
     "path": "prigm.mplstyle",
@@ -21,6 +21,7 @@
   },
   "case_index": 360,
   "case_id": "2020-08-2020-08-04T17:00-s52",
+  "case_label": "Wind \u00b7 4 August 2020",
   "channels": [
     "mu_x",
     "mu_y",
@@ -2685,8 +2686,8 @@
   "scope": "Raw draws, no pooled seeds, smoothing, sampling or clipping. Nominal marginal bands are not a calibration claim. Examples selected after TEST exposure.",
   "matplotlib_version": "3.10.9",
   "output_sha256": {
-    "fig_imputation.pdf": "2ebf9fa3159e1ddcfbbd26ef61aac7c25c60b91091068eeb45fdd4eaefaf3d05",
-    "fig_imputation.png": "33983c80611a37f0965c52f4c369f46ff86c96b36381a358b202e7f6e053e474"
+    "fig_imputation.pdf": "ea72289ff36c60204c153a375d3b587767aaeccaf92beeaa3794cc1fad2cac9a",
+    "fig_imputation.png": "5bee82f12ec79509f6b6a7ae0980271329c7603099a514a52b651495f3cc09f9"
   },
   "y_limits": [
     [

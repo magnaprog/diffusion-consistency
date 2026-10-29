@@ -72,7 +72,8 @@ def test_actual_artists_match_independent_raw_arrays(bundle, case_index, slot):
     try:
         assert len(fig.axes) == 20
         assert tuple(fig.get_size_inches()) == (5.5, 7.5)
-        assert fig._suptitle.get_text() == f"TEST window {case_index}"
+        title = {120: "ACE \u00b7 3 August 2010", 360: "Wind \u00b7 4 August 2020"}[case_index]
+        assert fig._suptitle.get_text() == title
         assert not fig._suptitle.get_parse_math()
         assert [fig.axes[j].get_title().replace("\n", " ") for j in range(4)] == [
             "D", "O-S", "G5", "Gaussian regression"]
@@ -81,7 +82,7 @@ def test_actual_artists_match_independent_raw_arrays(bundle, case_index, slot):
             "Available measurements", "Withheld measurements", "Predictive median",
             "Three ensemble members", "Nominal 90% marginal interval"]
         assert [text.get_text() for text in fig.texts] == [
-            f"TEST window {case_index}", "Time from start of missing hour (min)"]
+            title, "Time from start of missing hour (min)"]
         for row in range(5):
             limits = [fig.axes[row * 4 + col].get_ylim() for col in range(4)]
             assert all(lim == limits[0] for lim in limits)
@@ -356,7 +357,8 @@ def test_detail_artists_show_all_intervals_on_declared_scales(bundle):
                 ax = fig.axes[slot * 4 + col]
                 assert ax.get_yscale() == "linear"
                 if col == 0:
-                    assert ax.get_ylabel() == f"TEST {case['case_index']}\n" + r"$v_s$ (nT$^2$)"
+                    label = ("ACE \u00b7 3 Aug 2010", "Wind \u00b7 4 Aug 2020")[slot]
+                    assert ax.get_ylabel() == label + "\n" + r"$v_s$ (nT$^2$)"
                     assert ax.yaxis.label.get_parse_math()
                 elif col == 3:
                     assert ax.yaxis.get_ticks_position() == "right"
