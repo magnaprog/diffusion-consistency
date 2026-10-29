@@ -19,7 +19,7 @@ CALIBRATION_PINS = {
     "PROTOCOL.json": "00f15fae93bbb01846ec53ab726815464a28c7708d9ee79109ead0e7363899b5",
 }
 FIGURE_PINS = {
-    "fig_calibration": "ad2af45c5157435c902fb49e7c9e0950567692e6abf4286d6fa6c5824a44ec91",
+    "fig_calibration": "0c5f9fc5a27acdc47fa739a4749b05eb47fc417858bebd17bc897b34a70d8144",
     "fig_checkpoints": "8c56aaac2b5fb2e1a0c3525b909884b01ebbd0efe334894b92395d887390fe2f",
 }
 
@@ -212,56 +212,53 @@ def calibration_claims(tex, rendered, report, figure):
     block = g.float_block(floats, "fig:calibration")
     require(re.findall(r"\\includegraphics(?:\[[^]]*\])?\{([^}]+)\}", block)
             == ["figures/calibration/fig_calibration.pdf"], "calibration label and image differ")
-    caption = ("Score contributions and interval errors for the original ensembles, using diffusion checkpoints selected by raw validation score. "
-        "(a) G5 minus D for each seed and their mean. The change in distance to withheld measurements minus the change in the spread term equals the difference in energy score. "
-        "Both terms use 60 coordinates standardized on TRAIN; the spread term is half the mean Euclidean distance between distinct draws. "
-        "(b,c) Fractions of observations below and above nominal 90\\% intervals for the five primary coordinates. "
-        "Bars average three diffusion fits or show one Gaussian realization. Gray dots within each diffusion bar give seeds 7, 13 and 42 from left to right. "
-        "The dashed 5\\% reference assumes continuous exchangeability of the observation and ensemble members. Months receive equal weight. "
-        "These comparisons use the existing TEST ensembles and were made after the original results were available.")
+    caption = ("Why scores and interval coverage differ. Diffusion results use the checkpoints that minimize raw validation score. "
+        "(a) G5 minus D for each seed and their mean. The change in distance to the withheld record, less the change in the spread term, gives the energy score difference. "
+        "Both terms use 60 coordinates standardized on TRAIN; spread is half the mean distance between distinct predictions. "
+        "(b,c) Fractions of observations below and above nominal 90\\% intervals for the five primary quantities. "
+        "Bars average three diffusion fits or show one Gaussian ensemble. Gray dots show seeds 7, 13 and 42 from left to right. "
+        "The dashed 5\\% line assumes that, at each time and coordinate, the observation and ensemble members are exchangeable, with no ties. Months receive equal weight. "
+        "This analysis uses the existing TEST ensembles after the original results were available.")
     require(g.prose_text(g.float_caption(floats, "fig:calibration"), source=True)
             == g.prose_text(caption, source=True), "calibration caption differs")
     def bind(anchor, clause):
         g.bind_clause((tex, rendered), g.clause_pattern(g.prose_text(anchor, source=True)), clause)
-    bind("Score contributions and interval errors", caption)
+    bind("Why scores and interval coverage differ", caption)
     rows = {row["seed"]: row for row in figure["decomposition"]}
     r13, r42 = rows[13], rows[42]
     require(r13["delta_target"] < 0 < r13["negative_delta_dispersion"]
             and r42["negative_delta_dispersion"] < 0 < r42["delta_target"]
             and max(r13["delta_energy"], r42["delta_energy"]) < 0, "seedwise contribution directions")
-    # Exact seed coordinates remain checked by validate_calibration_figure.
-    bind("At seed 13, G5", "At seed 13, G5 decreases both distance to the measurements and spread; the larger decrease in distance outweighs the loss of spread.")
-    bind("At seed 42, both", "At seed 42, both increase; the larger increase in spread outweighs the greater distance to the measurements. Both patterns lower the score because spread is subtracted.")
-    bind("This decomposition explains", "This decomposition explains the score differences for the existing predictions. It cannot identify a training mechanism or separate G5's changes to representation and loss.")
+    # Locate the subject independently of the seed value checked in the clause.
+    for subject, clause in (
+        ("G5", "At seed 13, G5 reduces both distance to the measurements and spread, with the larger decrease in distance lowering the score."),
+        ("both terms", "At seed 42, both terms increase, and the larger increase in spread lowers the score."),
+    ):
+        g.bind_clause((tex, rendered), g.clause_pattern("at seed") + r"\s+[^,\s]+\s*,\s*" + g.clause_pattern(subject), clause)
+    bind("These are arithmetic explanations", "These are arithmetic explanations of the existing predictions. G5 changes both the generated representation and the training loss, so their separate effects on learning remain unresolved.")
     methods = report["methods"]
     means = {name: 100 * np.asarray(row["mean"])[4] for name, row in methods.items()}
     for name in ("D", "G5"):
         directions = np.asarray(methods[name]["model_means"])[:, 4, 0] - np.asarray(methods[name]["model_means"])[:, 4, 2]
         require(np.array_equal(np.sign(directions), [1, 1, -1]), "seedwise tail reversal: " + name)
-    bind("G5's nominal", rf"G5's nominal 90\% intervals still miss many observations, especially for $v_s$, whose coverage is {means['G5'][1]:.1f}\%.")
-    # Anchor before the percentage so malformed values cannot hide beside a
-    # valid duplicate. The fraction-difference clause has a separate anchor.
-    g.bind_clause((tex, rendered), g.clause_pattern("averaged over the three fits,"),
-         rf"Averaged over the three fits, {means['G5'][0]:.1f}\% of observations lie below G5's $v_s$ intervals and {means['G5'][2]:.1f}\% above them.")
-    bind("show a reversal that the averages obscure", "show a reversal that the averages obscure: missed observations lie predominantly below the intervals at seeds 7 and 13, and above them at seed 42. D also reverses direction at seed 42.")
-    bind("O-S's mean fractions", rf"O-S's mean fractions are {means['O-S'][0]:.1f}\% below and {means['O-S'][2]:.1f}\% above.")
+    bind("G5's nominal", rf"G5's nominal 90\% intervals cover only {means['G5'][1]:.1f}\% of the $v_s$ observations.")
+    g.bind_clause((tex, rendered), g.clause_pattern("across the") + r"\s+[^\s]+\s+" + g.clause_pattern("fits,"),
+         rf"Across the three fits, {means['G5'][0]:.1f}\% of observations fall below G5's $v_s$ intervals and {means['G5'][2]:.1f}\% above them.")
+    bind("shows why the mean alone", "shows why the mean alone is incomplete: errors are predominantly below the intervals at seeds 7 and 13, but above them at seed 42. D has the same reversal at seed 42.")
+    bind("For O-S, the mean fractions", rf"For O-S, the mean fractions are {means['O-S'][0]:.1f}\% below and {means['O-S'][2]:.1f}\% above.")
     ci = 100 * np.asarray(methods["G5"]["year_below_minus_above_95"])[:, 4]
     contrast = 100 * methods["G5"]["below_minus_above"][4]
-    bind(r"For G5's $v_s$ intervals, the fraction below", rf"For G5's $v_s$ intervals, the fraction below exceeds the fraction above by {contrast:.1f} percentage points, with a 95\% interval of $[{ci[0]:.1f},{ci[1]:.1f}]$ from resampling years.")
-    g.bind_clause((tex, rendered), g.clause_pattern("gaussian regression covers")
-         + r"(?!\s+" + g.clause_pattern("all twelve") + r"\b)",
-         rf"Gaussian regression covers {means['full_flank_gaussian'][1]:.1f}\% of $v_s$ observations, with "
+    bind(r"For G5's $v_s$ intervals, the fraction below",
+         rf"For G5's $v_s$ intervals, the fraction below exceeds the fraction above by {contrast:.1f} percentage points. "
+         rf"The 95\% interval is $[{ci[0]:.1f},{ci[1]:.1f}]$, using 10{{,}}000 resamples of years and the same years for both fractions. "
+         "Repeated occurrences of each year retain their weight. The difference uses percentages before rounding. "
+         "This contrast quantifies temporal variation for the existing models, checkpoint choices and samples; new fits or new checkpoint choices would add other sources of uncertainty.")
+    bind("Gaussian regression covers", rf"Gaussian regression covers {means['full_flank_gaussian'][1]:.1f}\% of $v_s$ observations, with "
          rf"{means['full_flank_gaussian'][0]:.1f}\% below and {means['full_flank_gaussian'][2]:.1f}\% above its intervals.")
-    for clause in (
-        "The difference between the two tail fractions is calculated before either percentage is rounded.",
-        "Each of 10{,}000 resamples calculates both fractions on the same sampled years and retains every occurrence of a repeated year.",
-        "The interval concerns this one contrast, conditional on the existing models, checkpoints and draws; it excludes variation from new training seeds or a new checkpoint choice.",
-    ):
-        bind(" ".join(clause.split()[:6]), clause)
 
 
 def checkpoint_claims(tex, rendered, checked):
-    """Bind the reported policies, contrasts and resampling scope to checked data."""
+    """Bind the reported choices, contrasts and resampling scope to checked data."""
     from experiments import verify_prigm_paper as g
     from experiments._prigm_checkpoint_evidence import UPDATES
     summary, saved = checked["summary"], checked["saved"]
@@ -273,49 +270,48 @@ def checkpoint_claims(tex, rendered, checked):
             "unchanged six validation choices")
     def bind(anchor, clause):
         g.bind_clause((tex, rendered), g.clause_pattern(g.prose_text(anchor, source=True)), clause)
-    bind("All six validation choices", "All six validation choices agree between 25 and 50 evaluations.")
+    g.bind_clause((tex, rendered), r"all\s+[^\s]+\s+" + g.clause_pattern("validation choices"),
+                  "All six validation choices agree between 25 and 50 evaluations for these fits and initial noise.")
     deltas = summary["common_update_TEST_contrasts"]
     values = [f"${deltas[str(u)]['mean']:.4f}$" for u in UPDATES]
-    bind("At the five common update counts, mean TEST", "At the five common update counts, mean TEST differences for O-S minus D are "
-         + ", ".join(values[:-1]) + ", and " + values[-1] + ", respectively.")
+    g.bind_clause((tex, rendered), g.clause_pattern("at the") + r"\s+[^\s]+\s+" + g.clause_pattern("common update counts, mean TEST"), "at the five common update counts, mean TEST differences for O-S minus D are "
+         + ", ".join(values[:-1]) + ", and " + values[-1] + ".")
     signs = [np.sign(deltas[str(u)]["seedwise"]) for u in UPDATES]
     require(all(np.all(s == -1) for s in signs[-2:])
             and all(set(s) == {-1, 1} for s in signs[:3]), "common-update seed directions")
     bind("O-S has lower scores at", "O-S has lower scores at all three seeds at the last two counts; seed differences have mixed signs at the first three.")
     changes = summary["final_minus_selected_TEST"]["P25"]
     means = summary["policy_means"]
-    bind("Replacing these choices", "Replacing these choices with the final checkpoints raises D's mean TEST score by "
-         f"{np.mean(changes['D']):.4f} and O-S's by {np.mean(changes['O-S']):.4f}, changing their difference from "
+    bind("Moving all fits", "Moving all fits to the final update raises D's mean TEST score by "
+         f"{np.mean(changes['D']):.4f} and O-S's by {np.mean(changes['O-S']):.4f}, changing O-S minus D from "
          f"${means['P25']['O-S_minus_D']:.4f}$ to ${means['F']['O-S_minus_D']:.4f}$.")
     frequencies = [record["D_s7"]["bootstrap_selection_counts"]["9560"] / 100
                    for record in (saved["curves"], summary["VAL50_selection_diagnostics"])]
-    bind("In 10{,}000 resamples", "In 10{,}000 resamples of the twenty years, D at seed 7 chooses "
+    g.bind_clause((tex, rendered), r"in\s+[^\s]+\s+" + g.clause_pattern("resamples of the"),
+         "In 10{,}000 resamples of the twenty years, D at seed 7 chooses "
          rf"update 9{{,}}560 in {frequencies[0]:.1f}\% of resamples with 25 evaluations and {frequencies[1]:.1f}\% with 50; "
-         "all other resamples choose the final checkpoint.")
+         "the other resamples choose the final update.")
     for rows in (saved["curves"], summary["VAL50_selection_diagnostics"]):
         for name in ("D_s13", "D_s42"):
             require(rows[name]["bootstrap_selection_counts"][str(policies[name]["P25"])] == 10000,
                     "D earlier-choice stability")
-    for clause in (
-        "D at seeds 13 and 42 retains its respective earlier choice in every resample under either evaluation count.",
-        "both these choices and the evaluation count are fixed before additional TEST samples are generated.",
-        "Validation with 50 evaluations selects the checkpoints, and both these choices and the evaluation count are fixed before additional TEST samples are generated.",
-        "This calculation leaves the roles of regularization and overfitting unresolved.",
-        "Each occurrence of a sampled year contributes both validation months, and every checkpoint uses the same resampled years.",
-        "The model weights and draws remain constant, so these frequencies measure variation across validation years.",
-        "Variation under fresh sampling noise and performance on a new population remain undetermined.",
+    g.bind_clause((tex, rendered), g.clause_pattern("D at seeds") + r"\s+[^\s]+\s+and\s+[^\s]+\s+" + g.clause_pattern("retains"),
+                  "D at seeds 13 and 42 retains its respective earlier choice in every resample under either evaluation count.")
+    for anchor, clause in (
+        ("validation ensembles with", "validation ensembles with 50 evaluations reuse the initial noise from the original ensembles with 25. Their validation scores determine the model choices before additional TEST samples are generated."),
+        ("Establishing whether regularization", "Establishing whether regularization or overfitting causes this pattern is a separate empirical question."),
+        ("Each sampled year contributes", "Each sampled year contributes both validation months, including repeated occurrences, and all checkpoints use the same resampled years."),
+        ("With weights and samples", "With weights and samples held constant, these frequencies measure sensitivity to the years represented in validation."),
     ):
-        bind(" ".join(clause.split()[:6]), clause)
+        bind(anchor, clause)
     floats = tex.replace(r"\begin{figure}", r"\begin{table}").replace(r"\end{figure}", r"\end{table}")
     block = g.float_block(floats, "fig:checkpoints")
     require(re.findall(r"\\includegraphics(?:\[[^]]*\])?\{([^}]+)\}", block)
             == ["figures/checkpoints/fig_checkpoints.pdf"], "checkpoint label and image differ")
-    caption = ("Scores across all five checkpoints for D and O-S at the three training seeds. "
-        "The subplots compare original VAL ensembles with 25 DDIM evaluations, new VAL ensembles with 50, and TEST ensembles with 50. "
-        "Each point averages windows within months and then gives months equal weight. Colors distinguish methods, with open markers for D and filled markers for O-S; line styles and marker shapes distinguish seeds. "
-        "Large black rings mark P25, the original validation choice, and crosses mark P50, the choice with 50 evaluations. These choices coincide for all six fits. "
-        "F marks the common final optimizer update. Each ensemble has 39 draws. VAL and TEST scores concern different sets of windows. "
-        "The additional TEST analysis evaluates choices already made on VAL.")
+    caption = ("How the D/O-S comparison changes during training. The subplots show VAL with 25 DDIM evaluations, VAL with 50, and TEST with 50. "
+        "Each point gives equal weight to months; ensembles contain 39 samples. Colors and open or filled markers distinguish D and O-S, while line styles and marker shapes distinguish seeds. "
+        "Black rings mark the validation choice with 25 evaluations, P25; crosses mark the choice with 50, P50. Both choices coincide for all six fits. "
+        "F marks the common final update. Validation and test scores concern different windows, and model choice precedes the additional TEST analysis.")
     require(g.prose_text(g.float_caption(floats, "fig:checkpoints"), source=True) == g.prose_text(caption, source=True),
             "checkpoint caption differs")
-    bind("Scores across all five checkpoints", caption)
+    bind("How the D/O-S comparison changes", caption)

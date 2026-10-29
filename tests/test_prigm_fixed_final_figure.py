@@ -191,6 +191,7 @@ def test_artist_arrays_units_seed_means_and_unclipped_labels(evidence, tmp_path)
         assert len(fig.axes) == 2
         assert fig.axes[0].get_ylabel() == "Energy score (standardized)"
         assert fig.axes[1].get_ylabel() == r"Mean absolute residual (nT$^2$)"
+        assert fig.axes[1].get_title(loc="left") == "(b) Mean absolute residual"
         for ax, metric in zip(fig.axes, ("energy", "residual")):
             assert ax.get_xscale() == ax.get_yscale() == "linear"
             assert ax.get_xlabel() == r"Penalty coefficient $c_R$"

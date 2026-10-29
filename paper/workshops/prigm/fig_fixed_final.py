@@ -144,7 +144,7 @@ def plot(rows):
         x = np.arange(len(COEFFICIENTS))
         styles = (("o", "-"), ("s", "--"), ("^", ":"))
         for ax, metric, title, ylabel in zip(
-                axes, ("energy", "residual"), ("(a) Raw energy score", "(b) Identity residual"),
+                axes, ("energy", "residual"), ("(a) Raw energy score", "(b) Mean absolute residual"),
                 ("Energy score (standardized)", r"Mean absolute residual (nT$^2$)")):
             for seed, (marker, linestyle) in zip(SEEDS, styles):
                 values = [row[metric] for row in rows if row["seed"] == seed]

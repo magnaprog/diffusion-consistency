@@ -4,7 +4,7 @@
   "protocol_sha256": "25d0cdefdd5dbb160c32c7b5f4a6053bab99e4a9f64832d9eb6502232bf24e6b",
   "source": {
     "path": "fig_calibration.py",
-    "sha256": "5f4046ca99c0f023013519fb5df0b986260b69ed7945e84fde35ea4dbfb7f4a1"
+    "sha256": "5f3c90a007b3ca51e3307979b7822d0fb2215bbfbb941af39ba77607aabc06d4"
   },
   "inputs": {
     "operator": {
@@ -756,12 +756,12 @@
   "scope": "Raw-selected frozen TEST ensembles, 480 windows. Equal months and fixed neural seeds, with each model scored separately; one Gaussian regression realization. No confidence intervals are plotted. Tail bars are model means; gray dots are the three fixed neural seeds, not pooled draws or a mixture. Pointwise year-bootstrap intervals remain in the numerical record only. No causal or full conditional-calibration claim.",
   "tail_reference": {
     "percent": 5,
-    "assumption": "continuous exchangeability of target and 39 ensemble draws"
+    "assumption": "at each time and coordinate, the observation and 39 ensemble members are exchangeable, with no ties"
   },
   "matplotlib_version": "3.10.9",
   "numpy_version": "2.4.4",
   "output_sha256": {
-    "fig_calibration.pdf": "524f38ff6fa13f87ba680dbad62014c4cc13415539c77186838df7e89299f56b",
-    "fig_calibration.png": "da2f4f4147f4bcb65931de12ecd37472b11352fc732ca3b514852557bde41170"
+    "fig_calibration.pdf": "34a9561c7a428a799e754a1cc0ab412e6171566cc36b023e5ab206a0fa832b63",
+    "fig_calibration.png": "21cbd40baf134ec8aa45248474ebdaa11cf0eb1b681a6bcb36eaafcac09e00f8"
   }
 }

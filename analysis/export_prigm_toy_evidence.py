@@ -1,7 +1,8 @@
 """Publish the completed toy-study records and reproduce its saved posterior comparison.
 
-learned.json retains all nine fitted models at update 5000, their training
-settings and file identities, and both raw results and results after the physical clipping map.
+learned.json contains results for all nine fits at update 5000, with their
+training settings and file identities. It includes scores before and after
+the physical clipping map.
 Each scoring record contains scores, mean_energy, month_balanced_energy,
 secondary metric reductions, and ordered per_window records. The learned
 metrics are retained from the completed study; this exporter does not train

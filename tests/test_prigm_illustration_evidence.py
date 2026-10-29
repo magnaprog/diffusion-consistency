@@ -138,7 +138,7 @@ def test_independent_pins_are_literal():
     assert illustrations.PINS == {
         EXCERPT: "f3b270d52ea52088fa84414fcb77b6954624913ed474618be245de417034a1cc",
         PROVENANCE: "4416bd1c76aa849de65595e445edc09d5230f2e0bfd2afc75c30c888697c3c66",
-        FIXED: "db2436baa4ae0229a870eafef05c867ab1e77d94426c5d0b65fd6111cc721f44",
+        FIXED: "5bd0176437a707c6c3f800103dc6d6b2db08a1905391c6633bb4b195de14d8fb",
         CASE: "5d2fbf52337f17d0722cfe19d6c1c975ae1ac4746832e50bc1cbb3f842e1b1f1",
         CASE.replace("120", "360"): "d5823fe76c1deecde13210b32f87ada619716079ac36d12ba1a3a2bbcf3d236f",
         "figures/imputation/detail/fig_imputation.manifest.json": "29802ad07eebd26ab31262441e7441aa78f5e3492e54bd4677a76d601c4d4a40",

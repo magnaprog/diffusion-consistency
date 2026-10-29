@@ -36,6 +36,7 @@ def source(paper, tmp_path):
                     ignore=shutil.ignore_patterns("__pycache__", "*.pyc"))
     shutil.copytree(REPO / exporter.documentation.ARCHIVE, root / exporter.documentation.ARCHIVE,
                     ignore=shutil.ignore_patterns("__pycache__", "*.pyc"))
+    shutil.copytree(REPO / exporter.documentation.OCT29_ARCHIVE, root / exporter.documentation.OCT29_ARCHIVE)
     (root / "docs").mkdir()
     shutil.copyfile(REPO / "docs/prigm_release.md", root / "docs/prigm_release.md")
     (root / exporter.PAPER).parent.mkdir(parents=True)
@@ -61,6 +62,13 @@ def test_export_has_exact_receipt_and_working_public_entrypoints(source, tmp_pat
     for name in exporter.documentation.NAMES:
         snapshot = exporter.documentation.ARCHIVE + "/" + name
         assert (output / snapshot).read_bytes() == (REPO / snapshot).read_bytes()
+    revision = exporter.documentation.OCT29_ARCHIVE
+    revision_files = {f"{revision}/MANIFEST.json", f"{revision}/README.md",
+                      *(f"{revision}/{name}" for name in exporter.documentation.OCT29_NAMES)}
+    assert len(revision_files) == 5
+    assert {name for name in receipt["files"] if name.startswith(revision + "/")} == revision_files
+    for name in revision_files:
+        assert (output / name).read_bytes() == (REPO / name).read_bytes()
     assert (output / exporter.PAPER / "fig_audit.py").is_file()
     assert (output / exporter.PAPER / "main.pdf").is_file()
     assert (output / "pytest.ini").read_bytes() == (REPO / "pytest.ini").read_bytes()
@@ -69,7 +77,7 @@ def test_export_has_exact_receipt_and_working_public_entrypoints(source, tmp_pat
         assert item == {"sha256": sha(payload), "bytes": len(payload)}
         if name not in receipt["generated"]:
             assert payload == (source / name).read_bytes()
-    for name in ("README.md", "AGENTS.md", "docs/prigm_release.md"):
+    for name in ("README.md", "AGENTS.md", "docs/prigm_release.md", f"{revision}/README.md"):
         path = output / name
         text = path.read_text()
         assert "Private excluded fixture" not in text
@@ -211,3 +219,71 @@ def test_exported_tree_can_export_again_without_editorial_scanner(source, tmp_pa
     assert not (first / "scripts/audit_prigm_prose.py").exists()
     repeated = exporter.export_release(first, tmp_path / "second")
     assert repeated["files"] == receipt["files"]
+
+
+@pytest.mark.parametrize("relative", ["MANIFEST.json", "prigm/schedule.py", "prigm/scoring.py", "README.md"])
+@pytest.mark.parametrize("damage", ["missing", "symlink"])
+def test_oct29_route_files_are_required_regular_sources(source, tmp_path, relative, damage):
+    path = source / exporter.documentation.OCT29_ARCHIVE / relative
+    if damage == "missing":
+        path.unlink()
+    else:
+        alternate = tmp_path / "alternate"
+        path.rename(alternate)
+        path.symlink_to(alternate)
+    output = tmp_path / "release"
+    with pytest.raises((ValueError, OSError)):
+        exporter.export_release(source, output)
+    assert not output.exists()
+
+
+@pytest.mark.parametrize("component", ["current", "previous", "manifest"])
+def test_collector_validates_captured_oct29_bytes(source, tmp_path, monkeypatch, component):
+    name = "prigm/schedule.py"
+    relative = name if component == "current" else f"{exporter.documentation.OCT29_ARCHIVE}/" + (
+        "MANIFEST.json" if component == "manifest" else name)
+    target = source / relative
+    original = exporter.paper_package.read_source
+    valid = target.read_bytes()
+    intercepted = []
+
+    def altered_read(path):
+        payload, stamp = original(path)
+        if path == target:
+            intercepted.append(path)
+            return payload + b"\n", stamp
+        return payload, stamp
+
+    monkeypatch.setattr(exporter.paper_package, "read_source", altered_read)
+    output = tmp_path / "release"
+    with pytest.raises(ValueError, match="source provenance mismatch|October 29 documentation manifest"):
+        exporter.export_release(source, output)
+    assert intercepted == [target]
+    assert target.read_bytes() == valid
+    assert not output.exists()
+
+
+@pytest.mark.parametrize("relative", ["MANIFEST.json", "prigm/schedule.py", "prigm/scoring.py"])
+def test_oct29_route_change_after_collection_cannot_complete(source, tmp_path, monkeypatch, relative):
+    target = source / exporter.documentation.OCT29_ARCHIVE / relative
+    original = exporter.collect
+
+    def changed(root):
+        files, evidence = original(root)
+        target.write_bytes(target.read_bytes() + b"\n")
+        return files, evidence
+
+    monkeypatch.setattr(exporter, "collect", changed)
+    output = tmp_path / "release"
+    with pytest.raises(ValueError, match="source changed during release copy"):
+        exporter.export_release(source, output)
+    assert not (output / "RELEASE_MANIFEST.json").exists()
+
+
+def test_oct29_export_does_not_discover_extra_snapshots(source, tmp_path):
+    extra = source / exporter.documentation.OCT29_ARCHIVE / "prigm/private.py"
+    extra.write_text("# Outside the declared three-file revision.\n")
+    output = tmp_path / "release"
+    receipt = exporter.export_release(source, output)
+    assert extra.relative_to(source).as_posix() not in receipt["files"]
+    assert not (output / extra.relative_to(source)).exists()

@@ -45,7 +45,7 @@ def figure(paper, stem="hmm", input_name="evidence/toy/hmm-stationary-01.json"):
     pdf.write_bytes(b"%PDF-1.4\nsynthetic figure\n%%EOF\n")
     png.write_bytes(b"\x89PNG\r\n\x1a\nsynthetic figure\n")
     save_json(directory / f"fig_{stem}.manifest.json", {
-        "schema_version": 1, "figure": f"fig_{stem}",
+        "schema_version": 2 if stem == "hmm" else 1, "figure": f"fig_{stem}",
         "source": {"path": generator.name, "sha256": sha(generator.read_bytes())},
         "inputs": {"record": {"path": Path(input_name).name,
                               "sha256": sha((paper / input_name).read_bytes())}},
@@ -992,8 +992,47 @@ def test_required_real_evidence_and_optional_audit_figure(paper, tmp_path):
     assert "fig_audit.py" in read_archive(output)
 
 
+def test_hmm_schema2_preserves_companion_bytes(paper):
+    files, _, _ = packager.collect(paper)
+    manifest_name = "figures/hmm/fig_hmm.manifest.json"
+    assert json.loads(files[manifest_name])["schema_version"] == 2
+    for name in (manifest_name, "fig_hmm.py", "figures/hmm/fig_hmm.pdf",
+                 "figures/hmm/fig_hmm.png", "evidence/toy/hmm-stationary-01.json"):
+        assert files[name] == (paper / name).read_bytes()
+
+
+@pytest.mark.parametrize("schema", [0, 1, 3, True, False, None, "2", 2.0, "missing"])
+def test_hmm_rejects_other_schema_versions(paper, schema):
+    packager.collect(paper)
+    path = paper / "figures/hmm/fig_hmm.manifest.json"
+    manifest = json.loads(path.read_text())
+    if schema == "missing":
+        del manifest["schema_version"]
+    else:
+        manifest["schema_version"] = schema
+    save_json(path, manifest)
+    with pytest.raises((ValueError, KeyError)):
+        packager.collect(paper)
+
+
+@pytest.mark.parametrize("schema", [2, True, 1.0])
+def test_other_figures_keep_integer_schema1(paper, schema):
+    figure(paper, "audit", "evidence/real/comparison.json")
+    source = paper / "main.tex"
+    source.write_text(source.read_text().replace(r"\end{document}",
+                      r"\includegraphics{figures/audit/fig_audit.pdf}\end{document}"))
+    packager.collect(paper)
+    path = paper / "figures/audit/fig_audit.manifest.json"
+    manifest = json.loads(path.read_text())
+    manifest["schema_version"] = schema
+    save_json(path, manifest)
+    with pytest.raises(ValueError, match="figure companion/generator SHA256 mismatch"):
+        packager.collect(paper)
+
+
 @pytest.mark.parametrize("change", ["pdf", "png", "generator", "input", "manifest-path"])
 def test_checked_figure_companions_and_inputs(paper, tmp_path, change):
+    packager.collect(paper)
     paths = {"pdf": "figures/hmm/fig_hmm.pdf", "png": "figures/hmm/fig_hmm.png",
              "generator": "fig_hmm.py", "input": "evidence/toy/hmm-stationary-01.json"}
     if change == "manifest-path":

@@ -1,9 +1,9 @@
 {
-  "schema_version": 1,
+  "schema_version": 2,
   "figure": "fig_hmm",
   "source": {
     "path": "fig_hmm.py",
-    "sha256": "221bb60c4774d89b801271cef62b8401b79241645385bfbd8b0159f751cf1d16"
+    "sha256": "9a7119a2b0039a35224401de48c4f50297bca860dd765cd61b8bb2b12a4e4170"
   },
   "style": {
     "path": "prigm.mplstyle",
@@ -88,7 +88,29 @@
         "mean_reference_self_energy_mc": 4.1640299388426705
       }
     ],
-    "panel_b_samplers": [
+    "panel_b_context_residuals": [
+      {
+        "t": 1,
+        "n": 36,
+        "mean_abs_r_star": 6.013165948966689e-16
+      },
+      {
+        "t": 25,
+        "n": 36,
+        "mean_abs_r_star": 5.900408923028195e-16
+      },
+      {
+        "t": 50,
+        "n": 36,
+        "mean_abs_r_star": 6.937891848119346e-11
+      },
+      {
+        "t": 100,
+        "n": 36,
+        "mean_abs_r_star": 4.1668080198758247e-05
+      }
+    ],
+    "panel_c_samplers": [
       {
         "method": "two_step",
         "denoiser_evaluations_per_draw": 2,
@@ -118,7 +140,7 @@
         "n_draws": 39
       }
     ],
-    "panel_b_horizontal_reference": {
+    "panel_c_horizontal_reference": {
       "method": "exact_reference",
       "denoiser_evaluations_per_draw": 0,
       "mean_energy": 4.228732270530632,
@@ -126,17 +148,12 @@
       "n_draws": 39
     }
   },
-  "unplotted_context_mean_abs_r_star": {
-    "1": 6.013165948966689e-16,
-    "25": 5.900408923028195e-16,
-    "50": 6.937891848119346e-11,
-    "100": 4.1668080198758247e-05
-  },
-  "score_note": "Panel (a) uses independent context reference draws. Panel (b) uses final samples scored against held-out targets; its line is exact_reference.mean_energy, not reference_self_energy_mc. Monte Carlo comparisons at measured budgets only.",
+  "score_note": "Panels (a,b) use the same 36 cases at each timestep. Panel (a) uses independent context reference draws. Panel (c) uses final samples on 288 windows; its line is exact_reference.mean_energy, not reference_self_energy_mc. All scores are finite Monte Carlo estimates.",
+  "residual_note": "Panel (b) plots the validated mean absolute residual on a logarithmic axis, without a floor or zero reference. The estimator uses one denoiser evaluation at t=1 and two at the other timesteps. This is an absolute residual, not the squared training penalty.",
   "matplotlib_version": "3.10.9",
   "backend": "Agg",
   "output_sha256": {
-    "fig_hmm.pdf": "787316eac782aaa929a01458a744641bdca405c363d719c849361976ae64ca55",
-    "fig_hmm.png": "203ad05f2e01fd9646157794f420e3f271552d09e6a6eb1316c3c79536db61a2"
+    "fig_hmm.pdf": "551412329ccb977e902c50d1d58f0c9cd7b9ebf135a30ddfca8f0cc44955a528",
+    "fig_hmm.png": "c43c9b89766a7ed5d49bbad2ddb9b145326bec5a2a8c69ed4ad9c60cadddc197"
   }
 }

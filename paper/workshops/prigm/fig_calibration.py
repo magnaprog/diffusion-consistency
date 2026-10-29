@@ -187,8 +187,9 @@ def plot(decomposition, tails):
                bbox_to_anchor=(.53, .125), columnspacing=1.3, handletextpad=.4)
     fig.text(.53, .095, "Bars: mean of three diffusion fits or one Gaussian. Gray dots: individual fits.",
              ha="center", fontsize=7)
-    fig.text(.53, .059, "The 5% line assumes continuous, exchangeable measurements and draws.",
-             ha="center", fontsize=7)
+    fig.text(.53, .075, "The 5% line assumes that, at each time and coordinate,\n"
+             "the observation and ensemble members are exchangeable, with no ties.",
+             ha="center", va="top", fontsize=7)
     return fig
 
 
@@ -229,7 +230,8 @@ def main(argv=None):
                  "b": "linear percent; target strictly below second order statistic",
                  "c": "linear percent; target strictly above 38th order statistic"},
         "scope": "Raw-selected frozen TEST ensembles, 480 windows. Equal months and fixed neural seeds, with each model scored separately; one Gaussian regression realization. No confidence intervals are plotted. Tail bars are model means; gray dots are the three fixed neural seeds, not pooled draws or a mixture. Pointwise year-bootstrap intervals remain in the numerical record only. No causal or full conditional-calibration claim.",
-        "tail_reference": {"percent": 5, "assumption": "continuous exchangeability of target and 39 ensemble draws"},
+        "tail_reference": {"percent": 5, "assumption": "at each time and coordinate, the observation "
+                           "and 39 ensemble members are exchangeable, with no ties"},
         "matplotlib_version": matplotlib.__version__, "numpy_version": np.__version__, "output_sha256": {},
     }
     with plt.rc_context(STYLE):

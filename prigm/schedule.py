@@ -1,9 +1,10 @@
-"""Cosine diffusion schedule with 1-based noisy states (plan Section 6).
+"""Cosine diffusion schedule with noisy timesteps 1 through T (plan Section 6).
 
-PIDM commit 733aeb0fe8e56f8d1b3aaf9ff24f340438c20d9a is 0-based: its tensor
-index t maps to this package's timestep t_1based = t + 1. alpha_bar_0 = 1
-is stored at 1-based index 0. Sigma_1 := Sigma_2 because the written
-posterior variance is zero at timestep 1.
+Array index 0 stores the clean state at time 0, with alpha_bar[0] = 1.
+Noisy timesteps 1 through T use the remaining array indices. PIDM commit
+733aeb0fe8e56f8d1b3aaf9ff24f340438c20d9a uses noisy tensor indices starting
+at 0: its index t maps to timestep t + 1 here. Sigma_1 := Sigma_2 because
+the written posterior variance is zero at timestep 1.
 """
 
 from __future__ import annotations
@@ -30,7 +31,7 @@ def build_schedule(
     s: float = COSINE_OFFSET,
     beta_cap: float = BETA_CAP,
 ) -> dict[str, np.ndarray]:
-    """Return 1-based arrays of length n_steps+1 with index 0 = t=0 clean.
+    """Return arrays of length n_steps+1 with index 0 for the clean state.
 
     betas[1:] has length n_steps; betas[0] unused (nan).
     alpha_bar[t] for t=1..n_steps is PIDM alphas_prod[t-1].

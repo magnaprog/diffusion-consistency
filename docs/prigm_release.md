@@ -36,17 +36,10 @@ from PyTorch's installation instructions. The legacy shell wrapper is excluded
 from the public export because it defaults to a private environment location.
 Invoke the Python coordinators directly in your chosen environment.
 
-PDF verification needs Poppler's `pdftotext` and `pdfinfo`, plus `pikepdf`
-(included in both installation paths above) to read complete PDF annotation URI
-strings. In camera-ready mode, only the exact public companion URI
-`https://github.com/magnaprog/diffusion-consistency` is exempt from the
-author-identity restriction on links; suffixes, queries and embedded newlines
-receive no exception. Anonymous manuscripts, PDF metadata and private paths
-retain their restrictions. The catalog URI base is checked as metadata without
-this exception, including when no relative links use it. Both raw annotation
-URIs and targets resolved against the base are checked; resolution cannot grant
-the exception to an annotation whose raw URI differs. Manuscript builds
-need pdfLaTeX, BibTeX, and the LaTeX packages loaded by
+PDF verification uses Poppler's `pdftotext` and `pdfinfo`, plus `pikepdf` to read
+complete link annotations. It checks the paper's metadata and links for private
+identifiers while allowing its public companion URL in camera-ready mode.
+Manuscript builds use pdfLaTeX, BibTeX, and the LaTeX packages loaded by
 [main.tex](../paper/workshops/prigm/main.tex), including `orcidlink`. Install
 CM-Super with its T1 font mapping to avoid bitmap typewriter fonts. The arXiv
 packager also uses Poppler's `pdffonts` and `pdftoppm` to check font embedding
@@ -65,6 +58,15 @@ CUDA_VISIBLE_DEVICES='' MPLBACKEND=Agg OPENBLAS_NUM_THREADS=2 OMP_NUM_THREADS=2 
 
 The verifier compares selected numerical claims and figure records with the public experimental files. It checks which source versions produced those records and examines the supplied manuscript PDF. It does not retrain neural models or certify every sentence. Rebuild the PDF after changing TeX.
 
+The toy interval calculations regenerate the exact conditional ensembles with
+the original random stream. For each of the 288 windows, the verifier checks
+the regenerated energy score against the original before calculating coverage
+and width.
+
+The audit counts 4,816,800 minute records on dates assigned to training,
+including 4,400,682 valid magnetic vectors. Both counts include records outside
+eligible training windows.
+
 For the full CPU test run, choose temporary storage with ample free space.
 Some evidence fixtures are large. `pytest.ini` limits default discovery to the
 active `tests/` directory. On Linux with sufficient `/dev/shm` capacity:
@@ -77,9 +79,8 @@ if scratch=$(mktemp -d /dev/shm/prigm-tests.XXXXXX); then
 fi
 ```
 
-Two temporary-directory locations in `tests/test_prigm_operator_mechanism.py`
-explicitly use `/dev/shm`; `TMPDIR` does not relocate them. CUDA tests skip in
-a CPU-only run, and the real OMNI schema test needs the original 2005 raw file.
+CUDA tests skip in a CPU-only run, and the real OMNI schema test needs the
+original 2005 raw file.
 Missing PDF tools can cause additional skips. Report the actual results and
 skip reasons for the revision being checked.
 
@@ -89,7 +90,15 @@ The public copy includes TEST observations, toy arrays and results, original pre
 
 The [source provenance record](../reproducibility/accepted_source/README.md) links eight exact copies of original source files to later reviewed code. All 43 current core modules are retained. Preserve the original evidence and its source hashes; results from a new run must remain identifiable as a different execution.
 
-The [documentation revision record](../reproducibility/documentation_source/README.md) maps 45 current files to their versions before the documentation changes: thirteen preserved on October 3 and 32 added on October 4, all from `8eff030`. The initial thirteen copies remain unchanged. The verifier authenticates both versions by hash and compares their Python syntax after removing docstrings. It follows this mapping to the earlier version, then follows the accepted-source mapping to the original execution source where required. Both sets of historical files must retain their bytes. These checks authenticate specific revisions; they do not prove equivalence for every possible runtime observation.
+The [earlier documentation record](../reproducibility/documentation_source/README.md)
+preserves 45 source versions from `8eff030`: thirteen copied on October 3 and
+32 on October 4. The [October 29 revision](../reproducibility/documentation_revisions/2026-10-29/README.md)
+first checks the toy exporter, scoring helper and schedule against three previous
+versions from `3c197eef`. The toy exporter and scoring helper then follow the
+earlier documentation map; the schedule's previous hash already matches the
+original evidence. Both documentation maps authenticate exact hashes and compare
+Python syntax after removing docstrings. The accepted-source map applies afterward
+where needed. Preserve all historical copies and manifests.
 
 A small hidden Markov model (HMM) execution check uses the included data and a new output file:
 
@@ -123,7 +132,13 @@ python experiments/run_prigm_toy_repair.py --help
 python experiments/run_prigm_fixed_final_sensitivity.py --help
 ```
 
-Create a separate directory for each new study and retain its declared settings, input hashes and execution records. The coordinators check source identities and enforce the order of validation, model selection and TEST evaluation. Analyses of TEST data that were already examined remain retrospective; generating new predictions does not make those observations an independent test set.
+Create a separate directory for each new study and retain its declared settings,
+input hashes and execution records. The real-data coordinator chooses checkpoints
+from validation scores before evaluating TEST. The toy coordinator evaluates
+update 5000, and the coefficient sensitivity coordinator compares update 29636
+across its declared settings. Each checks source identities throughout its stages.
+Analyses of TEST data that were already examined remain retrospective; generating
+new predictions does not make those observations an independent test set.
 
 ## Build the paper and its source archives
 
@@ -149,7 +164,7 @@ Inspect `paper/workshops/prigm/main.log` after the final LaTeX pass. When it
 requests another pass for cross-references, repeat the same `pdflatex` command
 from the paper directory and then rerun the verifier. Resolve undefined
 references or citations before packaging. The current manuscript has four main
-pages and 27 pages in total. Its bibliography uses `unsrtnat` to number entries
+pages and 28 pages in total. Its bibliography uses `unsrtnat` to number entries
 in first-citation order. Apply the same checks when compiling each extracted
 archive; the final log determines whether another LaTeX pass is needed.
 
@@ -182,7 +197,7 @@ The ZIP is named `residual_penalties_algebraic_completion_arxiv.zip`, and the pr
 | Group | Included material |
 | --- | --- |
 | Runtime and tooling | The approved Python inventory under `prigm`, `analysis`, `experiments`, `scripts`, and `tests`, recorded in `RELEASE_MANIFEST.json` |
-| Source history | The accepted-source manifest, explanation, and eight original source copies; the documentation manifest, explanation, and 45 source copies from before the documentation changes (the initial thirteen plus 32 added on October 4) |
+| Source history | The accepted-source manifest, explanation, and eight original source copies; the documentation manifest, explanation, and 45 source copies from before the earlier documentation changes, plus the October 29 manifest, explanation and three preceding source copies |
 | Paper | Files explicitly required by the current TeX source, public experimental records, figure manifests and generating scripts, and `main.pdf` |
 | Figure test support | `fig_audit.py`, even when its figure is not in the manuscript |
 | Setup and documentation | License, requirements, environment, `pytest.ini`, ignore rules, this guide, and generated public README/AGENTS |

@@ -106,6 +106,17 @@ def test_artists_keep_tail_direction_percent_scale_and_each_unpooled_seed(record
             reference = next(x for x in ax.lines if x.get_gid() == "tail_reference")
             np.testing.assert_array_equal(reference.get_ydata(), [5, 5])
         assert fig.axes[1].get_ylim() == fig.axes[2].get_ylim()
+        note = fig.texts[-1]
+        assert note.get_text() == (
+            "The 5% line assumes that, at each time and coordinate,\n"
+            "the observation and ensemble members are exchangeable, with no ties.")
+        assert note.get_fontsize() == 7
+        fig.canvas.draw()
+        renderer = fig.canvas.get_renderer()
+        bounds = note.get_window_extent(renderer)
+        assert fig.bbox.contains(bounds.x0, bounds.y0)
+        assert fig.bbox.contains(bounds.x1, bounds.y1)
+        assert bounds.y1 < fig.texts[-2].get_window_extent(renderer).y0
     finally:
         figure.plt.close(fig)
 
@@ -154,6 +165,9 @@ def test_repeatable_render_and_numeric_manifest(records, tmp_path):
         assert m["tails"] == figure.load_calibration(*paths[2:])[0]
         assert m["calibration_provenance"]["per_window_sha256"] == "a" * 64
         assert m["pointwise_intervals_plotted"] is False
+        assert m["tail_reference"] == {"percent": 5, "assumption": (
+            "at each time and coordinate, the observation and 39 ensemble members "
+            "are exchangeable, with no ties")}
         for name, digest in m["output_sha256"].items():
             assert figure.sha256(output / name) == digest
         manifests.append(m)
