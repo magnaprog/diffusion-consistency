@@ -72,11 +72,10 @@ Some evidence fixtures are large. `pytest.ini` limits default discovery to the
 active `tests/` directory. On Linux with sufficient `/dev/shm` capacity:
 
 ```bash
-if scratch=$(mktemp -d /dev/shm/prigm-tests.XXXXXX); then
+scratch=$(mktemp -d /dev/shm/prigm-tests.XXXXXX) &&
   TMPDIR="$scratch" CUDA_VISIBLE_DEVICES='' MPLBACKEND=Agg \
     OPENBLAS_NUM_THREADS=2 OMP_NUM_THREADS=2 MKL_NUM_THREADS=2 \
     python -m pytest -q -rs --basetemp "$scratch/pytest"
-fi
 ```
 
 CUDA tests skip in a CPU-only run, and the real OMNI schema test needs the
@@ -211,7 +210,7 @@ The ZIP is named `residual_penalties_algebraic_completion_arxiv.zip`, and the pr
 
 ## Export inventory and maintenance
 
-`scripts/export_prigm_release.py --output /chosen/fresh-directory` copies the public files without Git history and does not publish them. Use a new destination outside the source checkout. The following groups explicitly define which files are included:
+`python scripts/export_prigm_release.py --output /chosen/fresh-directory` copies the public files without Git history and does not publish them. Use a new destination outside the source checkout. The following groups explicitly define which files are included:
 
 | Group | Included material |
 | --- | --- |

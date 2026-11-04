@@ -373,7 +373,7 @@ def followup_prose(learned, reference, gradients, strata):
             f"{metric['cov90_mean']['mean'] * 100:.1f}"]
     ref = reference["secondary"]
     caption = ("Nine diffusion fits to the stationary hidden Markov model after 5{,}000 optimizer updates at seed 7. "
-               "Evaluation uses 288 windows and 39 samples per window; clipping retains the model state and samples. Raw $|R|$ is the mean absolute residual of the observation identity in HMM units. "
+               "Evaluation uses 288 windows and 39 samples per window; clipping acts on these same ensembles. Raw $|R|$ is the mean absolute residual of the observation identity in HMM units. "
                "The inequality column gives the percentage of generated bins that fail a moment inequality beyond rounding tolerance, separately from the equality residual. "
                "Coverage averages the five primary coordinates and twelve positions. "
                "The independent exact conditional ensemble has "
@@ -438,7 +438,7 @@ def followup_prose(learned, reference, gradients, strata):
         + ("includes" if pair['year_95'][0] <= 0 <= pair['year_95'][1] else "excludes") + " zero. "
         + f"O-S minus G5 is {g5['mean_diff']:.4f}, with interval [{vector(g5['year_95'], 4)}], "
         + f"and O-S minus D is {cr['comparisons']['O-S_raw_minus_D_raw']['mean_diff']:.4f} in the remaining {cr['n_windows']} windows. "
-        + "G5 has a lower mean score in this group, while the O-S versus D interval "
+        + f"G5 has a lower mean score in these {ch['n_windows']} windows, while the O-S versus D interval "
         + ("spans" if pair['year_95'][0] <= 0 <= pair['year_95'][1] else "excludes") + " zero. "
         + "The group uses information available to the model; cancellation can still vary with other magnetic conditions.\n\n"
         + f"High cancellation during the missing hour identifies {th['n_windows']} windows. O-S minus D is {target['mean_diff']:.4f}, with interval [{vector(target['year_95'], 4)}], "
@@ -676,10 +676,10 @@ def bundle_template(tmp_path_factory):
                           f"{m['r_obs_mean']['month_balanced']:.3f}", f"{100 * m['frac_support_violation_beyond_rounding']['month_balanced']:.1f}"]
     means = {k: v["mean_energy"] for k, v in oracle["methods"].items()}
     oracle_rows = {row: [f"{means[k]:.4f}"] for row, k in gate.ORACLE_ROWS.items()}
-    paragraph = ("An exact denoiser isolates error in the sampling approximation. "
-                 + r"Across 36 cases at $t=100$, two evaluations give mean absolute $R_{\mathrm{obs}}=1.23\times10^{-5}$ in HMM units, yet energy score 5.123 versus "
-                 + "2.356 for independent exact conditional samples. "
-                 + "Separately, DDIM sampling on 288 windows gives a poor score with two evaluations and scores close to that of the exact conditional ensemble with 25, 50, or 100. "
+    paragraph = ("The hidden Markov example examines sampling without error from fitting the denoiser. "
+                 + r"Across 36 cases at $t=100$, two evaluations give estimates with mean absolute $R_{\mathrm{obs}}=1.23\times10^{-5}$ in HMM units, but energy score 5.123 versus "
+                 + "2.356 for independent conditional samples. "
+                 + "Separately, DDIM sampling on 288 windows gives a poor score with two evaluations and scores close to the conditional reference with 25, 50, or 100. "
                  + "All scores have finite sampling error.")
     number_values = (200, 2000, 1000, 900, 800, 700, 300, 400, 250, 40, 10)
     count_text = " ".join(f"{v:,}".replace(",", "{,}") for v in number_values) + r" 10.00\% 2.35\times10^{-13} 0.1235"
@@ -1025,7 +1025,7 @@ def test_bad_toy_comparison_cannot_hide_behind_valid_duplicate(bundle_template, 
     root = bundle_template["root"]
     tex = (root / "main.tex").read_text()
     rendered = extracted(bundle_template["pages"])
-    paragraph = next(p for p in tex.split("\n\n") if "An exact denoiser isolates error" in p)
+    paragraph = next(p for p in tex.split("\n\n") if "The hidden Markov example examines sampling" in p)
     clause = paragraph[paragraph.index(anchor):].split(". ", 1)[0] + "."
     assert clause.count(old) == 1
     evidence = gate.validate_toy(root)
@@ -1343,7 +1343,7 @@ def test_citations_bound_to_visible_source_and_rendered_bibliography(bundle, dam
 
 def test_citation_apostrophe_typography_preserves_possessive(tmp_path):
     (tmp_path / "references.bib").write_text("@misc{fixture, title={Data at the {Earth}'s bow shock}}")
-    tex = r"\citep{fixture}"
+    tex = gate.STYLE_ANONYMOUS + "\n" + r"\citep{fixture}"
     rendered = "References\n[1] Data at the Earth\u2019s bow shock."
     gate.citation_checks(tmp_path, tex, rendered)
     with pytest.raises(ERRORS, match="cited title absent"):
@@ -1406,12 +1406,16 @@ def test_complete_hmm_regime_permutation_is_not_a_population_match(bundle):
 
 
 def test_pdf_toy_prose_error_cannot_hide_in_correct_oracle_table(bundle):
+    tex = (bundle["root"] / "main.tex").read_text()
+    evidence = gate.validate_toy(bundle["root"])
+    gate.toy_claims(tex, gate.pdf_checks(bundle["root"]), evidence)
     pages = copy.deepcopy(bundle["pages"])
-    pages[0] = [line.replace("energy score 5.123", "energy score 9.999") for line in pages[0]]
+    changed, count = re.subn(r"(energy\s+score\s+)5\.123\b", r"\g<1>9.999", "\n".join(pages[0]))
+    assert count == 1
+    pages[0] = changed.splitlines()
     write_pdf(bundle["root"] / "main.pdf", pages)
     with pytest.raises(ERRORS):
-        gate.toy_claims((bundle["root"] / "main.tex").read_text(), gate.pdf_checks(bundle["root"]),
-                        gate.validate_toy(bundle["root"]))
+        gate.toy_claims(tex, gate.pdf_checks(bundle["root"]), evidence)
 
 
 def test_main_table_must_also_render_before_references(bundle):
@@ -2042,7 +2046,7 @@ def test_toy_ddim_clause_crosses_only_a_matching_operator_float(bundle_template,
         rendered = rendered.replace(f"Figure {number}:", f"Figure {number + 1}:")
     elif damage == "score":
         value = f"{evidence[1]['mean_es_vs_ref']:.3f}"
-        rendered, count = re.subn(r"(energy score\s+)" + re.escape(value),
+        rendered, count = re.subn(r"(energy\s+score\s+)" + re.escape(value),
                                  lambda match: match[1] + "987.6543", rendered)
         assert count == 1
     elif damage == "sampler_name":
@@ -2219,7 +2223,7 @@ def test_every_followup_prose_number_is_clause_bound_in_source_and_pdf(bundle_te
 
 
 @pytest.mark.parametrize("title,old,new", [
-    (FOLLOWUP_TITLES[0], "clipping retains the model state and samples", "clipping selects a new model state and samples"),
+    (FOLLOWUP_TITLES[0], "clipping acts on these same ensembles", "clipping selects a new model state and samples"),
     (FOLLOWUP_TITLES[0], "separately from the equality residual", "including the equality residual"),
     (FOLLOWUP_TITLES[0], "that fail a moment inequality beyond rounding tolerance", "that fail the equality by any amount"),
     (FOLLOWUP_TITLES[0], "five primary coordinates", "six generated coordinates"),
@@ -2663,7 +2667,8 @@ def test_exact_coverage_binds_original_ensemble_table(bundle_template, scope, va
 @pytest.mark.parametrize("value", ["999", "-999", "NaN"])
 @pytest.mark.parametrize("valid_duplicate", [False, True])
 @pytest.mark.parametrize("kind", ["toy", "gradient", "learned", "learned_caption",
-                                  "cancellation_train", "cancellation_groups", "cancellation_seeds"])
+                                  "cancellation_train", "cancellation_groups", "cancellation_seeds",
+                                  "cancellation_g5_windows"])
 def test_numeric_claim_slots_reject_malformed_values_and_valid_duplicates(
         bundle_template, scope, value, valid_duplicate, kind):
     b = bundle_template
@@ -2672,7 +2677,7 @@ def test_numeric_claim_slots_reject_malformed_values_and_valid_duplicates(
     if kind == "toy":
         evidence = gate.validate_toy(b["root"])
         check = lambda source, pdf: gate.toy_claims(source, pdf, evidence)
-        pattern = r"Across\s+(?P<slot>36)\s+cases[\s\S]*?independent exact conditional samples\."
+        pattern = r"Across\s+(?P<slot>36)\s+cases[\s\S]*?independent conditional samples\."
     elif kind == "gradient":
         check = followup_check(b, FOLLOWUP_TITLES[1])
         pattern = r"At\s+\$?t\s*=\s*(?P<slot>25)\$?,\s+the ranges[\s\S]*?(?=\s+Each range spans)"
@@ -2682,6 +2687,7 @@ def test_numeric_claim_slots_reject_malformed_values_and_valid_duplicates(
             "cancellation_train": r"Every one of the (?P<slot>\d+) overlapping training windows[\s\S]*?distinct bins\.",
             "cancellation_groups": r"The\s+(?P<slot>\d+)\s+groups\s+comprise[\s\S]*?each\s+group\.",
             "cancellation_seeds": r"All (?P<slot>three) seed differences[\s\S]*? zero\.",
+            "cancellation_g5_windows": r"G5\s+has\s+a\s+lower\s+mean\s+score\s+in\s+these\s+(?P<slot>\d+)\s+windows,[\s\S]*? zero\.",
         }[kind]
     else:
         check = followup_check(b, FOLLOWUP_TITLES[0])

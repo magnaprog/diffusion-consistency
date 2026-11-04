@@ -218,7 +218,7 @@ def calibration_claims(tex, rendered, report, figure):
         "(a) G5 minus D for each seed and their mean. The change in distance to the withheld record, less the change in the spread term, gives the energy score difference. "
         "Both terms use 60 coordinates standardized on TRAIN; spread is half the mean distance between distinct predictions. "
         "(b,c) Fractions of observations below and above nominal 90\\% intervals for the five primary quantities. "
-        "Bars average three diffusion fits or show one Gaussian ensemble. Gray dots show seeds 7, 13 and 42 from left to right. "
+        "Diffusion bars average three fits; Gaussian regression uses one ensemble per window. Gray dots show seeds 7, 13 and 42 from left to right. "
         "The dashed 5\\% line assumes that, at each time and coordinate, the observation and ensemble members are exchangeable, with no ties. Months receive equal weight. "
         "This analysis uses the existing TEST ensembles after the original results were available.")
     require(g.prose_text(g.float_caption(floats, "fig:calibration"), source=True)
@@ -233,11 +233,13 @@ def calibration_claims(tex, rendered, report, figure):
             and max(r13["delta_energy"], r42["delta_energy"]) < 0, "seedwise contribution directions")
     # Locate the subject independently of the seed value checked in the clause.
     for subject, clause in (
-        ("G5", "At seed 13, G5 reduces both distance to the measurements and spread, with the larger decrease in distance lowering the score."),
-        ("both terms", "At seed 42, both terms increase, and the larger increase in spread lowers the score."),
+        ("G5", "At seed 13, G5 reduces both distance to the measurements and spread; the larger decrease in distance lowers the score."),
+        ("both terms", "At seed 42, both terms increase, and the larger increase in the spread term lowers the score."),
     ):
         g.bind_clause((tex, rendered), g.clause_pattern("at seed") + r"\s+[^,\s]+\s*,\s*" + g.clause_pattern(subject), clause)
-    bind("These are arithmetic explanations", "These are arithmetic explanations of the existing predictions. G5 changes both the generated representation and the training loss, so their separate effects on learning remain unresolved.")
+    bind("This arithmetic", "This arithmetic explains the score differences for the existing predictions.")
+    g.bind_clause((tex, rendered), r"(?:^|(?<=\. ))" + g.clause_pattern("Representation and training loss"),
+                  "Representation and training loss change together in G5; varying them separately would distinguish their effects on learning.")
     methods = report["methods"]
     means = {name: 100 * np.asarray(row["mean"])[4] for name, row in methods.items()}
     for name in ("D", "G5"):
@@ -264,6 +266,30 @@ def checkpoint_claims(tex, rendered, checked):
     from experiments import verify_prigm_paper as g
     from experiments._prigm_checkpoint_evidence import UPDATES
     summary, saved = checked["summary"], checked["saved"]
+    # Figure 2 can interrupt "Their validation scores" across a page break.
+    # Remove only that float after authenticating its number and full caption.
+    interrupted = list(re.finditer(
+        r"Their\s+\d+\s*\f(?P<figure>[\s\S]*?)\n[ \t]*(?=validation\s+scores)", rendered))
+    if interrupted:
+        require(len(interrupted) == 1, "ambiguous float in checkpoint comparison")
+        match = interrupted[0]
+        labels = re.findall(r"\\label\{(fig:[^}]+)\}", g.strip_comments(tex))
+        require(labels.count("fig:checkpoints") == 1, "checkpoint interruption requires its figure")
+        number = labels.index("fig:checkpoints") + 1
+        captions = list(re.finditer(r"(?m)^[ \t]*Figure[ \t]+(\d+):", match["figure"]))
+        require(len(captions) == 1 and int(captions[0][1]) == number,
+                "checkpoint interruption has wrong figure")
+        floats = tex.replace(r"\begin{figure}", r"\begin{table}").replace(r"\end{figure}", r"\end{table}")
+        caption = g.float_caption(floats, "fig:checkpoints")
+        require(re.fullmatch(g.clause_pattern(g.prose_text(caption, source=True)),
+                             g.prose_text(match["figure"][captions[0].end():])) is not None,
+                "checkpoint interruption caption differs")
+        # Move the authenticated float out of the sentence, retaining all its
+        # text so a contradictory claim inside it still counts as a duplicate.
+        # Keep the original rendering for the separate caption check below.
+        joined = rendered[:match.start()] + "Their " + rendered[match.end():] + "\n" + match["figure"]
+    else:
+        joined = rendered
     # Normalize grouped counts only in their stated prose contexts.
     rendered = re.sub(r"\b10,000(?=\s+resamples)|(?<=update )9,560(?=\s+in)",
                       lambda m: m[0].replace(",", ""), rendered)
@@ -301,11 +327,12 @@ def checkpoint_claims(tex, rendered, checked):
                   "D at seeds 13 and 42 retains its respective earlier choice in every resample under either evaluation count.")
     for anchor, clause in (
         ("validation ensembles with", "validation ensembles with 50 evaluations reuse the initial noise from the original ensembles with 25. Their validation scores determine the model choices before additional TEST samples are generated."),
+        ("Their validation scores", "Their validation scores determine the model choices before additional TEST samples are generated."),
         ("Establishing whether regularization", "Establishing whether regularization or overfitting causes this pattern is a separate empirical question."),
         ("Each sampled year contributes", "Each sampled year contributes both validation months, including repeated occurrences, and all checkpoints use the same resampled years."),
         ("With weights and samples", "With weights and samples held constant, these frequencies measure sensitivity to the years represented in validation."),
     ):
-        bind(anchor, clause)
+        g.bind_clause((tex, joined), g.clause_pattern(g.prose_text(anchor, source=True)), clause)
     floats = tex.replace(r"\begin{figure}", r"\begin{table}").replace(r"\end{figure}", r"\end{table}")
     block = g.float_block(floats, "fig:checkpoints")
     require(re.findall(r"\\includegraphics(?:\[[^]]*\])?\{([^}]+)\}", block)
@@ -313,7 +340,8 @@ def checkpoint_claims(tex, rendered, checked):
     caption = ("How the D/O-S comparison changes during training. The subplots show VAL with 25 DDIM evaluations, VAL with 50, and TEST with 50. "
         "Each point gives equal weight to months; ensembles contain 39 samples. Colors and open or filled markers distinguish D and O-S, while line styles and marker shapes distinguish seeds. "
         "Black rings mark the validation choice with 25 evaluations, P25; crosses mark the choice with 50, P50. Both choices coincide for all six fits. "
-        "F marks the common final update. Validation and test scores concern different windows, and model choice precedes the additional TEST analysis.")
+        "F marks the common final update. Validation and test scores concern different windows. "
+        "The P25 choices were fixed before this additional TEST comparison; the TEST period had been examined during earlier development.")
     require(g.prose_text(g.float_caption(floats, "fig:checkpoints"), source=True) == g.prose_text(caption, source=True),
             "checkpoint caption differs")
     bind("How the D/O-S comparison changes", caption)

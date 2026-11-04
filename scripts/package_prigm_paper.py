@@ -95,7 +95,7 @@ PUBLIC_COMPANION_URL = "https://github.com/magnaprog/diffusion-consistency"
 NATBIB_OPTIONS = r"\PassOptionsToPackage{numbers, sort&compress}{natbib}"
 # Private host/identity leaks are refused except the exact camera-ready companion URL.
 PRIVATE_LEAK = re.compile(r"magnaprog|skykev|/(?:home|Users|tmp)/|[A-Za-z]:\\Users\\", re.I)
-# Author identity refused in anonymous bundles and in non-manuscript members.
+# Names remain restricted outside the declared byline and bibliographic author fields.
 AUTHOR_LEAK = re.compile(
     r"\bKevin[\s~{}_,\\-]*Lee\b|\bAlison\b"
     r"|[\w.+-]+@(?:[\w-]+\.)+[a-z]{2,}\b",
@@ -173,6 +173,84 @@ def read_source(path):
     return payload, identity(before)
 
 
+def bibliographic_author_spans(text):
+    """Locate plain literal author values; unsupported BibTeX gets no exception.
+
+    Parse field boundaries so a note, comment or preamble cannot impersonate
+    an author field. This does not validate scholarly attribution or expand TeX.
+    """
+    spans, pos = [], 0
+
+    def space(pos):
+        while pos < len(text):
+            if text[pos].isspace():
+                pos += 1
+            elif text[pos] == "%":
+                end = text.find("\n", pos)
+                pos = len(text) if end < 0 else end + 1
+            else:
+                break
+        return pos
+
+    while (pos := space(pos)) < len(text):
+        entry = re.match(r"@([A-Za-z]+)\s*\{\s*[^,\s{}]+\s*,", text[pos:])
+        if not entry or entry[1].lower() in {"comment", "string", "preamble"}:
+            return []
+        pos += entry.end()
+        fields = set()
+        while True:
+            pos = space(pos)
+            if pos >= len(text):
+                return []
+            if text[pos] == "}":
+                pos += 1
+                break
+            field = re.match(r"([A-Za-z][\w-]*)\s*=\s*", text[pos:])
+            if not field or field[1].lower() in fields:
+                return []
+            key = field[1].lower()
+            fields.add(key)
+            pos += field.end()
+            if pos >= len(text):
+                return []
+            opening = text[pos]
+            if opening in '{"':
+                pos += 1
+                start, depth = pos, int(opening == "{")
+                while pos < len(text):
+                    char = text[pos]
+                    # BibTeX delimiters remain structural after a backslash.
+                    if char == "{":
+                        depth += 1
+                    elif char == "}":
+                        depth -= 1
+                        if depth < 0:
+                            return []
+                        if opening == "{" and depth == 0:
+                            break
+                    elif char == '"' and opening == '"' and depth == 0:
+                        break
+                    pos += 1
+                if pos >= len(text):
+                    return []
+                value = text[start:pos]
+                if (key == "author" and any(c.isalpha() for c in value)
+                        and all(c.isalpha() or c in " ,.'’-~\t\r\n" for c in value)):
+                    spans.append((start, pos))
+                pos += 1
+            else:
+                value = re.match(r"[A-Za-z0-9_.:+-]+", text[pos:])
+                if not value:
+                    return []
+                pos += value.end()
+            pos = space(pos)
+            if pos < len(text) and text[pos] == ",":
+                pos += 1
+            elif pos >= len(text) or text[pos] != "}":
+                return []
+    return spans
+
+
 def scan_text(text, name, placeholders=False, camera_ready=False):
     if "\x00" in text:
         raise ValueError(f"author/path leak or binary text in {name}")
@@ -185,6 +263,12 @@ def scan_text(text, name, placeholders=False, camera_ready=False):
     if camera_ready and name == "main.tex":
         allowed = {AUTHOR_CAMERA_READY.casefold(), EMAIL_CAMERA_READY.casefold()}
         if any(match[0].casefold() not in allowed for match in AUTHOR_LEAK.finditer(text)):
+            raise ValueError(f"author/path leak or binary text in {name}")
+    elif camera_ready and name == "references.bib":
+        authors = bibliographic_author_spans(text)
+        if any("@" in match[0] or not any(start <= match.start() and match.end() <= end
+                                         for start, end in authors)
+               for match in AUTHOR_LEAK.finditer(text)):
             raise ValueError(f"author/path leak or binary text in {name}")
     elif AUTHOR_LEAK.search(text):
         raise ValueError(f"author/path leak or binary text in {name}")
@@ -814,7 +898,7 @@ def deadline_bindings(files):
 def collect(root):
     files, identities = {}, {}
 
-    def add(name):
+    def add(name, *, bibliography_camera_ready=False):
         relative_name(name)
         if name in files:
             return files[name]
@@ -830,7 +914,8 @@ def collect(root):
                 decoded,
                 name,
                 placeholders=suffix == ".tex",
-                camera_ready=(name == "main.tex" and NOTICE_CAMERA_READY in decoded),
+                camera_ready=((name == "main.tex" and NOTICE_CAMERA_READY in decoded)
+                              or (name == "references.bib" and bibliography_camera_ready)),
             )
         elif suffix == ".json":
             check_json(payload, name)
@@ -959,7 +1044,7 @@ def collect(root):
     bibs = [d for d in declarations if d[0] == "bibliography"]
     if len(bibs) != 1 or bibs[0][1] is not None or bibs[0][2] not in ("references", "references.bib"):
         raise ValueError("requires only references.bib")
-    add("references.bib")
+    add("references.bib", bibliography_camera_ready=style == STYLE_CAMERA_READY)
     for declaration in declarations:
         if declaration in required or declaration in bibs:
             continue

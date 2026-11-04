@@ -911,6 +911,114 @@ def test_camera_ready_bundle_preserves_author_and_license(paper, tmp_path, suffi
         packager.scan_text(packager.EMAIL_CAMERA_READY, "evidence/record.json", camera_ready=True)
 
 
+@pytest.mark.parametrize("camera_ready", [False, True])
+@pytest.mark.parametrize("suffix", [".zip", ".tar.gz"])
+def test_bibliographic_authors_require_camera_ready_and_preserve_bytes(paper, tmp_path, camera_ready, suffix):
+    source = paper / "main.tex"
+    tex = source.read_text().replace(r"\citep{public}", r"\citep{public,lee2026pisces}")
+    source.write_text(camera_ready_source(tex) if camera_ready else tex)
+    bib = paper / "references.bib"
+    bib.write_text(bib.read_text() + "@misc{lee2026pisces,\n"
+                   "  title={{PISCES}: Physics-Informed Solar-wind Convolutional autoEncoder},\n"
+                   "  author={Lee, Kevin and March, Alison J.},\n"
+                   "  year={2026}, eprint={2609.28022}\n}\n")
+    output = tmp_path / ("bibliographic-authors" + suffix)
+    if camera_ready:
+        assert run(paper, output) == 0
+        assert read_archive(output)["references.bib"] == bib.read_bytes()
+    else:
+        assert run(paper, output) == 1
+        assert_nothing(output)
+
+
+@pytest.mark.parametrize("field", [
+    "author={Kevin Lee and Alison March}",
+    'AUTHOR = "March, Alison J. and Lee, Kevin"',
+    "author={O’Neill, Alison and Lee, Kevin}",
+])
+def test_bibliographic_author_role_is_not_a_citation_allowlist(field):
+    text = "@article{unrelated2020, title={A different study}, " + field + ", year=2020}\n"
+    packager.scan_text(text, "references.bib", camera_ready=True)
+    for name, camera_ready in (("references.bib", False), ("main.tex", True),
+                               ("evidence/record.json", True), ("fig_hmm.py", True)):
+        with pytest.raises(ValueError, match="author/path leak"):
+            packager.scan_text(text, name, camera_ready=camera_ready)
+
+
+@pytest.mark.parametrize("other", [
+    "note={Alison}", "editor={Alison March}", "title={Kevin Lee}",
+    "pdfauthor={Alison March}", "url={https://example.org/Alison}",
+    "note={author={Alison March}}", 'note="author={Alison March}"',
+    "note={\n@article{pretend, author={Alison March}, title={Other}}\n}",
+])
+def test_bibliographic_author_does_not_hide_a_second_identity_field(other):
+    text = "@article{public, author={Alison March}, " + other + "}\n"
+    with pytest.raises(ValueError, match="author/path leak"):
+        packager.scan_text(text, "references.bib", camera_ready=True)
+
+
+@pytest.mark.parametrize("text", [
+    r"@misc{example, title={\{Text}, author={Alison}, note={Text\}}, year=2026}",
+    r'@misc{example, title="\{Text", author={Alison}, note="Text\}", year=2026}',
+])
+def test_bibliographic_escaped_delimiters_do_not_create_author_fields(text):
+    # BibTeX puts the apparent author field inside the title in both entries.
+    text += "\n@article{valid, author={Alison March}, title={A study}}\n"
+    with pytest.raises(ValueError, match="author/path leak"):
+        packager.scan_text(text, "references.bib", camera_ready=True)
+
+
+@pytest.mark.parametrize("text", [
+    "% @article{commented, author={Alison March}}\n",
+    "@comment{public, author={Alison March}}\n",
+    '@preamble{"Alison March"}\n', '@string{person="Alison March"}\n',
+    "Alison March\n", "@article{bad, author={Alison March}\n",
+    "@article{bad, author={Alison} # {March}}\n",
+    "@article{bad, author=Alison}\n",
+    "@article{bad, author={Alison}, author={Jane Doe}}\n",
+    r"@article{bad, author={Alison \author{Other}}}",
+    r"@article{bad, author={Alison \hypersetup{pdfauthor={Other}}}}",
+    "@article{bad, author={{Alison} March}}\n",
+])
+def test_bibliographic_role_refuses_comments_commands_and_ambiguous_fields(text):
+    text += "\n@article{valid, author={Alison March}, title={A study}}\n"
+    with pytest.raises(ValueError, match="author/path leak"):
+        packager.scan_text(text, "references.bib", camera_ready=True)
+
+
+@pytest.mark.parametrize("leak", [
+    "person@example.edu", packager.EMAIL_CAMERA_READY, "/home/private/run", "/tmp/run",
+    "/Users/private/run", r"C:\Users\private\run", "magnaprog", "skykev1928",
+    packager.PUBLIC_COMPANION_URL,
+])
+def test_bibliographic_author_fields_keep_email_and_private_path_checks(leak):
+    text = "@article{public, author={Alison March and " + leak + "}, title={A study}}\n"
+    with pytest.raises(ValueError, match="author/path leak"):
+        packager.scan_text(text, "references.bib", camera_ready=True)
+
+
+@pytest.mark.parametrize("location", ["byline", "metadata", "body", "evidence", "generator"])
+def test_camera_ready_citation_does_not_exempt_other_identity_roles(paper, tmp_path, location):
+    source = paper / "main.tex"
+    tex = camera_ready_source(source.read_text())
+    if location == "byline":
+        tex = tex.replace(r"\author{Kevin Lee", r"\author{Kevin Lee and Alison March")
+    elif location == "metadata":
+        tex = tex.replace("pdfauthor={Kevin Lee}", "pdfauthor={Kevin Lee and Alison March}")
+    elif location == "body":
+        tex += "\nAlison March\n"
+    elif location == "evidence":
+        save_json(paper / "evidence/toy/oracle-stationary-01.json", {"author": "Alison March"})
+    else:
+        (paper / "fig_hmm.py").write_text("# Alison March\n")
+    source.write_text(tex)
+    bib = paper / "references.bib"
+    bib.write_text(bib.read_text().replace("Lee, Jane and March, John", "Lee, Kevin and March, Alison J."))
+    output = tmp_path / "other-identity.zip"
+    assert run(paper, output) == 1
+    assert_nothing(output)
+
+
 def test_license_changes_during_verification_refuse_publication(paper, tmp_path, monkeypatch):
     license_path = tmp_path / "LICENSE"
     license_path.write_bytes((REPO / "LICENSE").read_bytes())
