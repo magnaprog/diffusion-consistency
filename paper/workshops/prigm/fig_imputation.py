@@ -26,6 +26,9 @@ METHODS = ("D", "O-S", "G5", "full_flank_gaussian")
 LABELS = ("D", "O-S", "G5", "Gaussian\nregression")
 CHANNELS = ("mu_x", "mu_y", "mu_z", "m", "v_s")
 UNITS = ("nT", "nT", "nT", "nT", "nT^2")
+# Platform and OMNI arrival date of the two fixed, caption-identified cases.
+CASE_LABELS = {120: "ACE \u00b7 3 August 2010", 360: "Wind \u00b7 4 August 2020"}
+DETAIL_LABELS = {120: "ACE \u00b7 3 Aug 2010", 360: "Wind \u00b7 4 Aug 2020"}
 SELECTION = {"rule": "midpoints_of_two_equal_ordered_TEST_partitions",
              "zero_based_indices": [120, 360], "original_window_count": 480,
              "neural_seed": 7, "displayed_draws": [0, 1, 2], "after_test_exposure": True}
@@ -203,7 +206,7 @@ def plot_case(data, case_index):
                     symbol = (r"$\mu_x$", r"$\mu_y$", r"$\mu_z$", "$m$", "$v_s$")[row]
                     unit = r"nT$^2$" if row == 4 else "nT"
                     ax.set_ylabel(f"{symbol} ({unit})", parse_math=True)
-        fig.suptitle(f"TEST window {case_index}", fontsize=8, y=0.988, parse_math=False)
+        fig.suptitle(CASE_LABELS[case_index], fontsize=8, y=0.988, parse_math=False)
         fig.supxlabel("Time from start of missing hour (min)", y=0.077, fontsize=8)
         handles = [Line2D([], [], color="black", lw=0.9, label="Available measurements"),
                    Line2D([], [], color="black", ls="--", lw=0.9, label="Withheld measurements"),
@@ -270,7 +273,7 @@ def plot_detail(data):
                 if row == 0:
                     ax.set_title(LABELS[col], pad=8)
                 if col == 0:
-                    ax.set_ylabel(f"TEST {case['case_index']}\n" + r"$v_s$ (nT$^2$)",
+                    ax.set_ylabel(DETAIL_LABELS[case['case_index']] + "\n" + r"$v_s$ (nT$^2$)",
                                   parse_math=True)
                 elif col == 3:
                     ax.yaxis.tick_right()
@@ -326,7 +329,7 @@ def main(argv=None):
                                            "sha256": args.excerpt_sha256},
                                "provenance": {"path": "evidence/imputation/MANIFEST.json",
                                               "sha256": args.provenance_sha256}},
-                    "cases": detail_coordinates(data), "y_scale": "linear",
+                    "cases": detail_coordinates(data), "case_labels": DETAIL_LABELS, "y_scale": "linear",
                     "limit_rule": "truth bins 16:32 and ranks 1,37; neural methods share limits, Gaussian separate; padding 8% of range, floor 1e-6",
                     "axis_sides": {"neural": "left", "gaussian": "right"},
                     "matplotlib_version": matplotlib.__version__, "output_sha256": {}}
@@ -357,6 +360,7 @@ def main(argv=None):
                            "provenance": {"path": "evidence/imputation/MANIFEST.json",
                                           "sha256": args.provenance_sha256}},
                 "case_index": args.case_index, "case_id": str(data["ids"][(120, 360).index(args.case_index)]),
+                "case_label": CASE_LABELS[args.case_index],
                 "channels": list(CHANNELS), "units": list(UNITS), "method_order": list(METHODS),
                 "selection": data["provenance"]["selection"],
                 "coordinates": _coordinates(data, args.case_index),

@@ -1,0 +1,151 @@
+{
+  "analysis": "checkpoint_reselection_existing_scores",
+  "fixed_selection": {
+    "mean": -0.002499072543790685,
+    "percentile_2_5_97_5": [
+      -0.03459878912303925,
+      0.02419667512246182
+    ],
+    "relative_percentile_2_5_97_5": [
+      -0.016765797382768767,
+      0.01404904603588694
+    ]
+  },
+  "helper_sha256": {
+    "prigm/config.py": "651d668e5a714579c8809b1e49c6a146f0c214b2996b2637bde4eed6fc9f5bff",
+    "prigm/scoring.py": "aee13eb5fe1a8e645de8c9f89d7ba776e9ddd6e135a6835010fb4ed2d1f49b53",
+    "prigm/select.py": "b50f8f8f08e795a35505954621122686e7e7830668ed14388d87f04149d89b9b"
+  },
+  "input": {
+    "path": "paper/workshops/prigm/evidence/followup/checkpoints/SUMMARY.json",
+    "sha256": "abbf1b9e629c3ae61dd99c4c78d59fa0a78d5807ef51b83067e165c0fb7dd4fa"
+  },
+  "limits": [
+    "No retraining or new model samples",
+    "No new-fit uncertainty",
+    "No nominal coverage claim under temporal dependence",
+    "Accepted fixed-selection intervals and historical evidence unchanged"
+  ],
+  "observed_TEST": {
+    "D": 1.8876865331291952,
+    "O-S": 1.8849013455702182,
+    "O-S_minus_D": -0.0027851875589770536
+  },
+  "original_choices": {
+    "D_s13": 9560,
+    "D_s42": 16252,
+    "D_s7": 9560,
+    "O-S_s13": 29636,
+    "O-S_s42": 16252,
+    "O-S_s7": 29636
+  },
+  "procedure": {
+    "ensemble_members": 39,
+    "generator": "PCG64",
+    "groups": [
+      "D_s7",
+      "D_s13",
+      "D_s42",
+      "O-S_s7",
+      "O-S_s13",
+      "O-S_s42"
+    ],
+    "pairing": "Identical year multiplicities for VAL and TEST, all groups, fixed and reselected comparisons",
+    "replicates": 10000,
+    "seed": 7003,
+    "selection": "VAL only; exact ties to earlier update; all three fits retained",
+    "test_evaluations": 50,
+    "updates": [
+      2868,
+      9560,
+      16252,
+      22944,
+      29636
+    ],
+    "validation_evaluations": 50,
+    "weighting": "Equal represented-month means; repeated year occurrences retain multiplicity",
+    "years": [
+      2005,
+      2006,
+      2007,
+      2008,
+      2009,
+      2010,
+      2011,
+      2012,
+      2013,
+      2014,
+      2015,
+      2016,
+      2017,
+      2018,
+      2019,
+      2020,
+      2021,
+      2022,
+      2023,
+      2024
+    ]
+  },
+  "reselected": {
+    "mean": -0.0037399769949526787,
+    "percentile_2_5_97_5": [
+      -0.03358456092846413,
+      0.024587705854803566
+    ],
+    "relative_percentile_2_5_97_5": [
+      -0.016290595887193126,
+      0.014115754896196814
+    ]
+  },
+  "schema_version": 1,
+  "scope": "Exploratory sensitivity conditional on existing fits, saved checkpoints and ensemble draws; previously exposed TEST period.",
+  "selection_counts": {
+    "D_s13": {
+      "16252": 0,
+      "22944": 0,
+      "2868": 0,
+      "29636": 0,
+      "9560": 10000
+    },
+    "D_s42": {
+      "16252": 10000,
+      "22944": 0,
+      "2868": 0,
+      "29636": 0,
+      "9560": 0
+    },
+    "D_s7": {
+      "16252": 0,
+      "22944": 0,
+      "2868": 0,
+      "29636": 2832,
+      "9560": 7168
+    },
+    "O-S_s13": {
+      "16252": 0,
+      "22944": 2397,
+      "2868": 0,
+      "29636": 7592,
+      "9560": 11
+    },
+    "O-S_s42": {
+      "16252": 10000,
+      "22944": 0,
+      "2868": 0,
+      "29636": 0,
+      "9560": 0
+    },
+    "O-S_s7": {
+      "16252": 82,
+      "22944": 19,
+      "2868": 0,
+      "29636": 9799,
+      "9560": 100
+    }
+  },
+  "source": {
+    "path": "scripts/analyze_prigm_checkpoint_reselection.py",
+    "sha256": "45c629ad28bf24001c305e1e4a2a2b9db9072af49ab36c684e1757359090d2fa"
+  }
+}

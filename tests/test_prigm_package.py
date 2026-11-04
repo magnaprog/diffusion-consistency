@@ -542,7 +542,7 @@ def test_calibration_figure_numeric_manifest(calibration, tmp_path, capsys, keys
     assert_nothing(output)
 
 
-@pytest.mark.parametrize("label", ["fig:calibration", "fig:checkpoints", "app:checkpoints",
+@pytest.mark.parametrize("label", ["fig:calibration", "fig:checkpoints", "app:checkpoints", "fig:overview",
                                   r"\includegraphics{figures/calibration/fig_calibration.pdf}"])
 def test_followup_claims_require_the_new_evidence_group(paper, tmp_path, label):
     source = paper / "main.tex"
@@ -693,6 +693,142 @@ def test_checkpoint_curves_allow_reduction_roundoff(calibration, tmp_path):
     assert run(calibration, tmp_path / "roundoff.zip") == 0
 
 
+@pytest.fixture
+def overview(calibration):
+    """Asymmetric synthetic scores expose swapped policies, seeds and signs."""
+    root = calibration
+    prefix = root / "evidence/followup/checkpoints"
+    summary = json.loads((prefix / "SUMMARY.json").read_text())
+    scores = {"D": [[5., 2.], [6., 3.], [7., 4.]],
+              "O-S": [[4., 2.5], [7., 2.5], [5., 4.25]]}
+    for arm, rows in scores.items():
+        for seed, (final, selected) in zip((7, 13, 42), rows):
+            summary["curves"]["TEST"][f"{arm}_s{seed}"] = [4., 3., selected, 3., final]
+    save_json(prefix / "SUMMARY.json", summary)
+    provenance = json.loads((prefix / "MANIFEST.json").read_text())
+    provenance["files"]["SUMMARY.json"] = sha((prefix / "SUMMARY.json").read_bytes())
+    save_json(prefix / "MANIFEST.json", provenance)
+    checkpoint_path = root / "figures/checkpoints/fig_checkpoints.manifest.json"
+    checkpoint = json.loads(checkpoint_path.read_text())
+    checkpoint["curves"]["TEST50"] = summary["curves"]["TEST"]
+    for name in ("SUMMARY.json", "MANIFEST.json"):
+        checkpoint["inputs"][name]["sha256"] = sha((prefix / name).read_bytes())
+    save_json(checkpoint_path, checkpoint)
+    figure(root, "overview", "evidence/followup/checkpoints/SUMMARY.json")
+    path = root / "figures/overview/fig_overview.manifest.json"
+    manifest = json.loads(path.read_text())
+    calibration_path = root / "evidence/followup/calibration/summary.json"
+    tails = json.loads(calibration_path.read_text())
+    inputs = {name: "evidence/followup/checkpoints/" + name for name in packager.CHECKPOINT_FILES}
+    inputs["calibration"] = "evidence/followup/calibration/summary.json"
+    methods = ["D", "O-S", "G5", "full_flank_gaussian"]
+    manifest.update({
+        "inputs": {key: {"path": name, "sha256": sha((root / name).read_bytes())}
+                   for key, name in inputs.items()},
+        "dependency_sources": {key: {"path": name, "sha256": sha((root / name).read_bytes())}
+                               for key, name in (("checkpoints", "fig_checkpoints.py"),
+                                                 ("calibration", "fig_calibration.py"))},
+        "protocol_sha256": provenance["source_protocol_sha256"],
+        "scope_sha256": provenance["source_scope_sha256"],
+        "calibration_provenance": {key: tails[key] for key in ("bootstrap", "per_window_sha256")},
+        "channels": tails["channels"], "method_order": methods,
+        "interval_order_statistics": [2, 38], "n_draws": 39, "n_windows": 480,
+        "coverage_reference": {"percent": 90}, "pointwise_intervals_plotted": False,
+        "panel_a": {"policy_order": ["F", "P25"], "x": [0, 1], "seeds": [7, 13, 42],
+                    "score_by_arm": scores, "seedwise": [[-1., .5], [1., -.5], [-2., .25]],
+                    "mean": [-2/3, 1/12], "policies": summary["policies"],
+                    "validation_choices_agree": True}, "panel_b": {}})
+    for index, method in enumerate(methods):
+        row = tails["methods"][method]
+        positions = np.arange(5) + (index - 1.5) * .15
+        manifest["panel_b"][method] = {
+            "fixed_model_seeds": row["fixed_model_seeds"], "mean_percent": [50.] * 5,
+            "model_means_percent": [[50.] * 5 for _ in row["fixed_model_seeds"]],
+            "y": positions.tolist(),
+            "individual_y": [(positions + (s - 1) * .028).tolist() for s in range(3)]
+                            if method != "full_flank_gaussian" else []}
+    save_json(path, manifest)
+    tex = root / "main.tex"
+    tex.write_text(tex.read_text().replace(r"\end{document}",
+                   r"\includegraphics{figures/overview/fig_overview.pdf}\end{document}"))
+    return root
+
+
+@pytest.mark.parametrize("suffix", [".zip", ".tar.gz"])
+def test_overview_roundtrip_preserves_existing_figures(overview, tmp_path, suffix):
+    files, _, _ = packager.collect(overview)
+    output = tmp_path / ("overview" + suffix)
+    assert run(overview, output) == 0
+    members = read_archive(output)
+    assert all(members[name] == payload for name, payload in files.items())
+    assert {packager.OVERVIEW_FIGURE, packager.CHECKPOINT_FIGURE,
+            packager.CALIBRATION_FIGURE, "figures/hmm/fig_hmm.pdf"} <= members.keys()
+
+
+@pytest.mark.parametrize("keys,value", [
+    (["dependency_sources", "checkpoints", "sha256"], "0" * 64),
+    (["dependency_sources", "calibration", "path"], "fig_checkpoints.py"),
+    (["inputs", "calibration", "path"], "evidence/followup/checkpoints/SUMMARY.json"),
+    (["panel_a", "policy_order"], ["P25", "F"]),
+    (["panel_a", "seeds"], [42, 13, 7]),
+    (["panel_a", "validation_choices_agree"], 1),
+    (["panel_a", "score_by_arm", "D", 0, 0], 5.1),
+    (["panel_a", "seedwise", 0, 0], 1.),
+    (["panel_a", "mean", 1], .1),
+    (["panel_a", "mean", 0], "-0.6666666666666666"),
+    (["panel_a", "x"], [1, 0]),
+    (["channels"], ["mu_x", "mu_y", "mu_z", "v_s", "m"]),
+    (["panel_b", "D", "mean_percent", 0], .5),
+    (["panel_b", "D", "model_means_percent", 1, 4], 51.),
+    (["panel_b", "D", "y", 0], 1.),
+    (["panel_b", "full_flank_gaussian", "individual_y"], [[0, 1, 2, 3, 4]]),
+    (["interval_order_statistics"], [1, 39]),
+])
+def test_overview_figure_bindings_reject_mutations(overview, tmp_path, keys, value):
+    path = overview / "figures/overview/fig_overview.manifest.json"
+    record = json.loads(path.read_text())
+    target = record
+    for key in keys[:-1]:
+        target = target[key]
+    target[keys[-1]] = value
+    save_json(path, record)
+    output = tmp_path / "bad-overview.zip"
+    assert run(overview, output) == 1
+    assert_nothing(output)
+
+
+@pytest.mark.parametrize("damage", [None, "schema", "analysis", "source_path", "source_hash",
+                                     "input_path", "input_hash", "helper_hash", "extra_helper"])
+def test_checkpoint_reselection_has_separate_bound_payload(calibration, tmp_path, damage):
+    before, _, _ = packager.collect(calibration)
+    # Real result structure; only its input hash is adapted to the synthetic paper.
+    record = json.loads((packager.DEFAULT_PAPER / packager.RESELECTION_RESULT).read_text())
+    record["input"]["sha256"] = sha(before["evidence/followup/checkpoints/SUMMARY.json"])
+    if damage == "schema":
+        record["schema_version"] = True
+    elif damage == "analysis":
+        record["analysis"] = "different_analysis"
+    elif damage in ("source_path", "input_path"):
+        record[damage.split("_")[0]]["path"] = "wrong.json"
+    elif damage in ("source_hash", "input_hash"):
+        record[damage.split("_")[0]]["sha256"] = "0" * 64
+    elif damage == "helper_hash":
+        record["helper_sha256"]["prigm/select.py"] = "0" * 64
+    elif damage == "extra_helper":
+        record["helper_sha256"]["prigm/model.py"] = "0" * 64
+    path = calibration / packager.RESELECTION_RESULT
+    save_json(path, record)
+    output = tmp_path / "reselection.zip"
+    if damage:
+        assert run(calibration, output) == 1
+        assert_nothing(output)
+    else:
+        assert run(calibration, output) == 0
+        members = read_archive(output)
+        assert members[packager.RESELECTION_RESULT] == path.read_bytes()
+        assert all(members[name] == payload for name, payload in before.items())
+
+
 def read_archive(output):
     if output.suffix == ".zip":
         with zipfile.ZipFile(output) as archive:
@@ -773,6 +909,114 @@ def test_camera_ready_bundle_preserves_author_and_license(paper, tmp_path, suffi
     assert members["LICENSE"] == (REPO / "LICENSE").read_bytes()
     with pytest.raises(ValueError, match="author/path leak"):
         packager.scan_text(packager.EMAIL_CAMERA_READY, "evidence/record.json", camera_ready=True)
+
+
+@pytest.mark.parametrize("camera_ready", [False, True])
+@pytest.mark.parametrize("suffix", [".zip", ".tar.gz"])
+def test_bibliographic_authors_require_camera_ready_and_preserve_bytes(paper, tmp_path, camera_ready, suffix):
+    source = paper / "main.tex"
+    tex = source.read_text().replace(r"\citep{public}", r"\citep{public,lee2026pisces}")
+    source.write_text(camera_ready_source(tex) if camera_ready else tex)
+    bib = paper / "references.bib"
+    bib.write_text(bib.read_text() + "@misc{lee2026pisces,\n"
+                   "  title={{PISCES}: Physics-Informed Solar-wind Convolutional autoEncoder},\n"
+                   "  author={Lee, Kevin and March, Alison J.},\n"
+                   "  year={2026}, eprint={2609.28022}\n}\n")
+    output = tmp_path / ("bibliographic-authors" + suffix)
+    if camera_ready:
+        assert run(paper, output) == 0
+        assert read_archive(output)["references.bib"] == bib.read_bytes()
+    else:
+        assert run(paper, output) == 1
+        assert_nothing(output)
+
+
+@pytest.mark.parametrize("field", [
+    "author={Kevin Lee and Alison March}",
+    'AUTHOR = "March, Alison J. and Lee, Kevin"',
+    "author={O’Neill, Alison and Lee, Kevin}",
+])
+def test_bibliographic_author_role_is_not_a_citation_allowlist(field):
+    text = "@article{unrelated2020, title={A different study}, " + field + ", year=2020}\n"
+    packager.scan_text(text, "references.bib", camera_ready=True)
+    for name, camera_ready in (("references.bib", False), ("main.tex", True),
+                               ("evidence/record.json", True), ("fig_hmm.py", True)):
+        with pytest.raises(ValueError, match="author/path leak"):
+            packager.scan_text(text, name, camera_ready=camera_ready)
+
+
+@pytest.mark.parametrize("other", [
+    "note={Alison}", "editor={Alison March}", "title={Kevin Lee}",
+    "pdfauthor={Alison March}", "url={https://example.org/Alison}",
+    "note={author={Alison March}}", 'note="author={Alison March}"',
+    "note={\n@article{pretend, author={Alison March}, title={Other}}\n}",
+])
+def test_bibliographic_author_does_not_hide_a_second_identity_field(other):
+    text = "@article{public, author={Alison March}, " + other + "}\n"
+    with pytest.raises(ValueError, match="author/path leak"):
+        packager.scan_text(text, "references.bib", camera_ready=True)
+
+
+@pytest.mark.parametrize("text", [
+    r"@misc{example, title={\{Text}, author={Alison}, note={Text\}}, year=2026}",
+    r'@misc{example, title="\{Text", author={Alison}, note="Text\}", year=2026}',
+])
+def test_bibliographic_escaped_delimiters_do_not_create_author_fields(text):
+    # BibTeX puts the apparent author field inside the title in both entries.
+    text += "\n@article{valid, author={Alison March}, title={A study}}\n"
+    with pytest.raises(ValueError, match="author/path leak"):
+        packager.scan_text(text, "references.bib", camera_ready=True)
+
+
+@pytest.mark.parametrize("text", [
+    "% @article{commented, author={Alison March}}\n",
+    "@comment{public, author={Alison March}}\n",
+    '@preamble{"Alison March"}\n', '@string{person="Alison March"}\n',
+    "Alison March\n", "@article{bad, author={Alison March}\n",
+    "@article{bad, author={Alison} # {March}}\n",
+    "@article{bad, author=Alison}\n",
+    "@article{bad, author={Alison}, author={Jane Doe}}\n",
+    r"@article{bad, author={Alison \author{Other}}}",
+    r"@article{bad, author={Alison \hypersetup{pdfauthor={Other}}}}",
+    "@article{bad, author={{Alison} March}}\n",
+])
+def test_bibliographic_role_refuses_comments_commands_and_ambiguous_fields(text):
+    text += "\n@article{valid, author={Alison March}, title={A study}}\n"
+    with pytest.raises(ValueError, match="author/path leak"):
+        packager.scan_text(text, "references.bib", camera_ready=True)
+
+
+@pytest.mark.parametrize("leak", [
+    "person@example.edu", packager.EMAIL_CAMERA_READY, "/home/private/run", "/tmp/run",
+    "/Users/private/run", r"C:\Users\private\run", "magnaprog", "skykev1928",
+    packager.PUBLIC_COMPANION_URL,
+])
+def test_bibliographic_author_fields_keep_email_and_private_path_checks(leak):
+    text = "@article{public, author={Alison March and " + leak + "}, title={A study}}\n"
+    with pytest.raises(ValueError, match="author/path leak"):
+        packager.scan_text(text, "references.bib", camera_ready=True)
+
+
+@pytest.mark.parametrize("location", ["byline", "metadata", "body", "evidence", "generator"])
+def test_camera_ready_citation_does_not_exempt_other_identity_roles(paper, tmp_path, location):
+    source = paper / "main.tex"
+    tex = camera_ready_source(source.read_text())
+    if location == "byline":
+        tex = tex.replace(r"\author{Kevin Lee", r"\author{Kevin Lee and Alison March")
+    elif location == "metadata":
+        tex = tex.replace("pdfauthor={Kevin Lee}", "pdfauthor={Kevin Lee and Alison March}")
+    elif location == "body":
+        tex += "\nAlison March\n"
+    elif location == "evidence":
+        save_json(paper / "evidence/toy/oracle-stationary-01.json", {"author": "Alison March"})
+    else:
+        (paper / "fig_hmm.py").write_text("# Alison March\n")
+    source.write_text(tex)
+    bib = paper / "references.bib"
+    bib.write_text(bib.read_text().replace("Lee, Jane and March, John", "Lee, Kevin and March, Alison J."))
+    output = tmp_path / "other-identity.zip"
+    assert run(paper, output) == 1
+    assert_nothing(output)
 
 
 def test_license_changes_during_verification_refuse_publication(paper, tmp_path, monkeypatch):

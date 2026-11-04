@@ -47,7 +47,7 @@ def test_unreviewed_figure_set_requires_explicit_update(source_files, change):
         second = list(arxiv.FIGURES)[1]
         text = text.replace(old, "TEMP").replace(second, old).replace("TEMP", second)
     source_files["main.tex"] = text.encode()
-    with pytest.raises(ValueError, match="eight reviewed figures"):
+    with pytest.raises(ValueError, match="nine reviewed figures"):
         arxiv.prepare_source(source_files)
 
 

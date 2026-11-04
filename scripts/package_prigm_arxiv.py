@@ -1,7 +1,7 @@
 """Build a minimal arXiv ZIP and verify it against the workshop PDF.
 
 The upload contains only TeX, bibliography files, the required vendor style,
-and the eight figures. A fresh output directory holds the ZIP, its source
+and the nine figures. A fresh output directory holds the ZIP, its source
 folder, a preview PDF, and separate verification records. Nothing is submitted.
 """
 from __future__ import annotations
@@ -25,14 +25,15 @@ sys.path.insert(0, str(REPO))
 from scripts import package_prigm_paper as paper_package
 
 FIGURES = {
-    "figures/operator/fig_operator.pdf": "figures/figure_01_clipping.pdf",
+    "figures/overview/fig_overview.pdf": "figures/figure_01_overview.pdf",
     "figures/checkpoints/fig_checkpoints.pdf": "figures/figure_02_checkpoint_selection.pdf",
     "figures/hmm/fig_hmm.pdf": "figures/figure_03_exact_denoiser.pdf",
     "figures/calibration/fig_calibration.pdf": "figures/figure_04_scores_and_coverage.pdf",
-    "figures/fixed_final/fig_fixed_final.pdf": "figures/figure_05_penalty_strength.pdf",
-    "figures/imputation/case_120/fig_imputation.pdf": "figures/figure_06_imputation_window_120.pdf",
-    "figures/imputation/case_360/fig_imputation.pdf": "figures/figure_07_imputation_window_360.pdf",
-    "figures/imputation/detail/fig_imputation.pdf": "figures/figure_08_variance_predictions.pdf",
+    "figures/operator/fig_operator.pdf": "figures/figure_05_clipping.pdf",
+    "figures/fixed_final/fig_fixed_final.pdf": "figures/figure_06_penalty_strength.pdf",
+    "figures/imputation/case_120/fig_imputation.pdf": "figures/figure_07_imputation_window_120.pdf",
+    "figures/imputation/case_360/fig_imputation.pdf": "figures/figure_08_imputation_window_360.pdf",
+    "figures/imputation/detail/fig_imputation.pdf": "figures/figure_09_variance_predictions.pdf",
 }
 GRAPHIC = re.compile(r"(\\includegraphics\s*\[[^\]]*\]\s*\{)([^{}]+)(\})")
 ZIP_NAME = "residual_penalties_algebraic_completion_arxiv.zip"
@@ -44,11 +45,11 @@ def sha(data):
 
 
 def prepare_source(files):
-    """Rename exactly the eight figure references, preserving all other bytes."""
+    """Rename exactly the nine figure references, preserving all other bytes."""
     source = files["main.tex"].decode("utf-8")
     matches = list(GRAPHIC.finditer(source))
     if [m[2] for m in matches] != list(FIGURES):
-        raise ValueError("figure references differ from the eight reviewed figures")
+        raise ValueError("figure references differ from the nine reviewed figures")
     rewritten = GRAPHIC.sub(lambda m: m[1] + FIGURES[m[2]] + m[3], source)
     inverse = {v: k for k, v in FIGURES.items()}
     if GRAPHIC.sub(lambda m: m[1] + inverse[m[2]] + m[3], rewritten) != source:

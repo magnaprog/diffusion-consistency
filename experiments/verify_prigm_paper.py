@@ -53,7 +53,7 @@ MILESTONES = [2868, 9560, 16252, 22944, 29636]
 FORBIDDEN_EVIDENCE = ("PISCES", "magnaprog", "Kevin Lee", "kevinlee", "skykev1928",
                       "Alison March", "colorado.edu", "ucla.edu", "Jet Propulsion", "orcid")
 FORBIDDEN_ANONYMOUS = FORBIDDEN_EVIDENCE
-FORBIDDEN_CAMERA_READY = ("PISCES", "magnaprog", "skykev1928", "Alison March", "colorado.edu")
+FORBIDDEN_CAMERA_READY = ("magnaprog", "skykev1928", "Alison March", "colorado.edu")
 FORBIDDEN = FORBIDDEN_ANONYMOUS  # default for evidence helpers
 AUTHOR_CAMERA_READY = "Kevin Lee"
 ORCID_CAMERA_READY = "0009-0004-0388-9260"
@@ -1352,13 +1352,13 @@ def toy_claims(tex, rendered, evidence):
     require(gap > 0 and all(abs(means[f"ddim_{n}"] - means["exact_reference"]) < gap for n in (25, 50, 100)),
             "toy sampler comparison directions changed")
     source = tex[:tex.index("\\bibliography{")]
-    paragraphs = [p for p in re.split(r"\n\s*\n", source) if "An exact denoiser isolates error" in p]
+    paragraphs = [p for p in re.split(r"\n\s*\n", source) if "The hidden Markov example examines sampling" in p]
     require(len(paragraphs) == 1, "missing unique main-text toy diagnostic paragraph")
     main_rendered = re.split(r"(?m)^[ \t]*References[ \t]*$", pdf_without_line_numbers(rendered))[0]
-    # A page-top operator figure can separate "while" from the evaluation
+    # A page-top operator figure can separate "with" from the evaluation
     # counts. Rejoin only that page break and its source-matching figure caption.
     interrupted = list(re.finditer(
-        r"while\s+\d+\s*\f(?P<figure>[\s\S]*?)\n[ \t]*(?=25,\s*50,\s*or\s*100 DDIM evaluations approach)",
+        r"with\s+\d+\s*\f(?P<figure>[\s\S]*?)\n[ \t]*(?=[^\s]+,\s*[^\s]+,\s*or\s*[^\s]+)",
         main_rendered))
     if interrupted:
         require(len(interrupted) == 1, "ambiguous float in toy comparison")
@@ -1374,18 +1374,18 @@ def toy_claims(tex, rendered, evidence):
         require(re.fullmatch(clause_pattern(prose_text(caption, source=True)),
                              prose_text(match["figure"][captions[0].end():]).replace("±", "+-")) is not None,
                 "toy interruption caption differs")
-        main_rendered = main_rendered[:match.start()] + "while " + main_rendered[match.end():]
+        main_rendered = main_rendered[:match.start()] + "with " + main_rendered[match.end():]
     mantissa, exponent = f"{context['mean_abs_r_star']:.2e}".split("e")
     residual = mantissa + r"\times10^{" + str(int(exponent)) + "}"
     clauses = (
-        (r"Across [^\s]+ replicate contexts", "Across 36 replicate contexts at $t=100$, two evaluations give mean absolute $R_{\\mathrm{obs}}="
-         + residual + f"$ in HMM units, yet energy score {context['mean_es_vs_ref']:.3f} versus "
-         + f"{context['mean_reference_self_energy_mc']:.3f} for independent exact conditional samples."),
-        ("On a separate set", "On a separate set of 288 windows, two evaluations again give a poor score, while 25, 50, or 100 DDIM evaluations approach the exact conditional ensemble"),
-        ("These estimates", "These estimates have finite sampling error."),
+        (r"Across [^\s]+ cases", "Across 36 cases at $t=100$, two evaluations give estimates with mean absolute $R_{\\mathrm{obs}}="
+         + residual + f"$ in HMM units, but energy score {context['mean_es_vs_ref']:.3f} versus "
+         + f"{context['mean_reference_self_energy_mc']:.3f} for independent conditional samples."),
+        ("Separately, DDIM sampling on", "Separately, DDIM sampling on 288 windows gives a poor score with two evaluations and scores close to the conditional reference with 25, 50, or 100"),
+        ("All scores have", "All scores have finite sampling error."),
     )
     for anchor, expected in clauses:
-        bind_clause((paragraphs[0], main_rendered), anchor.lower(), expected)
+        bind_clause((source, main_rendered), anchor.lower(), expected)
 
 
 def original_payload(paper_dir, directory, filename, source, protocol_hash):
@@ -1750,7 +1750,7 @@ def prose_text(text, *, source=False):
             if re.fullmatch(r"[ \t]*2[ \t]*", line):
                 column, below = line.index("2"), lines[i + 1]
                 bases = [m for m in re.finditer(r"\bBref\b", below)
-                         if 0 <= column - m.end() <= 8 and not below[m.end():column].strip()]
+                         if m.start() <= column <= m.end() + 8 and not below[m.end():column].strip()]
                 if len(bases) == 1:
                     end = bases[0].end()
                     lines[i], lines[i + 1] = "", below[:end] + "2" + below[end:]
@@ -1819,7 +1819,10 @@ def deadline_claims(tex, rendered, real, evidence):
             f"{row['negative_delta_dispersion']:.5f}", f"{row['delta_energy']:.5f}"]
     bind_table(tex, rendered, "tab:operators", expected, ("Procedure",))
     def bind(anchor, expected_clause):
-        bind_clause((tex, rendered), clause_pattern(prose_text(anchor, source=True)), expected_clause)
+        pattern = clause_pattern(prose_text(anchor, source=True))
+        if anchor == "The marginal":
+            pattern = r"(?:^|(?<=\. ))" + pattern
+        bind_clause((tex, rendered), pattern, expected_clause)
     selection = evidence["D_selection"]
     table_labels = re.findall(r"\\label\{(tab:[^}]+)\}", strip_comments(tex))
     require(table_labels.count("tab:operators") == 1, "D clipping comparison requires operator table")
@@ -1830,25 +1833,26 @@ def deadline_claims(tex, rendered, real, evidence):
     bind("Choosing the model independently", f"Choosing the model independently on VAL after clipping adds a further change of ${selection['selection_effect']:.5f}$; seed~7 is the only run for which the chosen training step changes.")
     for anchor, expected_clause in (
         ("For each window, the percentile", "For each window, the percentile is calculated across its samples and hidden bins. These window percentiles are averaged within each month, then across months and seeds. Taking one percentile across all windows would be a different calculation."),
-        ("The construction specifies", "The construction specifies a feasible adjustment, without a claim of minimum displacement."),
-        ("Compared with Gaussian interpolation, regression", "Compared with Gaussian interpolation, regression uses more available measurements, a different conditional mean fit and a different finite noise realization. Its score difference compares procedures that differ in all three respects."),
-        ("These marginal", "These marginal 95\\% intervals measure temporal variation conditional on the three existing diffusion fits and one Gaussian ensemble. They use the original 10{,}000 temporal resamples, with the same years in both methods of each contrast. Variation from new fits, resampling seeds or repeating validation selection is outside these intervals. This later comparison uses a TEST period that had already been examined."),
+        ("This sequential construction", "This sequential construction can move samples farther than a nearest-point projection."),
+        ("Gaussian regression changes", "Gaussian regression changes three parts of the interpolation baseline: the available measurements used as input, the fit of the conditional mean, and the finite realization of the sampling noise. Its score difference measures their combined effect."),
+        ("The marginal", "The marginal 95\\% intervals use the original 10{,}000 temporal resamples, with the same years for both methods in each comparison. They measure variation across the test years while retaining the three diffusion fits, the Gaussian ensemble and the validation choices. Repeating training, noise generation or validation choice would introduce further variation. This analysis uses a test period examined during earlier development."),
     ):
         bind(anchor, expected_clause)
     plotted = {row["method"]: row for row in evidence["plotted_rows"]}
     require(plotted["G5"]["movement"] > 0
             and plotted["gaussian"]["negative_delta_dispersion"] > -plotted["gaussian"]["delta_target"] > 0,
             "clipping displacement and spread directions changed")
-    bind("G5's samples move", "G5's samples move, yet their mean energy score changes little.")
-    bind("For Gaussian interpolation, clipping", "For Gaussian interpolation, clipping brings samples closer to the withheld measurements but reduces the spread term by more, increasing the score.")
+    bind("It moves G5's samples", "It moves G5's samples with little change in their mean energy score.")
+    bind("For Gaussian interpolation, it", "For Gaussian interpolation, it brings samples closer to the withheld measurements, but the subtracted spread term falls by more, increasing the score.")
     # Tables retain the numerical results omitted from the conceptual abstract.
     difference = real[0]["arm_means"]["D_raw"] - real[0]["arm_means"]["O-S_raw"]
     require(difference > 0, "selected penalty improvement direction changed")
-    bind("This study compares", "This study compares a residual penalty during diffusion training, algebraic completion of one variable, and clipping of samples to satisfy the moment constraints.")
-    bind("The penalty's benefit", "The penalty's benefit depends on the stage of training: choosing models by validation largely removes the mean improvement seen at the final update.")
+    bind("Conditional diffusion experiments", "Conditional diffusion experiments examine how enforcing this relation affects predictive accuracy.")
+    bind("Here, a penalty", "Here, a penalty changes training, generating fewer coordinates changes the representation, and clipping transforms existing samples.")
+    bind("A residual penalty", "A residual penalty improves the energy score at the end of training, but most of its mean advantage disappears after validation chooses the model.")
     require(real[1]['methods']['G5_raw']['metrics']['cov90_mean']['month_balanced'] < .9,
             "G5 coverage no longer falls below nominal")
-    bind("The model that generates", "The model that generates fewer variables has the lowest mean energy score, though its prediction intervals cover too few measurements and its training objective also changes.")
+    bind("Generating fewer statistics", "Generating fewer statistics and computing the remaining quantity algebraically gives the lowest mean score, with changes to both the representation and training loss. Its prediction intervals still miss too many measurements.")
     g5, boundary = (operator["methods"][name]["metrics"] for name in ("G5", "gaussian"))
     data_only = operator["methods"]["D"]["metrics"]
     target_reduction = data_only["raw_target_term"]["month_balanced"] - g5["raw_target_term"]["month_balanced"]
@@ -1863,10 +1867,12 @@ def deadline_claims(tex, rendered, real, evidence):
                 clause_pattern("G5's mean score improvement"),
                 "G5's mean score improvement over D is largely accounted for by its larger spread term. Its mean distance to the withheld measurements is also slightly smaller. "
                 f"Figure~{number}(a) separates these contributions using the checkpoints that minimize raw validation score, the same 60 standardized coordinates, and equal month and seed weights.")
-    bind("For G5, the 90th percentile", "For G5, the 90th percentile of $\\max(r-m,0)/B_{\\mathrm{ref}}$ is calculated within each window and averages to "
-         f"{g5['raw_m_minus_r_severity_quantiles']['month_balanced'][2]:.5f}, compared with "
+    bind("Before any allowance for rounding", "Before any allowance for rounding, $\\max(r-m,0)/B_{\\mathrm{ref}}$ measures the dimensionless shortfall in mean magnitude.")
+    bind_clause((tex, rendered), clause_pattern("Its") + r"\s+[^\s]+\s+" + clause_pattern("percentile within each window"),
+         "Its 90th percentile within each window averages to "
+         f"{g5['raw_m_minus_r_severity_quantiles']['month_balanced'][2]:.5f} for G5 and "
          f"{boundary['raw_m_minus_r_severity_quantiles']['month_balanced'][2]:.5f} for Gaussian interpolation.")
-    bind("For $\\max(-v_s,0)", "For $\\max(-v_s,0)/B_{\\mathrm{ref}}^2$, the corresponding values are "
+    bind("For negative scalar variance", "For negative scalar variance, the corresponding quantity is $\\max(-v_s,0)/B_{\\mathrm{ref}}^2$, with averages of "
          f"{g5['raw_vs_severity_quantiles']['month_balanced'][2]:.6f} and {boundary['raw_vs_severity_quantiles']['month_balanced'][2]:.6f}.")
     bind("Clipping changes D's score", f"Clipping changes D's score by ${selection['fixed_checkpoint_correction']:.4f}$; choosing another checkpoint adds ${selection['selection_effect']:.4f}$.")
     metrics = gaussian["metrics"]
@@ -1916,9 +1922,9 @@ def deadline_claims(tex, rendered, real, evidence):
     number = table_labels.index("tab:calibration") + 1
     # Locate every copy without assuming a valid numeric token; the full clause checks the table number.
     bind_clause((tex.replace(r"\ref{tab:calibration}", str(number)), rendered),
-                clause_pattern("in table") + r"\s+[^,\s]+\s*,\s*" + clause_pattern("O-S falls farther"),
-                f"In Table~{number}, O-S falls farther below nominal 90\\% coverage by {difference:.1f} percentage points, "
-                "exceeding the prespecified threshold of two percentage points.")
+                clause_pattern("O-S falls"),
+                f"O-S falls farther below 90\\% coverage than D by {difference:.1f} percentage points, "
+                f"exceeding the prespecified threshold of two percentage points (Table~{number}).")
     fixed = evidence["fixed_final"]
     if fixed is not None:
         expected = {}
@@ -1935,11 +1941,15 @@ def deadline_claims(tex, rendered, real, evidence):
         bind_table(tex, rendered, "tab:fixedfinal", expected, ("Coefficient / seed",))
         require(np.all(np.asarray(means["0.0005"]["raw"]) < means["0"]["raw"]), "final original-coefficient seed signs changed")
         bind("At the original coefficient, O-S", "At the original coefficient, O-S has a lower energy score than D at the end of all three training runs.")
-        bind("At the final update, O-S", "At the final update, O-S with the original coefficient has a lower raw score than D for all three seeds.")
-        bind("These exploratory results show", "These exploratory results show that the D/O-S comparison depends on the stage of training evaluated; its persistence across additional fits is untested.")
-        bind("The training step for this comparison", "The training step for this comparison was specified in advance, and all twelve fits are included. Their TEST scores serve to compare the coefficients, without choosing a coefficient or an earlier model state from those scores.")
-        bind("The residual term adds", "The residual term adds denoiser evaluations and hence computational cost at equal update counts.")
-        bind("The comparison is exploratory:", "The comparison is exploratory: equal update counts can involve different amounts of computation, and differences in score may reflect convergence or overfitting.")
+        bind("At the final update, O-S", "At the final update, O-S with the original coefficient has a lower raw energy score than D for all three seeds.")
+        bind("The comparison consequently", "The comparison consequently depends on which stage of training supplies the predictions.")
+        bind_clause((tex, rendered), clause_pattern("These") + r"\s+[^\s]+\s+" + clause_pattern("runs"),
+                    "These three runs establish that dependence in the present experiment.")
+        bind("The final training step", "The final training step was specified before this comparison, and all twelve fits are included. These TEST scores serve only to compare the coefficient settings at that stage.")
+        bind_clause((tex, rendered), clause_pattern("All") + r"\s+[^\s]+\s+" + clause_pattern("coefficient/seed combinations"),
+                    "All twelve coefficient/seed combinations are shown at the common final update, without selecting a coefficient or checkpoint from these TEST scores.")
+        bind("The penalty adds", "The penalty adds denoiser evaluations and computational cost.")
+        bind("Equal update counts", "Equal update counts can involve different amounts of computation, and score differences can reflect convergence or overfitting.")
         residuals = [float(np.mean([row["results"]["raw"]["summary"]["r_obs_mean"]["month_balanced"]
                                    for row in fixed["rows"] if row["id"].startswith("c" + coefficient + "_s")]))
                      for coefficient in FIXED_COEFFICIENTS]
@@ -1948,8 +1958,8 @@ def deadline_claims(tex, rendered, real, evidence):
                 and energies[-1] > energies[-2] and np.argmin(energies) == 2, "fixed-final mean trends changed")
         fixed_number = figure_labels.index("fig:fixedfinal") + 1
         bind_clause((tex.replace(r"\ref{fig:fixedfinal}", str(fixed_number)), rendered),
-                    clause_pattern("Increasing the penalty lowers"),
-                    f"Increasing the penalty lowers the mean absolute residual in Figure~{fixed_number}, but the mean energy score first falls and then rises.")
+                    clause_pattern("A stronger penalty"),
+                    f"A stronger penalty reduces the mean absolute residual, but its effect on predictive accuracy changes with its strength (Figure~{fixed_number}). The mean energy score first falls and then rises.")
         bind("The strongest penalty gives", "The strongest penalty gives the smallest residual; the original coefficient gives the lowest mean score.")
         signs = np.asarray(means["0.005"]["raw"]) - means["0"]["raw"]
         require(np.all(signs[:2] > 0) and signs[2] < 0, "largest-coefficient seed directions changed")
@@ -1977,7 +1987,7 @@ def learned_toy_claims(tex, rendered, evidence):
     cap_scopes = (caption, pdf_caption)
     bind_clause(cap_scopes, r"[^\s]+ diffusion fits", "Nine diffusion fits to the stationary hidden Markov model after 5{,}000 optimizer updates at seed 7.")
     for anchor, expected in (
-        ("Evaluation uses", "Evaluation uses 288 windows and 39 samples per window; clipping retains the model state and samples."),
+        ("Evaluation uses", "Evaluation uses 288 windows and 39 samples per window; clipping acts on these same ensembles."),
         (r"Raw \|R\|", "Raw $|R|$ is the mean absolute residual of the observation identity in HMM units."),
         ("The inequality column", "The inequality column gives the percentage of generated bins that fail a moment inequality beyond rounding tolerance, separately from the equality residual."),
         ("Coverage averages", "Coverage averages the five primary coordinates and twelve positions."),
@@ -2075,11 +2085,13 @@ def residual_weight_claims(paper_dir, tex, rendered):
 def cancellation_claims(tex, rendered, record):
     """Bind published TRAIN cutoffs and validated TEST reductions, not a TRAIN refit."""
     scopes = claim_subsection(tex, rendered, "Directional cancellation with thresholds from TRAIN")
-    # A page-top annual table can interrupt the seed-sign sentence. Rejoin only
+    # A page-top annual table can interrupt the seed or training-count sentence. Rejoin only
     # its complete source-matching caption, header and rows; the detailed-table
     # gate separately binds these cells to the numerical evidence.
     text = prose_text(scopes[1])
-    interruptions = list(re.finditer(r"all three seed\s+(table \d+:[\s\S]*?)\s+(?=differences are)", text))
+    interruptions = list(re.finditer(
+        r"(?P<prefix>all\s+[^\s]+\s+seed|every one of the\s+[^\s]+\s+overlapping training windows)"
+        r"\s+(?P<table>table \d+:[\s\S]*?)\s+(?=differences are|contributes equally)", text))
     if interruptions:
         require(len(interruptions) == 1, "ambiguous annual table in cancellation prose")
         labels = re.findall(r"\\label\{(tab:[^}]+)\}", strip_comments(tex))
@@ -2087,9 +2099,9 @@ def cancellation_claims(tex, rendered, record):
         expected = (f"Table {labels.index('tab:years') + 1}: " + float_caption(tex, "tab:years")
                     + " " + " ".join(" ".join(row) for row in source_table_rows(tex, "tab:years")))
         match = interruptions[0]
-        require(re.fullmatch(clause_pattern(prose_text(expected, source=True)), match[1]) is not None,
+        require(re.fullmatch(clause_pattern(prose_text(expected, source=True)), match["table"]) is not None,
                 "cancellation interruption table differs")
-        scopes = (scopes[0], text[:match.start()] + "all three seed " + text[match.end():])
+        scopes = (scopes[0], text[:match.start()] + match["prefix"] + " " + text[match.end():])
     cutoffs, groups = record["cutoffs"], record["groups"]
     n = record["arrays"]["TRAIN"]["n_windows"]
     for cutoff in cutoffs.values():
@@ -2130,7 +2142,7 @@ def cancellation_claims(tex, rendered, record):
                 f"O-S minus D is {target['mean_diff']:.4f}, with interval {interval(target)}, "
                 f"compared with {tr['comparisons']['O-S_raw_minus_D_raw']['mean_diff']:.4f} in the remaining {tr['n_windows']} windows.")
     for anchor, expected in (
-        ("G5 has a lower mean score in this group", "G5 has a lower mean score in this group, while the O-S versus D interval " + ("spans" if includes else "excludes") + " zero."),
+        ("G5 has a lower mean score in these", f"G5 has a lower mean score in these {ch['n_windows']} windows, while the O-S versus D interval " + ("spans" if includes else "excludes") + " zero."),
         ("The group uses information", "The group uses information available to the model; cancellation can still vary with other magnetic conditions."),
         ("Although the thresholds come", "Although the thresholds come from TRAIN, assignment to these TEST groups uses the withheld values. The score comparison is consequently conditional on outcome selection."),
         ("Combining high cancellation during", "Combining high cancellation during the missing hour with the lowest energy quartile leaves "
@@ -2181,7 +2193,13 @@ def detailed_table_values(real, observations):
         tables["tab:channelcoverage"][name] = [f"{100 * v:.1f}" for v in coverage.mean(axis=0)]
         tables["tab:geometry"][name] = [f"{metric(arm + '_raw', k):.4f}" for k in
             ("variogram", "seam_l_mean", "seam_r_mean", "internal_mean", "seam_l_rmse", "seam_r_rmse")]
-    tables["tab:roundtrip"] = {k: [scientific_cell(v) for v in values]
+    precision_labels = {
+        "Original float64": "Original, double precision",
+        "Float64 normalization and inverse": "Double precision round trip",
+        "Float32, six coordinates": "Single precision, six coordinates",
+        "Float32, derived v_v": "Single precision, five coordinates",
+    }
+    tables["tab:roundtrip"] = {precision_labels[k]: [scientific_cell(v) for v in values]
                                for k, values in observation_roundtrips(observations).items()}
     strata = {"Wind (52)": "imf_source_52", "ACE (71)": "imf_source_71"}
     strata.update({f"{lo}--{hi}": f"years_{lo}_{hi}" for lo, hi in diagnostics.YEAR_GROUPS})
@@ -2377,8 +2395,10 @@ def illustration_claims(tex, rendered):
                 f"Figures~{case_numbers[0]} and {case_numbers[1]} show predictions before clipping.")
     bind_clause((tex, rendered), r"windows\s+[^\s]+\s+and\s+[^,\s]+\s*,\s*" + clause_pattern("counting from"),
                 "Windows 120 and 360, counting from zero, are the midpoints of the two halves of the ordered list of 480 windows.")
-    bind_clause((tex, rendered), clause_pattern("Diffusion uses seed") + r"\s+[^,\s]+\s*,\s*" + clause_pattern("the first"),
-                "Diffusion uses seed 7, the first declared seed.")
+    # Distinguish the standalone selection sentence from the longer caption
+    # sentence; its seed value remains outside the locator.
+    bind_clause((tex, rendered), clause_pattern("Diffusion uses seed") + r"\s+[^.\s]+\s*\.",
+                "Diffusion uses seed 7.")
     bind_clause((tex, rendered), clause_pattern("In TEST window") + r"\s+[^,\s]+\s*,\s*" + clause_pattern("every diffusion method"),
                 "In TEST window 120, every diffusion method covers $v_s$ in zero of the twelve hidden bins.")
     bind_clause((tex, rendered), clause_pattern("In window") + r"\s+[^,\s]+\s*,\s*" + clause_pattern("D, O-S"),
@@ -2388,18 +2408,17 @@ def illustration_claims(tex, rendered):
         ('After sorting those samples', 'After sorting those samples in increasing order, values 2 and 38 form the inclusive nominal 90\\% interval.'),
         ('D, O-S and G5 share a linear scale', 'D, O-S and G5 share a linear scale in each row;'),
         ('Gaussian regression uses a separate', 'Gaussian regression uses a separate linear scale on the right.'),
-        ('Band heights and vertical distances', 'Band heights and vertical distances are comparable on a common scale.'),
-        ('Every subplot includes', 'Every subplot includes all measurements, medians and interval ends in its axis limits.'),
+        ('Vertical distances', 'Vertical distances can be compared directly among the three diffusion methods within a row.'),
+        ('Axis limits', 'Axis limits include every displayed measurement, median and interval endpoint.'),
         ('The horizontal gray line', 'The horizontal gray line marks zero;'),
         ('predictions below it', 'predictions below it are physically impossible because variance is nonnegative.'),
         ('In both examples, diffusion', 'In both examples, diffusion generally places its median above the withheld variance, which often falls outside the nominal intervals.'),
-        ("Gaussian regression's much wider intervals", "Gaussian regression's much wider intervals contain all twelve withheld values in both windows. Its residual covariance is common to every context, and its distribution places probability on negative $v_s$, which is physically impossible."),
+        ("Gaussian regression's", "Gaussian regression's wider intervals contain all twelve withheld values in both windows."),
         ('The aggregate coverage results', 'The aggregate coverage results show the same shortfall from nominal coverage for this quantity.'),
-        ('The frequency of these particular error patterns', 'The frequency of these particular error patterns across TEST, and their origin during training, remain uncertain.'),
+        ('The model uses', 'The model uses one residual covariance for every context. Its Gaussian distribution also assigns probability to negative $v_s$, even though variance is nonnegative.'),
         ('Position determines their choice', 'Position determines their choice independently of model error, although TEST had already been examined.'),
-        ('Minimizing the raw validation score gives', 'Minimizing the raw validation score gives training step 9560 for D and 29636 for O-S and G5;'),
-        ('Gaussian regression uses the fit', 'Gaussian regression uses the fit chosen by validation and the noise realization from seed 13.'),
-        ('These examples illustrate individual', 'These examples illustrate individual reconstructions, with uncertain representativeness across TEST.'),
+        ('Every method uses the fit', 'Every method uses the fit that minimizes raw validation score; Gaussian regression samples use seed 13.'),
+        ('These examples show both', 'These examples show both the broad uncertainty intervals and the impossible values that accompany them.'),
         ('The colored curve joins', 'The colored curve joins the marginal medians of 39 samples at each time and coordinate.'),
         ('These curves and intervals', 'These curves and intervals concern each time and quantity separately; simultaneous coverage of an entire trajectory is a separate property.'),
         ('The joined medians', 'The joined medians can be irregular and can differ from every sampled trajectory.'),
@@ -2412,7 +2431,7 @@ def illustration_claims(tex, rendered):
         ('the right gives mean absolute', 'the right gives mean absolute $R_{\\mathrm{obs}}$ in nT$^2$.'),
         ('Colored lines show marginal medians', 'Colored lines show marginal medians, bands show nominal 90\\% intervals, and thin lines show ensemble members 0, 1 and 2.'),
         ('Colored lines show empirical medians', 'Colored lines show empirical medians, and bands show nominal 90\\% marginal predictive intervals from all 39 samples.'),
-        ('Increasing the penalty lowers', f'Increasing the penalty lowers the mean absolute residual in Figure~{fixed_number}, but the mean energy score first falls and then rises.'),
+        ('A stronger penalty', f'A stronger penalty reduces the mean absolute residual, but its effect on predictive accuracy changes with its strength (Figure~{fixed_number}). The mean energy score first falls and then rises.'),
         ('Reconstruction from ACE', 'Reconstruction from ACE measurements on 3 August 2010, TEST window 120.'),
         ('The $v_s$ axis is linear', 'The $v_s$ axis is linear within $0.05$ nT$^2$ of zero and logarithmic outside, so equal vertical distances can represent different absolute errors in that row.'),
         ('Reconstruction from Wind', 'Reconstruction from Wind measurements on 4 August 2020, TEST window 360.'),
@@ -2420,7 +2439,10 @@ def illustration_claims(tex, rendered):
         ('The plots show them separately', 'The plots show them separately from the twelve predicted bins, with short line breaks from $-5$ to $0$ minutes and from $55$ to $60$ minutes.'),
     )
     for anchor, expected in clauses:
-        bind_clause((tex, rendered), clause_pattern(prose_text(anchor, source=True)), expected)
+        pattern = clause_pattern(prose_text(anchor, source=True))
+        if anchor == "Vertical distances":
+            pattern = r"(?:^|(?<=\. ))" + pattern
+        bind_clause((tex, rendered), pattern, expected)
 
 
 def manuscript_mode(tex):
@@ -2490,6 +2512,12 @@ def source_checks(paper_dir, tex):
     from experiments import _prigm_camera_ready as camera_ready
     if camera_ready.claimed(paper_dir, tex):
         expected_figures |= camera_ready.FIGURES
+        require(figures == [
+            "figures/overview/fig_overview.pdf", "figures/checkpoints/fig_checkpoints.pdf",
+            "figures/hmm/fig_hmm.pdf", "figures/calibration/fig_calibration.pdf",
+            "figures/operator/fig_operator.pdf", "figures/fixed_final/fig_fixed_final.pdf",
+            "figures/imputation/case_120/fig_imputation.pdf", "figures/imputation/case_360/fig_imputation.pdf",
+            "figures/imputation/detail/fig_imputation.pdf"], "reviewed figure order differs")
     require(len(figures) == len(expected_figures) and set(figures) == expected_figures,
             "primary figure inventory contains missing, historical or unbound assets")
     for name in figures:
@@ -2512,7 +2540,8 @@ def source_checks(paper_dir, tex):
 
 def citation_checks(paper_dir, tex, rendered):
     bib = strip_comments(local(paper_dir, "references.bib").read_text())
-    require(not any(s.lower() in bib.lower() for s in FORBIDDEN_EVIDENCE), "author-identifying bibliography")
+    forbidden = mode_forbidden(manuscript_mode(tex))
+    require(not any(s.lower() in bib.lower() for s in forbidden), "author-identifying bibliography")
     keys = re.findall(r"^\s*@(?!(?:comment|string|preamble)\b)\w+\s*\{\s*([^,]+),", bib, re.M | re.I)
     cited = {key.strip() for group in re.findall(r"\\cite[a-zA-Z]*\*?(?:\[[^]]*\])*\{([^}]*)\}", tex)
              for key in group.split(",")}
@@ -2737,6 +2766,17 @@ def verify(paper_dir=PAPER):
         if checkpoint_figure is not None and tex is not None and rendered is not None:
             report.check("camera-ready checkpoint claims and scope in source and PDF",
                 lambda: camera_ready.checkpoint_claims(tex, rendered, checkpoint_data))
+        reselection = None
+        if checkpoint_data is not None:
+            reselection = report.check("checkpoint reselection: paired years, choices and percentile sensitivity",
+                lambda: camera_ready.validate_reselection(paper_dir, checkpoint_data))
+        else:
+            report.add("checkpoint reselection", False, "requires authenticated checkpoint scores")
+        if reselection is not None and tex is not None and rendered is not None:
+            report.check("checkpoint reselection claims and counts in source and PDF",
+                         lambda: camera_ready.reselection_claims(tex, rendered, reselection))
+        else:
+            report.add("checkpoint reselection claims", False, "requires checked sensitivity, manuscript and PDF")
         calibration, calibration_figure = None, None
         if real is not None and deadline is not None:
             calibration = report.check("camera-ready tail diagnostics: all models, months and paired intervals",
@@ -2749,6 +2789,17 @@ def verify(paper_dir=PAPER):
         if calibration_figure is not None and tex is not None and rendered is not None:
             report.check("camera-ready calibration claims and scope in source and PDF",
                          lambda: camera_ready.calibration_claims(tex, rendered, calibration, calibration_figure))
+        overview = None
+        if checkpoint_data is not None and calibration is not None:
+            overview = report.check("overview figure: authenticated sources, policy contrasts and model coverage coordinates",
+                lambda: camera_ready.validate_overview(paper_dir, checkpoint_data, calibration))
+        else:
+            report.add("overview figure", False, "requires authenticated checkpoint and calibration records")
+        if overview is not None and tex is not None and rendered is not None:
+            report.check("overview figure caption and population in source and PDF",
+                         lambda: camera_ready.overview_claims(tex, rendered))
+        else:
+            report.add("overview figure claims", False, "requires checked figure, manuscript and PDF")
     if real is not None and observations is not None:
         report.check("TEST tertiles, group IDs and frozen-score statistics",
                      lambda: validate_test_strata(paper_dir, real, observations))

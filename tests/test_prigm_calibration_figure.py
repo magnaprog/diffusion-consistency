@@ -90,7 +90,7 @@ def test_artists_keep_tail_direction_percent_scale_and_each_unpooled_seed(record
     tails, _ = figure.load_calibration(cal, ch)
     fig = figure.plot(rows, tails)
     try:
-        np.testing.assert_allclose(fig.get_size_inches(), [5.5, 5])
+        np.testing.assert_allclose(fig.get_size_inches(), [5.5, 4.7])
         for ax, outcome in zip(fig.axes[1:], (0, 2)):
             for name in figure.METHODS:
                 bars = [next(p for p in ax.patches if p.get_gid() == f"{name}_{outcome}_mean_{channel}")
@@ -106,17 +106,24 @@ def test_artists_keep_tail_direction_percent_scale_and_each_unpooled_seed(record
             reference = next(x for x in ax.lines if x.get_gid() == "tail_reference")
             np.testing.assert_array_equal(reference.get_ydata(), [5, 5])
         assert fig.axes[1].get_ylim() == fig.axes[2].get_ylim()
-        note = fig.texts[-1]
+        assert len(fig.texts) == 1  # The duplicated assumption footer was removed.
+        note = fig.texts[0]
         assert note.get_text() == (
-            "The 5% line assumes that, at each time and coordinate,\n"
-            "the observation and ensemble members are exchangeable, with no ties.")
+            "Bars: mean of three diffusion fits or one Gaussian. Gray dots: individual fits.")
+        # The reference-line qualification remains in the figure's caption.
+        tex = SOURCE.with_name("main.tex").read_text()
+        assert r"\label{fig:calibration}" in tex
+        before_label = tex.split(r"\label{fig:calibration}", 1)[0]
+        caption = " ".join(before_label.rsplit(r"\caption{", 1)[1].split())
+        assert (r"The dashed 5\% line assumes that, at each time and coordinate, "
+                "the observation and ensemble members are exchangeable, with no ties.") in caption
         assert note.get_fontsize() == 7
         fig.canvas.draw()
         renderer = fig.canvas.get_renderer()
         bounds = note.get_window_extent(renderer)
         assert fig.bbox.contains(bounds.x0, bounds.y0)
         assert fig.bbox.contains(bounds.x1, bounds.y1)
-        assert bounds.y1 < fig.texts[-2].get_window_extent(renderer).y0
+        assert bounds.y1 < fig.legends[0].get_window_extent(renderer).y0
     finally:
         figure.plt.close(fig)
 

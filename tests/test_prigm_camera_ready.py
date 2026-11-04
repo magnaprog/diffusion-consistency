@@ -5,6 +5,7 @@ import json
 from pathlib import Path
 import re
 import shutil
+import subprocess
 
 import numpy as np
 import pytest
@@ -16,6 +17,33 @@ from prigm.recovery import ContractMismatch
 
 PAPER = Path(__file__).resolve().parents[1] / "paper/workshops/prigm"
 CALIBRATION = Path("evidence/followup/calibration")
+
+
+@pytest.mark.parametrize("identity", ["PISCES", "Kevin Lee", "Alison March"])
+def test_public_citation_identity_respects_manuscript_mode(tmp_path, identity):
+    title = "Public solar wind research"
+    (tmp_path / "references.bib").write_text(
+        "@misc{prior,\n title={" + title + "},\n author={" + identity + "},\n year={2026}\n}\n")
+    rendered = "References\n[1] " + title
+    anonymous = verifier.STYLE_ANONYMOUS + r"\cite{prior}"
+    with pytest.raises(ValueError, match="author-identifying bibliography"):
+        verifier.citation_checks(tmp_path, anonymous, rendered)
+    camera_ready = verifier.STYLE_CAMERA_READY + r"\cite{prior}"
+    if identity == "Alison March":
+        # The public-citation change does not waive other forbidden identities.
+        with pytest.raises(ValueError, match="author-identifying bibliography"):
+            verifier.citation_checks(tmp_path, camera_ready, rendered)
+    else:
+        verifier.citation_checks(tmp_path, camera_ready, rendered)
+
+
+def test_current_public_pisces_citation_resolves_in_camera_ready_pdf():
+    if shutil.which("pdftotext") is None:
+        pytest.skip("rendered citation binding requires pdftotext")
+    tex = (PAPER / "main.tex").read_text()
+    assert r"\citep{lee2026pisces}" in tex
+    rendered = subprocess.check_output(["pdftotext", "-layout", str(PAPER / "main.pdf"), "-"]).decode()
+    verifier.citation_checks(PAPER, tex, rendered)
 
 
 @pytest.fixture(scope="module")
@@ -212,13 +240,13 @@ def test_legitimate_repeated_seed_mentions_do_not_duplicate_claim_anchors(public
 @pytest.mark.parametrize("before,after", [
     ("49.0\\% of observations fall below G5's", "49.1\\% of observations fall below G5's"),
     ('G5 reduces both distance', 'G5 increases both distance'),
-    ('the larger increase in spread', 'the larger increase in distance'),
-    ('lowering the score', 'raising the score'),
+    ('the larger increase in the spread term', 'the larger increase in the distance term'),
+    ('the larger decrease in distance lowers the score', 'the larger decrease in distance raises the score'),
     ('errors are predominantly below the intervals at seeds 7 and 13', 'errors are predominantly above the intervals at seeds 7 and 13'),
     ('37.7\\% below', '37.8\\% below'),
     ('by 38.4 percentage points', 'by 38.5 percentage points'),
     ('the fraction below exceeds the fraction above by', 'the fraction above exceeds the fraction below by'),
-    ('their separate effects on learning remain unresolved', 'their separate effects on learning are established'),
+    ('varying them separately would distinguish their effects on learning', 'this comparison already establishes their separate effects on learning'),
     ('$[36.2,40.6]$', '$[36.2,40.7]$'),
     ('covers 98.1\\%', 'covers 98.2\\%'),
     ('using 10{,}000 resamples', 'using 1{,}000 resamples'),
@@ -356,7 +384,7 @@ def test_checkpoint_clauses_and_rendered_thousands_counts(checkpoint_claim_recor
     ('With weights and samples held constant', 'With weights and samples varying'),
     ('measure sensitivity to the years represented in validation', 'establish performance on a new population'),
     ('crosses mark the choice with 50, P50', 'crosses mark the choice with 25, P25'),
-    ('model choice precedes the additional TEST analysis', 'model choice uses the additional TEST analysis'),
+    ('The P25 choices were fixed before this additional TEST comparison', 'The P25 choices were fixed after this additional TEST comparison'),
 ])
 def test_revised_checkpoint_clauses_reject_changes(checkpoint_claim_records, scope, before, after):
     tex, rendered = manuscript()
@@ -374,8 +402,8 @@ def test_revised_checkpoint_clauses_reject_changes(checkpoint_claim_records, sco
 @pytest.mark.parametrize("scope", ["source", "PDF"])
 @pytest.mark.parametrize("kind,clause,old,new", [
     ('checkpoint', 'validation ensembles with 50 evaluations reuse the initial noise from the original ensembles with 25. Their validation scores determine the model choices before additional TEST samples are generated.', 'before', 'after'),
-    ('calibration', 'At seed 13, G5 reduces both distance to the measurements and spread, with the larger decrease in distance lowering the score.', 'G5 reduces', 'G5 increases'),
-    ('calibration', 'At seed 42, both terms increase, and the larger increase in spread lowers the score.', 'both terms increase', 'both terms decrease'),
+    ('calibration', 'At seed 13, G5 reduces both distance to the measurements and spread; the larger decrease in distance lowers the score.', 'G5 reduces', 'G5 increases'),
+    ('calibration', 'At seed 42, both terms increase, and the larger increase in the spread term lowers the score.', 'both terms increase', 'both terms decrease'),
 ])
 def test_reworded_claim_cannot_hide_behind_valid_duplicate(
         public_records, checkpoint_claim_records, scope, kind, clause, old, new):
@@ -401,8 +429,8 @@ def test_reworded_claim_cannot_hide_behind_valid_duplicate(
 @pytest.mark.parametrize("negative", [False, True])
 @pytest.mark.parametrize("valid_duplicate", [False, True])
 @pytest.mark.parametrize("kind,clause,old,new", [
-    ("calibration", "At seed 13, G5 reduces both distance to the measurements and spread, with the larger decrease in distance lowering the score.", "13", "14"),
-    ("calibration", "At seed 42, both terms increase, and the larger increase in spread lowers the score.", "42", "43"),
+    ("calibration", "At seed 13, G5 reduces both distance to the measurements and spread; the larger decrease in distance lowers the score.", "13", "14"),
+    ("calibration", "At seed 42, both terms increase, and the larger increase in the spread term lowers the score.", "42", "43"),
     ("checkpoint", r"In 10{,}000 resamples of the twenty years, D at seed 7 chooses update 9{,}560 in 61.0\% of resamples with 25 evaluations and 71.5\% with 50; the other resamples choose the final update.", "10{,}000", "10{,}001"),
     ("checkpoint", "D at seeds 13 and 42 retains its respective earlier choice in every resample under either evaluation count.", "13", "14"),
 ])
@@ -458,3 +486,54 @@ def test_word_count_slots_reject_malformed_values_and_valid_duplicates(
     message = "missing or duplicate clause" if valid_duplicate else "clause differs"
     with pytest.raises(ValueError, match=scope + ": " + message):
         check(changed if scope == "source" else tex, changed if scope == "PDF" else rendered)
+
+
+@pytest.mark.parametrize('damage', [None, 'number', 'caption', 'extra_text', 'plot_contradiction'])
+def test_checkpoint_page_break_accepts_only_its_authenticated_float(checkpoint_claim_records, damage):
+    tex, rendered = manuscript()
+    floats = tex.replace(r'\begin{figure}', r'\begin{table}').replace(r'\end{figure}', r'\end{table}')
+    caption = verifier.prose_text(verifier.float_caption(floats, 'fig:checkpoints'), source=True)
+    assert rendered.count(caption) == 1
+    rendered = rendered.replace(caption, '', 1)
+    labels = re.findall(r'\\label\{(fig:[^}]+)\}', tex)
+    number = labels.index('fig:checkpoints') + 1
+    if damage == 'number':
+        number = 999
+    elif damage == 'caption':
+        caption = caption.replace('p25 choices were fixed before', 'p25 choices were fixed after')
+    elif damage == 'extra_text':
+        caption += ' An unrelated sentence must not disappear.'
+    plot = ('Their validation scores determine the model choices after additional TEST samples are generated.\n'
+            if damage == 'plot_contradiction' else '')
+    assert rendered.count('their validation scores') == 1
+    rendered = rendered.replace('their validation scores',
+        f'Their\n9\n\f{plot}Figure {number}: {caption}\n\nvalidation scores', 1)
+    if damage is None:
+        camera.checkpoint_claims(tex, rendered, checkpoint_claim_records)
+    else:
+        message = 'PDF: missing or duplicate clause' if damage == 'plot_contradiction' else 'checkpoint interruption'
+        with pytest.raises(ValueError, match=message):
+            camera.checkpoint_claims(tex, rendered, checkpoint_claim_records)
+
+
+@pytest.mark.parametrize('scope', ['source', 'PDF'])
+def test_validation_timing_contradiction_cannot_hide_beside_valid_paragraph(checkpoint_claim_records, scope):
+    tex, rendered = manuscript()
+    camera.checkpoint_claims(tex, rendered, checkpoint_claim_records)
+    false = 'Their validation scores determine the model choices after additional TEST samples are generated.'
+    if scope == 'source':
+        tex += '\n' + false
+    else:
+        rendered += '\n' + false
+    with pytest.raises(ValueError, match=scope + ': missing or duplicate clause'):
+        camera.checkpoint_claims(tex, rendered, checkpoint_claim_records)
+
+
+def test_checkpoint_and_calibration_bind_actual_pdf(checkpoint_claim_records, public_records):
+    if shutil.which('pdftotext') is None:
+        pytest.skip('PDF bindings require pdftotext')
+    tex = (PAPER / 'main.tex').read_text()
+    rendered = subprocess.check_output(['pdftotext', '-layout', str(PAPER / 'main.pdf'), '-']).decode()
+    camera.checkpoint_claims(tex, rendered, checkpoint_claim_records)
+    report, _, _, figure = public_records
+    camera.calibration_claims(tex, rendered, report, figure)

@@ -1,0 +1,450 @@
+{
+  "schema_version": 1,
+  "figure": "fig_overview",
+  "protocol_sha256": "eeca7c2e14d982f0b3e972256cc9acf7a5aaa8dc03da6a9299a708c78a7b5946",
+  "scope_sha256": "5210fbe5432aec70433ed9d7c10a1ba61503e5c7c15e43cc2fa37bfac478674a",
+  "source": {
+    "path": "fig_overview.py",
+    "sha256": "b49c6add1547eaf19fca92ccca2ce623e88dd1625d33690cba4e39a3c92aa3d7"
+  },
+  "dependency_sources": {
+    "checkpoints": {
+      "path": "fig_checkpoints.py",
+      "sha256": "44e26d777dd8cc2e9846798e02db21c6fffba2a3a551394291cf3bb6a1d14f0a"
+    },
+    "calibration": {
+      "path": "fig_calibration.py",
+      "sha256": "93cb36ed8b7fc15b4565b93efe395861912f8057373375c87081569f0c48a087"
+    }
+  },
+  "style": {
+    "path": "prigm.mplstyle",
+    "sha256": "3ac5d2448a3a022a70705fafabc407937c3db1514128834934a15004b70f0a08"
+  },
+  "inputs": {
+    "PROTOCOL.json": {
+      "path": "evidence/followup/checkpoints/PROTOCOL.json",
+      "sha256": "af4d29ba91a088725669115a9f35d89dda2be7be4da764d3fe992ef5f4ecc670"
+    },
+    "SAVED_VAL25.json": {
+      "path": "evidence/followup/checkpoints/SAVED_VAL25.json",
+      "sha256": "b8252f106557590cd1c055c6c07d22fe8a6449a7c167b5b55e1626ca2ac8445f"
+    },
+    "SCOPE.json": {
+      "path": "evidence/followup/checkpoints/SCOPE.json",
+      "sha256": "49627ce438c813ae41c7a3220a1c9a08bb018d0f3bb224efa90fd302ca5a4426"
+    },
+    "SELECTION.json": {
+      "path": "evidence/followup/checkpoints/SELECTION.json",
+      "sha256": "cec06beb2a6313d049526620a43856c9973a4caa11dac91ab68beba229c5cd2f"
+    },
+    "SUMMARY.json": {
+      "path": "evidence/followup/checkpoints/SUMMARY.json",
+      "sha256": "abbf1b9e629c3ae61dd99c4c78d59fa0a78d5807ef51b83067e165c0fb7dd4fa"
+    },
+    "MANIFEST.json": {
+      "path": "evidence/followup/checkpoints/MANIFEST.json",
+      "sha256": "385b7048217cddfaed2c6bb48a1706928ddca1c4b35fd71e533065a518c5d036"
+    },
+    "calibration": {
+      "path": "evidence/followup/calibration/summary.json",
+      "sha256": "ad86c8344ee3c84d8423d0818a1d06ab7b0964ef70a7289bcc6ffcd32461873d"
+    }
+  },
+  "panel_a": {
+    "policy_order": [
+      "F",
+      "P25"
+    ],
+    "x": [
+      0,
+      1
+    ],
+    "seeds": [
+      7,
+      13,
+      42
+    ],
+    "score_by_arm": {
+      "D": [
+        [
+          1.9786974038367084,
+          1.9575229938859366
+        ],
+        [
+          1.9778484702792234,
+          1.829731165770156
+        ],
+        [
+          1.9900482586723123,
+          1.8758054397314914
+        ]
+      ],
+      "O-S": [
+        [
+          1.9557614175708047,
+          1.9557614175708047
+        ],
+        [
+          1.8933815569209664,
+          1.8933815569209664
+        ],
+        [
+          1.931177471594993,
+          1.805561062218883
+        ]
+      ]
+    },
+    "seedwise": [
+      [
+        -0.022935986265903763,
+        -0.001761576315131963
+      ],
+      [
+        -0.08446691335825696,
+        0.06365039115081039
+      ],
+      [
+        -0.0588707870773193,
+        -0.07024437751260848
+      ]
+    ],
+    "mean": [
+      -0.05542456223382667,
+      -0.0027851875589766837
+    ],
+    "policies": {
+      "D_s13": {
+        "F": 29636,
+        "P25": 9560,
+        "P50": 9560
+      },
+      "D_s42": {
+        "F": 29636,
+        "P25": 16252,
+        "P50": 16252
+      },
+      "D_s7": {
+        "F": 29636,
+        "P25": 9560,
+        "P50": 9560
+      },
+      "O-S_s13": {
+        "F": 29636,
+        "P25": 29636,
+        "P50": 29636
+      },
+      "O-S_s42": {
+        "F": 29636,
+        "P25": 16252,
+        "P50": 16252
+      },
+      "O-S_s7": {
+        "F": 29636,
+        "P25": 29636,
+        "P50": 29636
+      }
+    },
+    "validation_choices_agree": true
+  },
+  "panel_b": {
+    "D": {
+      "fixed_model_seeds": [
+        7,
+        13,
+        42
+      ],
+      "mean_percent": [
+        83.57638888888889,
+        83.24074074074073,
+        83.00925925925927,
+        73.76736111111111,
+        40.64814814814815
+      ],
+      "model_means_percent": [
+        [
+          79.82638888888889,
+          83.6111111111111,
+          80.39930555555559,
+          76.78819444444443,
+          15.538194444444443
+        ],
+        [
+          87.46527777777774,
+          85.72916666666669,
+          88.2986111111111,
+          75.5034722222222,
+          42.743055555555564
+        ],
+        [
+          83.43750000000001,
+          80.38194444444444,
+          80.32986111111111,
+          69.01041666666667,
+          63.663194444444436
+        ]
+      ],
+      "y": [
+        -0.22499999999999998,
+        0.775,
+        1.775,
+        2.775,
+        3.775
+      ],
+      "individual_y": [
+        [
+          -0.253,
+          0.747,
+          1.7469999999999999,
+          2.747,
+          3.747
+        ],
+        [
+          -0.22499999999999998,
+          0.775,
+          1.775,
+          2.775,
+          3.775
+        ],
+        [
+          -0.19699999999999998,
+          0.803,
+          1.803,
+          2.803,
+          3.803
+        ]
+      ]
+    },
+    "O-S": {
+      "fixed_model_seeds": [
+        7,
+        13,
+        42
+      ],
+      "mean_percent": [
+        78.16550925925925,
+        74.63541666666667,
+        76.43518518518519,
+        67.04282407407408,
+        53.85416666666667
+      ],
+      "model_means_percent": [
+        [
+          69.21874999999999,
+          75.97222222222221,
+          73.81944444444444,
+          49.18402777777778,
+          33.993055555555564
+        ],
+        [
+          81.52777777777777,
+          66.84027777777779,
+          74.11458333333333,
+          71.51041666666667,
+          58.26388888888888
+        ],
+        [
+          83.75,
+          81.09375,
+          81.37152777777779,
+          80.4340277777778,
+          69.30555555555556
+        ]
+      ],
+      "y": [
+        -0.075,
+        0.925,
+        1.925,
+        2.925,
+        3.925
+      ],
+      "individual_y": [
+        [
+          -0.103,
+          0.897,
+          1.897,
+          2.897,
+          3.897
+        ],
+        [
+          -0.075,
+          0.925,
+          1.925,
+          2.925,
+          3.925
+        ],
+        [
+          -0.047,
+          0.9530000000000001,
+          1.953,
+          2.953,
+          3.953
+        ]
+      ]
+    },
+    "G5": {
+      "fixed_model_seeds": [
+        7,
+        13,
+        42
+      ],
+      "mean_percent": [
+        82.08333333333333,
+        85.88541666666667,
+        87.60416666666667,
+        82.15856481481481,
+        40.52083333333332
+      ],
+      "model_means_percent": [
+        [
+          86.33680555555556,
+          86.99652777777777,
+          90.10416666666667,
+          87.04861111111111,
+          28.83680555555555
+        ],
+        [
+          71.16319444444444,
+          84.44444444444447,
+          85.15625,
+          76.59722222222223,
+          17.899305555555554
+        ],
+        [
+          88.75,
+          86.21527777777779,
+          87.55208333333334,
+          82.8298611111111,
+          74.82638888888887
+        ]
+      ],
+      "y": [
+        0.075,
+        1.075,
+        2.075,
+        3.075,
+        4.075
+      ],
+      "individual_y": [
+        [
+          0.047,
+          1.047,
+          2.047,
+          3.047,
+          4.047000000000001
+        ],
+        [
+          0.075,
+          1.075,
+          2.075,
+          3.075,
+          4.075
+        ],
+        [
+          0.103,
+          1.103,
+          2.103,
+          3.103,
+          4.103
+        ]
+      ]
+    },
+    "full_flank_gaussian": {
+      "fixed_model_seeds": [
+        null
+      ],
+      "mean_percent": [
+        92.77777777777779,
+        92.88194444444446,
+        92.15277777777777,
+        93.92361111111113,
+        98.12500000000001
+      ],
+      "model_means_percent": [
+        [
+          92.77777777777779,
+          92.88194444444446,
+          92.15277777777777,
+          93.92361111111113,
+          98.12500000000001
+        ]
+      ],
+      "y": [
+        0.22499999999999998,
+        1.225,
+        2.225,
+        3.225,
+        4.225
+      ],
+      "individual_y": []
+    }
+  },
+  "calibration_provenance": {
+    "bootstrap": {
+      "replicates": 10000,
+      "schemes": [
+        "year",
+        "twoyear"
+      ],
+      "seed": 7003
+    },
+    "per_window_sha256": "d8f738012e3c8d2e977e21c77d404c5e7a76c2f996202127be02011c57ee65d4"
+  },
+  "figure_inches": [
+    5.5,
+    2.3
+  ],
+  "channels": [
+    "mu_x",
+    "mu_y",
+    "mu_z",
+    "m",
+    "v_s"
+  ],
+  "method_order": [
+    "D",
+    "O-S",
+    "G5",
+    "full_flank_gaussian"
+  ],
+  "colors": {
+    "D": "#0072B2",
+    "O-S": "#D55E00",
+    "G5": "#009E73",
+    "full_flank_gaussian": "#CC79A7"
+  },
+  "seed_color": "#9C27E8",
+  "seed_markers": {
+    "7": "o",
+    "13": "s",
+    "42": "^"
+  },
+  "method_markers": {
+    "D": "o",
+    "O-S": "s",
+    "G5": "^",
+    "full_flank_gaussian": "D"
+  },
+  "axes": {
+    "a": "linear; O-S minus D energy score in 60 TRAIN-standardized coordinates; one paired contrast per fixed seed, black diamonds average three seeds; F is update 29636; P25 uses separate raw-VAL choices for D and O-S; P25=P50",
+    "b": "linear percent; marginal interval coverage over 12 hidden positions per window, then equal months; filled diffusion markers average three fixed fits; open circles show individual fits; Gaussian regression uses one ensemble realization per window and no averaging across model seeds"
+  },
+  "interval_order_statistics": [
+    2,
+    38
+  ],
+  "n_draws": 39,
+  "n_windows": 480,
+  "coverage_reference": {
+    "percent": 90,
+    "assumption": "at each time and coordinate, the observation and 39 ensemble members are exchangeable, with no ties"
+  },
+  "pointwise_intervals_plotted": false,
+  "scope": "Existing, previously examined TEST period. Equal months; each fixed model retains its own 39 draws. No pooled samples, confidence intervals, new fits, or uncertainty from repeated selection. Connecting lines identify paired seed contrasts under two policies, not a causal effect or training trajectory.",
+  "matplotlib_version": "3.10.9",
+  "numpy_version": "2.4.4",
+  "output_sha256": {
+    "fig_overview.pdf": "868c13069d7a2f5e7730d996cff0995906748633c46efcfecee0024b55a582d4",
+    "fig_overview.png": "a80c1a8d67074e4e6b8e471270131b795c13fc2073bbd8b4cc859ea33045d2b6"
+  }
+}
