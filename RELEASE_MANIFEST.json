@@ -1,5 +1,5 @@
 {
-  "base_commit": null,
+  "base_commit": "ff78906b711bf1c1e3b41391ba3e1cb610be45ae",
   "excluded": [
     "Git history",
     "private handoffs and execution receipts",
@@ -444,12 +444,12 @@
       "sha256": "a80c1a8d67074e4e6b8e471270131b795c13fc2073bbd8b4cc859ea33045d2b6"
     },
     "paper/workshops/prigm/main.pdf": {
-      "bytes": 550325,
-      "sha256": "3db1de011bb1c334ee886e3cf58223136f08979892844193001845bb7a22d8f1"
+      "bytes": 550382,
+      "sha256": "88554ca20a4a0fbf57d2f03be94950827668637957733d1a28b750ca1710948e"
     },
     "paper/workshops/prigm/main.tex": {
-      "bytes": 96310,
-      "sha256": "e3841fd7ffe92a68ef7cbe0665a206007a6de383a35c9502d52ecce78bf10c20"
+      "bytes": 96359,
+      "sha256": "598026f570c549524ae895996fe03ffa894c33f26ec7cded2c1056e5b1b4a331"
     },
     "paper/workshops/prigm/neurips_2025.sty": {
       "bytes": 13023,
