@@ -160,7 +160,11 @@ new predictions does not make those observations an independent test set.
 
 ## Build the paper and its source archives
 
-The figure-generating scripts share `paper/workshops/prigm/prigm.mplstyle`. Figure text and mathematics use DejaVu Serif, supplied by Matplotlib. Axis labels and subplot titles are 8 points; ticks, legends and notes are 7 points at the manuscript's display widths. Colors have consistent meanings, and markers, line patterns, hatching and subplot labels also identify the quantities. The Okabe-Ito method palette uses blue for D, vermilion for O-S, bluish green for G5 and reddish purple for Gaussian regression. In Figures 5(b) and 4(a), sky-blue bars show changes in distance to the withheld observations, orange hatched bars show the negative change in dispersion, and purple diamonds show the resulting score change. Figure 5(b) compares predictions after and before clipping; Figure 4(a) compares G5 with D. These score-component colors are distinct from the method palette. The scientific inputs, plotted numerical values, workshop manuscript template and body fonts remain unchanged.
+The figure-generating scripts share `paper/workshops/prigm/prigm.mplstyle`. Figure text and mathematics use DejaVu Serif, supplied by Matplotlib. Axis labels and subplot titles are 8 points; ticks, legends and notes are 7 points at the manuscript's display widths.
+
+Colors have consistent meanings, and markers, line patterns, hatching and subplot labels also identify the quantities. The Okabe-Ito method palette uses blue for D, vermilion for O-S, bluish green for G5 and reddish purple for Gaussian regression.
+
+Figure 4(a) compares G5 with D: sky-blue bars show the distance change, orange hatched bars show the negative spread change, and purple diamonds show the score change. Figure 5(b) compares the same ensembles after and before clipping. It uses blue circles and orange squares for the two score components, with purple diamonds for their sum. Point symbols avoid implying additive bar lengths on its symmetric logarithmic axis. Figure 5(a) uses black diamonds for mean displacement. These component colors are distinct from the method palette. The scientific inputs, plotted numerical values, workshop manuscript template and body fonts remain unchanged.
 
 The generators resolve DejaVu Serif without a default-font fallback and embed
 TrueType subsets in the PDFs. No separate installation of plotting fonts is needed to generate
@@ -182,7 +186,7 @@ Inspect `paper/workshops/prigm/main.log` after the final LaTeX pass. When it
 requests another pass for cross-references, repeat the same `pdflatex` command
 from the paper directory and then rerun the verifier. Resolve undefined
 references or citations before packaging. The current manuscript has four main
-pages and 28 pages in total. Its bibliography uses `unsrtnat` to number entries
+pages and 29 pages in total. Its bibliography uses `unsrtnat` to number entries
 in first-citation order. Apply the same checks when compiling each extracted
 archive; the final log determines whether another LaTeX pass is needed.
 

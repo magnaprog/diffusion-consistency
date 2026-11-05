@@ -368,17 +368,19 @@ def followup_prose(learned, reference, gradients, strata):
         fit = learned["fits"][name]
         metric = fit["raw"]["secondary"]
         rows[(fit["config"]["arm"], f"{fit['config']['c_r']:g}")] = [
-            f"{fit['raw']['mean_energy']:.4f}", f"{fit['corrected']['mean_energy']:.4f}",
+            f"{fit['raw']['mean_energy']:.4f}",
             f"{metric['r_obs_mean']['mean']:.4f}", f"{metric['frac_support_violation_beyond_rounding']['mean'] * 100:.1f}",
-            f"{metric['cov90_mean']['mean'] * 100:.1f}"]
+            f"{metric['cov90_mean']['mean'] * 100:.1f}", f"{metric['width90_mean']['mean']:.4f}"]
     ref = reference["secondary"]
     caption = ("Nine diffusion fits to the stationary hidden Markov model after 5{,}000 optimizer updates at seed 7. "
-               "Evaluation uses 288 windows and 39 samples per window; clipping acts on these same ensembles. Raw $|R|$ is the mean absolute residual of the observation identity in HMM units. "
+               "Evaluation uses 288 windows and 39 samples per window. Raw $|R|$ is the mean absolute residual of the observation identity in HMM units. "
                "The inequality column gives the percentage of generated bins that fail a moment inequality beyond rounding tolerance, separately from the equality residual. "
-               "Coverage averages the five primary coordinates and twelve positions. "
+               "Coverage and width average the five primary coordinates and twelve positions. "
+               "Width is the mean difference between inclusive order statistics 2 and 38 of 39 raw predictions in standardized primary coordinates. "
                "The independent exact conditional ensemble has "
                f"{ref['cov90_mean']['mean'] * 100:g}\\% coverage for the inclusive nominal 90\\% intervals.")
     toy_prose = "Table compares nine fits to the stationary chain with 50 DDIM evaluations for sampling.\n\n" + table("tab:learnedtoy", rows, caption)
+    toy_prose = toy_prose.replace("Procedure & Values", r" & \multicolumn{5}{c}{Raw predictions} \\" + "\nProcedure & Values")
     toy_prose += (f"\nDiscreteness also matters for interval coverage. The exact conditional ensembles in Table 2 give coverage of {ref['cov90_mean']['mean'] * 100:.1f}\\% and "
                   f"{ref['cov50_mean']['mean'] * 100:.2f}\\% under the nominal 90\\% and 50\\% conventions, "
                   f"with mean widths {ref['width90_mean']['mean']:.4f} and {ref['width50_mean']['mean']:.4f} in standardized coordinates. "
@@ -2135,13 +2137,28 @@ def test_learned_table_order_inventory_and_percentage_scaling(bundle_template, d
         new = old.replace("0.0005", "0.005", 1)
     else:
         cells = list(rows.values())[1]
-        new = old.replace(" & " + cells[-1] + r" \\", f" & {float(cells[-1]) / 100:.1f}" + r" \\")
+        new = old.replace(" & " + cells[-2] + " & ", f" & {float(cells[-2]) / 100:.1f} & ")
     check = followup_check(b, "Training diffusion models on the same HMM")
     with pytest.raises(ERRORS):
         check(tex.replace(old, new), pdf)
 
 
 FOLLOWUP_TITLES = ("Training diffusion models on the same HMM", "How the residual penalty is weighted", "Directional cancellation with thresholds from TRAIN")
+
+
+@pytest.mark.parametrize("scope", ["source", "PDF"])
+def test_learned_table_requires_raw_prediction_header(bundle_template, scope):
+    b = bundle_template
+    tex = (b["root"] / "main.tex").read_text()
+    pdf = extracted(b["pages"])
+    check = followup_check(b, FOLLOWUP_TITLES[0])
+    check(tex, pdf)
+    if scope == "source":
+        tex = tex.replace("Raw predictions", "Clipped predictions") + "\nRaw predictions"
+    else:
+        pdf = pdf.replace("Raw predictions", "Clipped predictions") + "\nRaw predictions"
+    with pytest.raises(ERRORS, match="header must identify raw predictions"):
+        check(tex, pdf)
 
 
 @pytest.mark.parametrize("location", ["seeds", "training_count"])
@@ -2223,10 +2240,11 @@ def test_every_followup_prose_number_is_clause_bound_in_source_and_pdf(bundle_te
 
 
 @pytest.mark.parametrize("title,old,new", [
-    (FOLLOWUP_TITLES[0], "clipping acts on these same ensembles", "clipping selects a new model state and samples"),
+    (FOLLOWUP_TITLES[0], "39 samples per window", "117 pooled samples per window"),
     (FOLLOWUP_TITLES[0], "separately from the equality residual", "including the equality residual"),
     (FOLLOWUP_TITLES[0], "that fail a moment inequality beyond rounding tolerance", "that fail the equality by any amount"),
     (FOLLOWUP_TITLES[0], "five primary coordinates", "six generated coordinates"),
+    (FOLLOWUP_TITLES[0], "raw predictions in standardized primary coordinates", "clipped predictions in physical units"),
     (FOLLOWUP_TITLES[0], "tied values can raise coverage", "tied values cannot raise coverage"),
     (FOLLOWUP_TITLES[0], "would mischaracterize calibration in this toy", "fully characterize calibration in this toy"),
     (FOLLOWUP_TITLES[0], "The exact conditional ensembles in Table 2", "An independent ensemble in Table 2"),
@@ -2667,6 +2685,7 @@ def test_exact_coverage_binds_original_ensemble_table(bundle_template, scope, va
 @pytest.mark.parametrize("value", ["999", "-999", "NaN"])
 @pytest.mark.parametrize("valid_duplicate", [False, True])
 @pytest.mark.parametrize("kind", ["toy", "gradient", "learned", "learned_caption",
+                                  "learned_width",
                                   "cancellation_train", "cancellation_groups", "cancellation_seeds",
                                   "cancellation_g5_windows"])
 def test_numeric_claim_slots_reject_malformed_values_and_valid_duplicates(
@@ -2691,8 +2710,11 @@ def test_numeric_claim_slots_reject_malformed_values_and_valid_duplicates(
         }[kind]
     else:
         check = followup_check(b, FOLLOWUP_TITLES[0])
-        pattern = (r"compares\s+(?P<slot>nine)\s+fits[\s\S]*?for sampling\." if kind == "learned"
-                   else r"(?P<slot>Nine)\s+diffusion fits[\s\S]*?seed 7\.")
+        pattern = {
+            "learned": r"compares\s+(?P<slot>nine)\s+fits[\s\S]*?for sampling\.",
+            "learned_caption": r"(?P<slot>Nine)\s+diffusion fits[\s\S]*?seed 7\.",
+            "learned_width": r"Width is[\s\S]*?statistics\s+(?P<slot>2)\s+and[\s\S]*?coordinates\.",
+        }[kind]
     check(tex, rendered)
     original = tex if scope == "source" else rendered
     matches = list(re.finditer(pattern, original))

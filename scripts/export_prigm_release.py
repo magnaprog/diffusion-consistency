@@ -112,6 +112,7 @@ tests/test_prigm_fixed_final_figure.py
 tests/test_prigm_fixed_final_sensitivity.py
 tests/test_prigm_followup_summary.py
 tests/test_prigm_full_flank_gaussian.py
+tests/test_prigm_gaussian_supplement.py
 tests/test_prigm_gradient_probe.py
 tests/test_prigm_illustration_evidence.py
 tests/test_prigm_illustration_publication.py

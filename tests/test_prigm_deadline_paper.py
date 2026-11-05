@@ -64,6 +64,14 @@ def test_released_deadline_cpu_evidence_replays_read_only(public_originals):
         assert result["operator"]["n_windows"] == 480
         assert set(result["operator"]["methods"]) == set(gate.bootstrap.ARMS + gate.bootstrap.CONTROLS)
         assert {"raw", "corrected", "raw_r_obs_mean"} <= set(result["gaussian"]["metrics"])
+        tables = gate.detailed_table_values(real, observations, result)
+        # Independently calculated acceptance values for the frozen public draws.
+        assert tables["tab:calibration"]["Gaussian regression raw"] == ["0.1813", "75.6", "0.5617", "94.0", "1.4203"]
+        assert tables["tab:calibration"]["Gaussian regression clipped"] == ["0.1804", "68.8", "0.5103", "93.5", "1.2863"]
+        assert tables["tab:channelcoverage"]["Gaussian regression"] == ["92.8", "92.9", "92.2", "93.9", "98.1"]
+        assert tables["tab:alternative"]["Gaussian regression raw"] == ["1.5728", "6.1746", "1.0497", "94.0", "6.0961"]
+        assert tables["tab:alternative"]["Gaussian regression clipped"] == ["1.5728", "5.0391", "2.1873", "67.5", "10.0897"]
+        assert tables["tab:geometry"]["Gaussian regression"] == ["0.0796", "1.5734", "1.5647", "1.5642", "2.0780", "2.0770"]
         assert len(result["plotted_rows"]) == 5
         if "fixed-final.json" in gate.read_json(PUBLIC / "MANIFEST.json")["files"]:
             assert len(result["fixed_final"]["rows"]) == 12
@@ -165,6 +173,82 @@ def test_current_deadline_tables_and_prose_match_source_and_pdf(public_claims):
 
 
 @pytest.mark.parametrize("scope", ["source", "PDF"])
+@pytest.mark.parametrize("coefficient", ["999", "1,000", "1{,}000", "NaN", "", "9 99"])
+@pytest.mark.parametrize("duplicate_location", ["none", "same_section", "after_section"])
+def test_fixed_final_score_coefficient_anchor_keeps_other_contexts(public_claims, scope, coefficient, duplicate_location):
+    tex, rendered, real, evidence = public_claims
+    # First accept the current paper, including the separate learned-toy comparison.
+    gate.deadline_claims(tex, rendered, real, evidence)
+    original = tex if scope == "source" else rendered
+    normalized = gate.prose_text(original, source=scope == "source")
+    assert len(re.findall(r"at\s+cr\s*=", normalized)) >= 2
+    assert "even though its coverage is lower" in normalized
+    prefix = r"At\s+\$c_R=0\.005\$," if scope == "source" else r"At\s+cR\s*=\s*0\.005,"
+    pattern = prefix + r"\s+the\s+score\s+is\s+lower\s+than\s+D['’]s\s+at\s+seed\s+42\s+and\s+higher\s+at\s+seeds\s+7\s+and\s+13\."
+    matches = list(re.finditer(pattern, original))
+    assert len(matches) == 1
+    match = matches[0]
+    valid = match.group()
+    wrong = valid.replace("0.005", coefficient, 1)
+    if duplicate_location == "same_section":
+        wrong += " " + valid
+    changed = original[:match.start()] + wrong + original[match.end():]
+    if duplicate_location == "after_section":
+        # The paper has later sections; a valid clause there cannot rescue this one.
+        later = "Related work on physical constraints in prediction and generation"
+        assert later in original[match.end():]
+        changed += "\n" + valid
+    changed_scopes = (changed, rendered) if scope == "source" else (tex, changed)
+    error = "missing or duplicate clause" if duplicate_location == "same_section" else "clause differs"
+    with pytest.raises(ValueError, match=scope + ": " + error):
+        gate.deadline_claims(*changed_scopes, real, evidence)
+
+
+@pytest.mark.parametrize("title", [
+    "Penalty strength after training",
+    "Training diffusion models on the same HMM",
+    "How the residual penalty is weighted",
+    "Directional cancellation with thresholds from TRAIN",
+])
+def test_claim_scope_accepts_current_section_and_subsections(public_claims, title):
+    tex, rendered, real, evidence = public_claims
+    gate.deadline_claims(tex, rendered, real, evidence)
+    source, pdf = gate.claim_subsection(tex, rendered, title)
+    assert source.strip() and pdf.strip()
+    assert not re.search(r"\\(?:sub)*section\*?\{", source)
+    if title == "Penalty strength after training":
+        for text, is_source in ((source, True), (pdf, False)):
+            normalized = gate.prose_text(text, source=is_source)
+            assert len(re.findall(r"at\s+cr\s*=", normalized)) == 1
+            assert "even though its coverage is lower" not in normalized
+            assert "solar wind reconstruction addresses quantities" not in normalized
+    elif title == "Training diffusion models on the same HMM":
+        assert "even though its coverage is lower" in source
+        assert "even though its coverage is lower" in gate.prose_text(pdf)
+
+
+@pytest.mark.parametrize("scope", ["source", "PDF"])
+@pytest.mark.parametrize("damage", ["missing", "duplicate"])
+def test_fixed_final_score_section_heading_is_required(public_claims, scope, damage):
+    tex, rendered, real, evidence = public_claims
+    gate.deadline_claims(tex, rendered, real, evidence)
+    title = "Penalty strength after training"
+    if scope == "source":
+        heading = r"\section{" + title + "}"
+        assert tex.count(heading) == 1
+        changed = tex.replace(heading, "" if damage == "missing" else heading + "\n" + heading, 1)
+        changed_scopes = changed, rendered
+    else:
+        matches = list(re.finditer(r"(?m)^[ \t]*[A-Z][ \t]+" + re.escape(title) + r"[ \t]*$", rendered))
+        assert len(matches) == 1
+        heading = matches[0].group()
+        changed = rendered.replace(heading, "" if damage == "missing" else heading + "\n" + heading, 1)
+        changed_scopes = tex, changed
+    with pytest.raises(ValueError, match="missing or duplicate " + scope + " section/subsection"):
+        gate.deadline_claims(*changed_scopes, real, evidence)
+
+
+@pytest.mark.parametrize("scope", ["source", "PDF"])
 def test_false_score_role_cannot_hide_before_valid_duplicate(public_claims, scope):
     tex, rendered, real, evidence = public_claims
     source = tex if scope == "source" else rendered
@@ -188,7 +272,9 @@ def test_wrong_coverage_reference_is_rejected(public_claims, scope, alter_differ
         pattern = r"O-S falls farther[\s\S]*?two percentage points \(Table~\\ref\{tab:calibration\}\)\."
         original = tex
     else:
-        pattern = r"O-S\s+falls\s+farther[\s\S]*?two\s+percentage\s+points\s+\(Table\s+\d+\)\."
+        # pdftotext can place an isolated page footer before the table reference.
+        pattern = (r"O-S\s+falls\s+farther[\s\S]*?two\s+percentage\s+points"
+                   r"(?:\s+|\s*\n[ \t]*\d+[ \t]*\n\f\s*)\(Table\s+\d+\)\.")
         original = rendered
     matches = list(re.finditer(pattern, original))
     assert len(matches) == 1
@@ -716,6 +802,13 @@ def gaussian_test_case(tmp_path, monkeypatch):
     movement = [{"mean_primary_l2": 0.} for _ in ids]
     calculated["correction_displacement"] = {"per_window": movement, "summary": reduced(movement, months)}
     monkeypatch.setattr(fg, "test_scores", lambda *args: copy.deepcopy(calculated))
+    # This fixture isolates the authenticated TEST interface, not metric arithmetic.
+    def supplementary(ensemble, truth, nrm, months, kinds):
+        return {kind: {new: copy.deepcopy(calculated[kind]["summary"][old])
+                       for new, old in (("es5", "primary_es"), ("es_vec", "vector_energy"),
+                                        ("proxy_crps", "resolved_energy_proxy_crps"))}
+                for kind in kinds}
+    monkeypatch.setattr(gate, "gaussian_supplemental_metrics", supplementary)
     commit_name = f"test/{name}/gen_00000000/COMMIT.json"
     candidate = {"lambda": .1, "rho": 0., "selected_for": ["raw", "corrected"], "ensemble": f"test/{name}",
                  "ensemble_commit_sha256": gate.digest(root / commit_name), **copy.deepcopy(calculated)}
@@ -742,6 +835,71 @@ def test_gaussian_test_interface_preserves_population_and_ranks(gaussian_test_ca
     assert result["metrics"]["raw_r_obs_mean"]["mean"] == 0.
     assert result["ranks"]["raw"]["primary_es"]["rank_among_original_18_plus_selected"] == 1
     assert len(result["ranks"]["raw"]["primary_es"]["original_18"]) == 18
+    assert set(result["supplemental_metrics"]) == {"raw", "corrected"}
+
+
+@pytest.mark.parametrize("metric", ["es5", "es_vec", "proxy_crps"])
+def test_gaussian_supplement_crosschecks_existing_metrics(gaussian_test_case, monkeypatch, metric):
+    args, _, _ = gaussian_test_case
+    original = gate.gaussian_supplemental_metrics
+    def damaged(*args):
+        result = original(*args)
+        result["raw"][metric]["month_balanced"] *= 1.01
+        return result
+    monkeypatch.setattr(gate, "gaussian_supplemental_metrics", damaged)
+    with pytest.raises(ERRORS, match="supplemental existing metric"):
+        gate.validate_gaussian(*args)
+
+
+def test_gaussian_separate_selected_candidates_keep_their_own_supplements(gaussian_test_case, monkeypatch):
+    args, state, first_name = gaussian_test_case
+    root = args[0]
+    contract, fit, selection, hashes = gate.validate_gaussian_fit()
+    second_pair = (1., .5)
+    second_name = fg.candidate_name(*second_pair)
+    selection["selected"]["corrected"].update({"lambda": 1., "rho": .5})
+    selection["selected_union"].append(second_name)
+    first_meta = {**state["meta"], "selected_for": ["raw"]}
+    second_meta = {**fg.ensemble_metadata(contract, hashes, selection, args[-1], second_pair),
+                   "schema_version": 2, "ids_sha256": id_hash(state["ids"]), "generation": 0,
+                   "files": {"ensemble.npz": fake_hash("synthetic ensemble")}}
+    monkeypatch.setattr(fg, "read_ensemble", lambda path: (
+        np.broadcast_to(state["single"], (480, 39, 6, 48)), state["ids"],
+        second_meta if Path(path).name == second_name else first_meta))
+    second_path = root / f"test/{second_name}/gen_00000000"
+    second_path.mkdir(parents=True)
+    np.savez(second_path / "ensemble.npz", ids=np.array([], dtype="U1"), ensemble=np.zeros(0))
+    second_commit = f"test/{second_name}/gen_00000000/COMMIT.json"
+    second_hash = save(root / second_commit, second_meta)
+    phase = gate.read_json(root / "test/TEST_STARTED.json")
+    phase["selected_union"] = selection["selected_union"]
+    save(root / "test/TEST_STARTED.json", phase)
+    record = gate.read_json(root / "test/SCORES.json")
+    record["selected"] = selection["selected"]
+    record["candidates"][first_name]["selected_for"] = ["raw"]
+    second = copy.deepcopy(record["candidates"][first_name])
+    second.update({"lambda": 1., "rho": .5, "selected_for": ["corrected"],
+                   "ensemble": f"test/{second_name}", "ensemble_commit_sha256": second_hash})
+    record["candidates"][second_name] = second
+    save(root / "test/SCORES.json", record)
+    completed = gate.read_json(root / "test/COMPLETED.json")
+    completed["selected_union"] = selection["selected_union"]
+    completed["files"][second_commit] = second_hash
+    completed["files"] = {path: gate.digest(root / path) for path in completed["files"]}
+    save(root / "test/COMPLETED.json", completed)
+    calls = []
+    original = gate.gaussian_supplemental_metrics
+    def marked(*args):
+        kinds = tuple(args[-1]);calls.append(kinds)
+        result = original(*args)
+        for kind in kinds:
+            result[kind]["es6"] = {"mean": float(len(calls)), "month_balanced": float(len(calls))}
+        return result
+    monkeypatch.setattr(gate, "gaussian_supplemental_metrics", marked)
+    result = gate.validate_gaussian(*args)
+    assert calls == [("raw",), ("corrected",)]
+    assert result["supplemental_metrics"]["raw"]["es6"]["mean"] == 1.
+    assert result["supplemental_metrics"]["corrected"]["es6"]["mean"] == 2.
 
 
 @pytest.mark.parametrize("damage,match", [
@@ -1071,8 +1229,10 @@ def test_table_reference_slots_reject_malformed_values_and_valid_duplicates(
     original = tex if scope == "source" else rendered
     slot = re.escape(r"\ref{" + label + "}") if scope == "source" else r"\d+"
     if label == "tab:calibration":
+        # Only the PDF locator permits an isolated footer at a page break.
+        separator = r"(?:\s+|\s*\n[ \t]*\d+[ \t]*\n\f\s*)" if scope == "PDF" else r"\s+"
         pattern = (gate.clause_pattern(prefix) + r"[\s\S]*?" + gate.clause_pattern(ending)
-                   + r"\s+\(Table[~\s]+(?P<slot>" + slot + r")\)\.")
+                   + separator + r"\(Table[~\s]+(?P<slot>" + slot + r")\)\.")
     else:
         pattern = gate.clause_pattern(prefix) + r"[~\s]+(?P<slot>" + slot + r")[\s\S]*?" + gate.clause_pattern(ending)
     matches = list(re.finditer(pattern, original))
@@ -1098,7 +1258,10 @@ def test_revised_count_cannot_hide_behind_valid_duplicate(public_claims, scope, 
     tex, rendered, real, evidence = public_claims
     gate.deadline_claims(tex, rendered, real, evidence)
     original = tex if scope == 'source' else rendered
-    match = re.search(r'\s+'.join(re.escape(word) for word in clause.split()), original)
+    # pdftotext can lift the next sentence's squared unit above this line.
+    # The positive check above verifies that unit before locating this mutation.
+    separator = r'\s+(?:2[ \t]*\n\s*)?' if scope == 'PDF' else r'\s+'
+    match = re.search(separator.join(re.escape(word) for word in clause.split()), original)
     assert match is not None
     valid = match.group()
     changed = original[:match.start()] + valid.replace(before, after, 1) + original[match.end():] + '\n' + valid

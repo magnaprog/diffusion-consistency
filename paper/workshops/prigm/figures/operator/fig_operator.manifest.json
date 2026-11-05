@@ -4,7 +4,7 @@
   "protocol_sha256": "25d0cdefdd5dbb160c32c7b5f4a6053bab99e4a9f64832d9eb6502232bf24e6b",
   "source": {
     "path": "fig_operator.py",
-    "sha256": "0c1b0528ab1e26ab2f3b4eefbb620296d68783eb3c1155940961c82b3b4a2ce0"
+    "sha256": "1a4e8ec31441a8dfb8235487b77989baacd7eb7456deadc7154023e607007377"
   },
   "style": {
     "path": "prigm.mplstyle",
@@ -103,7 +103,7 @@
   },
   "matplotlib_version": "3.10.9",
   "output_sha256": {
-    "fig_operator.pdf": "6c4bf5045d2ea76a88cee74e1216427b42405f71ca9d87990940c0705c632c9f",
-    "fig_operator.png": "89d9b9b1cca7a29add91c242ca0e0bcb447094ffb87eedb8c8b5041898ae2739"
+    "fig_operator.pdf": "57174a1bea7e5fe03bb6ca1b2397d7798bbe2926c884a07e9bb3abf561524ce3",
+    "fig_operator.png": "5f4f32c2912a4ce0cb9f86491ec12259ecd33e7137051eabdea1939b9f1e9012"
   }
 }
