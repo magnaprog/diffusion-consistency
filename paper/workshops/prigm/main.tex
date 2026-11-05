@@ -309,26 +309,26 @@ The denoising comparison distinguishes two conditioning sets. For one fixed nois
 
 \subsection{Training diffusion models on the same HMM}
 
-The learned models test how these residual objectives behave during training. Each fit uses 4{,}096 windows generated at seed 106 by cycling through the nine $(\alpha,p)$ combinations, a U-Net with channel widths 32/64/64, batches of 128, and 5{,}000 optimizer updates at seed 7. The remaining optimizer and diffusion settings follow Appendix~\ref{app:protocol}. Table~\ref{tab:learnedtoy} compares nine fits to the stationary chain with 50 DDIM evaluations for sampling. M and S denote the mean estimate and the estimate from two denoiser evaluations defined in Appendix~\ref{app:protocol}. At both coefficients, the identity penalty gives primary scores close to D, whereas omitting the variances gives higher scores with either estimator. These comparisons concern one training seed and its existing samples; variation across training seeds remains outside this comparison. The earlier models with independent end states belong to a separate analysis.
+The learned models test how these residual objectives behave during training. Each fit uses 4{,}096 windows generated at seed 106 by cycling through the nine $(\alpha,p)$ combinations, a U-Net with channel widths 32/64/64, batches of 128, and 5{,}000 optimizer updates at seed 7. The remaining optimizer and diffusion settings follow Appendix~\ref{app:protocol}. Table~\ref{tab:learnedtoy} compares nine fits to the stationary chain with 50 DDIM evaluations for sampling. M and S denote the mean estimate and the estimate from two denoiser evaluations defined in Appendix~\ref{app:protocol}. At both coefficients, the identity penalty gives primary scores close to D, whereas omitting the variances gives higher scores with either estimator. These comparisons concern one training seed and its existing samples; variation across training seeds remains outside this comparison. The earlier models with independent end states belong to a separate analysis. The mean 90\% interval width is greater for I-S at $c_R=0.005$ than for D, even though its coverage is lower.
 
 \begin{table}[ht]
 \centering
-\caption{Nine diffusion fits to the stationary hidden Markov model after 5{,}000 optimizer updates at seed 7. Evaluation uses 288 windows and 39 samples per window; clipping acts on these same ensembles. Raw $|R|$ is the mean absolute residual of the observation identity in HMM units. The inequality column gives the percentage of generated bins that fail a moment inequality beyond rounding tolerance, separately from the equality residual. Coverage averages the five primary coordinates and twelve positions. The independent exact conditional ensemble has 100\% coverage for the inclusive nominal 90\% intervals.}
+\caption{Nine diffusion fits to the stationary hidden Markov model after 5{,}000 optimizer updates at seed 7. Evaluation uses 288 windows and 39 samples per window. Raw $|R|$ is the mean absolute residual of the observation identity in HMM units. The inequality column gives the percentage of generated bins that fail a moment inequality beyond rounding tolerance, separately from the equality residual. Coverage and width average the five primary coordinates and twelve positions. Width is the mean difference between inclusive order statistics 2 and 38 of 39 raw predictions in standardized primary coordinates. The independent exact conditional ensemble has 100\% coverage for the inclusive nominal 90\% intervals.}
 \label{tab:learnedtoy}
 \begin{tabular}{lrrrrrr}
 \toprule
- & & \multicolumn{2}{c}{Energy score} & \multicolumn{3}{c}{Raw samples} \\
-Procedure & $c_R$ & Raw & Clipped & $|R|$ & \parbox[c]{19mm}{\centering Bins failing inequalities (\%)} & 90\% coverage (\%) \\
+ & & \multicolumn{5}{c}{Raw predictions} \\
+Procedure & $c_R$ & \parbox[c]{14mm}{\centering Energy score} & $|R|$ & \parbox[c]{19mm}{\centering Bins failing inequalities (\%)} & \parbox[c]{18mm}{\centering 90\% coverage (\%)} & \parbox[c]{13mm}{\centering 90\% width} \\
 \midrule
-D & 0 & 4.2607 & 4.2609 & 0.0126 & 27.5 & 94.5 \\
-I-M & 0.0005 & 4.3283 & 4.3285 & 0.2861 & 26.6 & 84.3 \\
-I-M & 0.005 & 4.6021 & 4.6022 & 0.7050 & 26.6 & 81.2 \\
-I-S & 0.0005 & 4.4991 & 4.4993 & 0.6262 & 26.0 & 77.5 \\
-I-S & 0.005 & 4.8020 & 4.8020 & 1.0086 & 29.2 & 74.6 \\
-O-M & 0.0005 & 4.2604 & 4.2605 & 0.0122 & 27.8 & 94.7 \\
-O-M & 0.005 & 4.2544 & 4.2545 & 0.0095 & 27.4 & 95.3 \\
-O-S & 0.0005 & 4.2593 & 4.2595 & 0.0120 & 27.8 & 94.8 \\
-O-S & 0.005 & 4.2551 & 4.2553 & 0.0094 & 27.4 & 95.9 \\
+D & 0 & 4.2607 & 0.0126 & 27.5 & 94.5 & 1.4833 \\
+I-M & 0.0005 & 4.3283 & 0.2861 & 26.6 & 84.3 & 1.4939 \\
+I-M & 0.005 & 4.6021 & 0.7050 & 26.6 & 81.2 & 1.5625 \\
+I-S & 0.0005 & 4.4991 & 0.6262 & 26.0 & 77.5 & 1.5396 \\
+I-S & 0.005 & 4.8020 & 1.0086 & 29.2 & 74.6 & 1.6499 \\
+O-M & 0.0005 & 4.2604 & 0.0122 & 27.8 & 94.7 & 1.4835 \\
+O-M & 0.005 & 4.2544 & 0.0095 & 27.4 & 95.3 & 1.4854 \\
+O-S & 0.0005 & 4.2593 & 0.0120 & 27.8 & 94.8 & 1.4836 \\
+O-S & 0.005 & 4.2551 & 0.0094 & 27.4 & 95.9 & 1.4855 \\
 \bottomrule
 \end{tabular}
 \end{table}
@@ -340,7 +340,7 @@ Discreteness also matters for interval coverage. The exact conditional ensembles
 \section{Prediction scores and interval coverage}
 \label{app:details}
 
-Here and in Appendix~\ref{app:strata}, Gaussian denotes interpolation with a Gaussian residual fit on TRAIN. Gaussian regression instead uses the wider available context; Table~\ref{tab:main} and Appendix~\ref{app:extension} present that model separately.
+Here and in Appendix~\ref{app:strata}, Gaussian denotes interpolation with a Gaussian residual fit on TRAIN. Rows explicitly labeled Gaussian regression use the wider available context, as described in Appendix~\ref{app:extension}. Both Gaussian methods use one ensemble per window.
 
 The five primary quantities differ in both units and scale. Subtracting each quantity's TRAIN mean and dividing by its TRAIN scale makes field values in nT and scalar variance in nT$^2$ dimensionless. The energy score then compares predictions for the whole missing hour in 60 coordinates, balancing distance to the withheld record against separation between predictions. The true conditional distribution minimizes the expected score \citep{gneiting2007strictly}. Here, energy is the name of a statistical criterion. The magnetic energy density calculation below addresses a different physical question.
 
@@ -427,7 +427,7 @@ Gaussian regression covers 98.1\% of $v_s$ observations, with 0.6\% below and 1.
 \centering
 \caption{Marginal continuous ranked probability scores, interval coverage and width for the five primary quantities. Scores and widths use dimensionless standardized values; coverage is in percent. Results average hidden positions, months and three diffusion seeds. Each other method uses one ensemble. Clipped rows apply the clipping map. Diffusion procedures choose checkpoints separately before and after clipping, except the D row that retains the weights from the raw procedure. Gaussian denotes interpolation with a Gaussian residual.}
 \label{tab:calibration}
-\setlength{\tabcolsep}{4pt}
+\setlength{\tabcolsep}{3.5pt}
 \begin{tabular}{lrrrrr}
 \toprule
  & & \multicolumn{2}{c}{50\% intervals} & \multicolumn{2}{c}{90\% intervals} \\
@@ -444,6 +444,8 @@ G5 raw & 0.1634 & 38.1 & 0.3137 & 75.7 & 0.9308 \\
 G5 clipped & 0.1624 & 38.4 & 0.3128 & 75.8 & 0.9287 \\
 Gaussian raw & 0.1960 & 76.4 & 0.6262 & 94.3 & 1.5822 \\
 Gaussian clipped & 0.1935 & 68.6 & 0.5512 & 93.6 & 1.3933 \\
+Gaussian regression raw & 0.1813 & 75.6 & 0.5617 & 94.0 & 1.4203 \\
+Gaussian regression clipped & 0.1804 & 68.8 & 0.5103 & 93.5 & 1.2863 \\
 Interpolation raw & 0.1993 & 0.0 & 0.0000 & 0.0 & 0.0000 \\
 Interpolation clipped & 0.1993 & 0.0 & 0.0000 & 0.0 & 0.0000 \\
 Persistence raw & 0.2697 & 0.1 & 0.0000 & 0.1 & 0.0000 \\
@@ -465,6 +467,7 @@ I-S & 82.2 & 74.8 & 80.7 & 74.3 & 34.9 \\
 O-S & 78.2 & 74.6 & 76.4 & 67.0 & 53.9 \\
 G5 & 82.1 & 85.9 & 87.6 & 82.2 & 40.5 \\
 Gaussian & 93.1 & 93.5 & 92.2 & 94.1 & 98.5 \\
+Gaussian regression & 92.8 & 92.9 & 92.2 & 93.9 & 98.1 \\
 Interpolation & 0.0 & 0.0 & 0.0 & 0.0 & 0.0 \\
 Persistence & 0.1 & 0.2 & 0.1 & 0.0 & 0.0 \\
 \bottomrule
@@ -472,20 +475,20 @@ Persistence & 0.1 & 0.2 & 0.1 & 0.0 & 0.0 \\
 \end{table}
 
 \begin{samepage}
-Changing the coordinates in the score changes the question it asks. The vector score in Table~\ref{tab:alternative} uses 36 standardized coordinates; adding $m$, $v_s$ and $v_v$ gives 72. Although $v_v$ follows from the other quantities for realizable statistics, including it changes distances and the relative influence of errors. The resulting scores have different scales and can rank methods differently. Gaussian interpolation has a lower mean vector score than D, I-S and O-S. G5 has the lowest mean primary score over five quantities, while its rank changes when $v_v$ enters the score.
+Changing the coordinates in the score changes the question it asks. The vector score in Table~\ref{tab:alternative} uses 36 standardized coordinates; adding $m$, $v_s$ and $v_v$ gives 72. Although $v_v$ follows from the other quantities for realizable statistics, including it changes distances and the relative influence of errors. The resulting scores have different scales and can rank methods differently. Gaussian interpolation has a lower mean vector score than D, I-S and O-S. Gaussian regression is close to G5 for vectors alone, but has a much larger score than G5 when all six quantities enter. Its algebraic completion satisfies the variance identity while leaving errors in the joint distribution. G5 has the lowest mean primary score over five quantities, while its rank changes when $v_v$ enters the score.
 
-The magnetic energy calculation assesses a different aspect of the prediction. For realizable statistics, $m^2+v_s$ equals the mean squared magnitude of the five vector averages, each over one minute. Conversion to T$^2$ and division by $2\mu_0$ give the magnetic energy density represented by those averages; variation within the original minute averages is absent. The same scalar transformation is applied to every predicted bin and averaged over the missing hour for each ensemble member. CRPS compares this scalar ensemble with the energy density of the withheld record. Interpreting each predicted value as the energy density of vectors with the other predicted moments depends on their joint realizability. CRPS and interval width have units of J\,m$^{-3}$, shown as multiples of $10^{-12}$ in Table~\ref{tab:alternative}. Raw Gaussian interpolation has the lowest CRPS for this quantity among the procedures in that table. Clipping brings the moments into the ranges in Equation~\ref{eq:support} to rounding tolerance, but its effect on the score depends on how the predictive distribution changes.
+The magnetic energy calculation assesses a different aspect of the prediction. For realizable statistics, $m^2+v_s$ equals the mean squared magnitude of the five vector averages, each over one minute. Conversion to T$^2$ and division by $2\mu_0$ give the magnetic energy density represented by those averages; variation within the original minute averages is absent. The same scalar transformation is applied to every predicted bin and averaged over the missing hour for each ensemble member. CRPS compares this scalar ensemble with the energy density of the withheld record. Interpreting each predicted value as the energy density of vectors with the other predicted moments depends on their joint realizability. CRPS and interval width have units of J\,m$^{-3}$, shown as multiples of $10^{-12}$ in Table~\ref{tab:alternative}. Raw Gaussian regression has the lowest mean CRPS for this quantity among the procedures in that table, slightly below Gaussian interpolation. Clipping brings the moments into the ranges in Equation~\ref{eq:support} to rounding tolerance, but its effect on the score depends on how the predictive distribution changes.
 \end{samepage}
 
 \begin{table}[ht]
 \centering
 \caption{Scores for alternative magnetic quantities. The vector and six-coordinate energy scores use 36 and 72 standardized coordinates. The last three columns assess the mean magnetic energy density over the missing hour, computed for each ensemble member from $m^2+v_s$. This quantity retains the energy represented by vector averages over one minute and excludes variation within those averages. Raw rows evaluate the same scalar even when the other predicted moments are inconsistent. Continuous ranked probability score and interval width are in $10^{-12}$ J\,m$^{-3}$; coverage is in percent. Validation chooses model states separately for raw and clipped diffusion predictions. Gaussian denotes Gaussian interpolation.}
 \label{tab:alternative}
-\setlength{\tabcolsep}{4pt}
+\setlength{\tabcolsep}{3.5pt}
 \begin{tabular}{@{}lrrrrr@{}}
 \toprule
  & \multicolumn{2}{c}{Energy score} & \multicolumn{3}{c}{Resolved magnetic energy density} \\
-Procedure & Vector & \parbox[c]{17mm}{\centering Six coordinates} & \parbox[c]{27mm}{\centering Continuous ranked probability score} & 90\% coverage (\%) & 90\% width \\
+Procedure & Vector & \parbox[c]{17mm}{\centering Six coordinates} & \parbox[c]{27mm}{\centering Continuous ranked probability score} & \parbox[c]{19mm}{\centering 90\% coverage (\%)} & \parbox[c]{14mm}{\centering 90\% width} \\
 \midrule
 D raw & 1.6351 & 2.1528 & 2.8599 & 74.3 & 6.2166 \\
 D clipped & 1.6222 & 2.5726 & 2.7568 & 68.5 & 6.6024 \\
@@ -497,6 +500,8 @@ G5 raw & 1.5740 & 2.4959 & 1.8961 & 82.2 & 6.8060 \\
 G5 clipped & 1.5740 & 2.4285 & 1.9066 & 82.4 & 6.8757 \\
 Gaussian raw & 1.5909 & 2.7342 & 1.0816 & 93.8 & 6.1012 \\
 Gaussian clipped & 1.5909 & 4.2146 & 2.5465 & 64.8 & 11.2941 \\
+Gaussian regression raw & 1.5728 & 6.1746 & 1.0497 & 94.0 & 6.0961 \\
+Gaussian regression clipped & 1.5728 & 5.0391 & 2.1873 & 67.5 & 10.0897 \\
 Interpolation raw & 1.9834 & 2.8920 & 1.2771 & 0.0 & 0.0000 \\
 Interpolation clipped & 1.9834 & 4.6381 & 1.2771 & 0.0 & 0.0000 \\
 Persistence raw & 2.7925 & 3.6601 & 2.6284 & 0.0 & 0.0000 \\
@@ -511,6 +516,8 @@ At the two edges of the missing hour, vector increments connect indices 17 to 18
 
 The withheld record has mean increment magnitudes of 1.0460 nT at the left edge, 1.0539 nT at the right edge, and 1.0831 nT inside the missing hour. Interpolation imposes a smooth connection between the available measurements. Comparison with the withheld increments tests how well that smooth connection represents the actual variation.
 
+All four diffusion procedures produce larger mean increments at the two edges than the withheld record. D, I-S and O-S also have smaller mean increments inside the missing hour; G5 is close to the observed internal value. Both Gaussian methods exceed all three observed increment means. This comparison separates variation inside the predictions from abrupt transitions where they meet the available measurements.
+
 The variogram score examines dependence through differences between coordinates, using exponent $1/2$ \citep{scheuerer2015variogram}. This calculation weights 175 pairs equally: 55 connect adjacent times within a primary quantity and 120 connect different quantities at the same time. For pair $(i,j)$, let $d_k=|x_{k,i}-x_{k,j}|^{1/2}$. The contribution is $(|y_i-y_j|^{1/2}-\bar d)^2-s_d^2/K$, with $K=39$ and variance $s_d^2$ computed using divisor $K-1$. The squared term compares the transformed difference in the measurements with the ensemble mean. For independent samples, that estimate has variance $\operatorname{Var}(d_k)/K$; subtracting $s_d^2/K$ removes its upward Monte Carlo bias in expectation. The final score averages these contributions. It complements the energy score by emphasizing differences between coordinates.
 
 
@@ -519,6 +526,7 @@ The variogram score examines dependence through differences between coordinates,
 \centering
 \caption{Vector increments and variogram scores before clipping. Increment magnitudes and RMSE use nT. Observed mean increments are 1.0460 at the left edge, 1.0539 at the right edge and 1.0831 inside the missing hour. RMSE is calculated across the 39 individual predictions in each window, then averaged over months and seeds; it includes both predictive spread and error of the predictive mean. The variogram uses the 175 standardized coordinate pairs defined in the text and the finite-ensemble bias correction. Clipping retains the vector increments when the model weights stay the same, while its changes to $m$ and $v_s$ can alter the variogram. D also changes vector predictions through the separate validation choice of checkpoint at seed 7. Gaussian denotes interpolation with a Gaussian residual.}
 \label{tab:geometry}
+\setlength{\tabcolsep}{5.5pt}
 \begin{tabular}{lrrrrrr}
 \toprule
  & & \multicolumn{3}{c}{Mean increment magnitude} & \multicolumn{2}{c}{Root mean square error} \\
@@ -529,6 +537,7 @@ I-S & 0.0521 & 1.3309 & 1.4224 & 0.8156 & 1.8059 & 1.8854 \\
 O-S & 0.0524 & 1.3111 & 1.3296 & 0.7635 & 1.7974 & 1.7990 \\
 G5 & 0.0490 & 1.3717 & 1.3830 & 1.0789 & 1.8893 & 1.8958 \\
 Gaussian & 0.0905 & 1.5737 & 1.5587 & 1.5718 & 2.1020 & 2.1114 \\
+Gaussian regression & 0.0796 & 1.5734 & 1.5647 & 1.5642 & 2.0780 & 2.0770 \\
 Interpolation & 0.0658 & 0.2518 & 0.2518 & 0.2518 & 1.0373 & 1.0309 \\
 Persistence & 0.1003 & 0.0000 & 3.2730 & 0.0000 & 1.0460 & 3.1140 \\
 \bottomrule
@@ -692,7 +701,7 @@ For D, Table~\ref{tab:operators} attributes an energy score change of $-0.00637$
 \begin{figure}[t]
  \centering
  \includegraphics[width=0.90\linewidth]{figures/operator/fig_operator.pdf}
-\caption{Clipping samples from models chosen by raw validation score. (a) Mean displacement in 60 standardized coordinates on a logarithmic axis. Blue circles show individual fits; purple diamonds show their mean or one Gaussian ensemble. (b) Solid bars show the change in distance to withheld values; striped bars show the change in the negative spread term. Their sum, the energy score change, appears as purple diamonds. The symmetric logarithmic axis is linear inside $\pm0.005$. Clipping changes D's score by $-0.0064$; choosing another checkpoint adds $-0.0118$.}
+\caption{Clipping samples from models chosen by raw validation score. (a) Mean displacement in 60 standardized coordinates on a logarithmic axis. Blue circles show individual fits; black diamonds show their mean or one Gaussian ensemble. (b) Blue circles show the change in distance to withheld values; orange squares show the change in the negative spread term. Their sum, the energy score change, appears as purple diamonds. The symmetric logarithmic axis is linear inside $\pm0.005$. Clipping changes D's score by $-0.0064$; choosing another checkpoint adds $-0.0118$.}
  \label{fig:operator}
 \end{figure}
 

@@ -680,6 +680,30 @@ def validate_gaussian_fit(root, protocol, core, receipt_hash):
     return contract, fit, selection, hashes
 
 
+def gaussian_supplemental_metrics(ensemble, truth, nrm, months, selected_for):
+    """Recompute table diagnostics from this authenticated selected ensemble.
+
+    Keep the historical Gaussian producer and its recorded schema unchanged.
+    Raw and corrected selection can identify different lambda/rho candidates.
+    """
+    from prigm.run_score import decode_ensemble
+    from prigm.observation import closure_correct
+    from prigm.run_secondaries import window_diagnostics, summarize_diagnostics
+    fields = ("es5", "es_vec", "es6", "crps5_mean", "cov50_mean", "width50_mean",
+              "cov90_mean", "width90_mean", "cov90_by_position_channel", "proxy_crps",
+              "proxy_cov90", "proxy_width90", "variogram", "seam_l_mean", "seam_r_mean",
+              "internal_mean", "seam_l_rmse", "seam_r_rmse")
+    records = {kind: [] for kind in selected_for}
+    require(set(records) <= {"raw", "corrected"} and records, "unknown Gaussian scoring kind")
+    for stored, observed in zip(ensemble, truth):
+        raw = decode_ensemble(stored, nrm)
+        for kind in records:
+            samples = raw if kind == "raw" else closure_correct(raw)
+            values = window_diagnostics(samples, observed, nrm, stored_dtype=ensemble.dtype)
+            records[kind].append({key: values[key] for key in fields})
+    return {kind: summarize_diagnostics(rows, months) for kind, rows in records.items()}
+
+
 def validate_gaussian(root, protocol, core, observations, real, receipt_hash):
     from analysis import prigm_full_flank_gaussian as fg
     from prigm.observation import residual_obs
@@ -703,7 +727,7 @@ def validate_gaussian(root, protocol, core, observations, real, receipt_hash):
     require(set(record["candidates"]) == set(selection["selected_union"]), "Gaussian selected TEST union differs")
     factors = fg.candidate_factors(fit)
     completions = ["test/TEST_STARTED.json", "test/SCORES.json"]
-    selected_metrics, selected_scores = {}, {}
+    selected_metrics, selected_scores, supplemental_metrics = {}, {}, {}
     for pair in fg.selected_pairs(selection):
         name = fg.candidate_name(*pair)
         path = local(root, f"test/{name}")
@@ -723,6 +747,14 @@ def validate_gaussian(root, protocol, core, observations, real, receipt_hash):
         expected = {"lambda": pair[0], "rho": pair[1], "selected_for": meta["selected_for"],
                     "ensemble": f"test/{name}", "ensemble_commit_sha256": digest(root / commit), **calculated}
         deadline_close(record["candidates"][name], expected, "Gaussian all TEST metrics")
+        supplemental = gaussian_supplemental_metrics(ensemble, z, nrm, months, meta["selected_for"])
+        require(set(supplemental) == set(meta["selected_for"]), "Gaussian supplemental selection differs")
+        for kind, values in supplemental.items():
+            for new, old in (("es5", "primary_es"), ("es_vec", "vector_energy"),
+                             ("proxy_crps", "resolved_energy_proxy_crps")):
+                deadline_close({new: values[new]}, {new: calculated[kind]["summary"][old]},
+                               "Gaussian supplemental existing metric")
+            supplemental_metrics[kind] = values
         for kind in ("raw", "corrected"):
             values = deadline_reductions(record["candidates"][name][kind], months,
                                         {key: () for key in calculated[kind]["summary"]})
@@ -750,7 +782,8 @@ def validate_gaussian(root, protocol, core, observations, real, receipt_hash):
             value = selected_metrics[kind][new]["month_balanced"]
             ranks[kind][new] = {"rank_among_original_18_plus_selected": 1 + sum(v < value for v in original.values()),
                                 "original_18": original, "selected_value": value}
-    return {"selection": selection, "metrics": selected_metrics, "ranks": ranks, "scores": selected_scores}
+    return {"selection": selection, "metrics": selected_metrics, "ranks": ranks,
+            "scores": selected_scores, "supplemental_metrics": supplemental_metrics}
 
 
 def validate_fixed_final(record, real, observations, protocol, inputs, core, operator=None):
@@ -1775,18 +1808,18 @@ def clause_pattern(text):
 
 
 def claim_subsection(tex, rendered, title):
-    """One named source subsection and its PDF heading, ending at the next heading."""
+    """One named section or subsection and its PDF heading, ending at the next heading."""
     tex = strip_comments(tex)
-    marker = r"\subsection{" + title + "}"
-    require(tex.count(marker) == 1, "missing or duplicate source subsection: " + title)
-    source = re.split(r"\\(?:sub)*section\*?\{", tex.split(marker, 1)[1], maxsplit=1)[0]
+    markers = list(re.finditer(r"\\(?:sub)*section\*?\{" + re.escape(title) + r"\}", tex))
+    require(len(markers) == 1, "missing or duplicate source section/subsection: " + title)
+    source = re.split(r"\\(?:sub)*section\*?\{", tex[markers[0].end():], maxsplit=1)[0]
     pdf = table_text(pdf_without_line_numbers(rendered))
     titles = re.findall(r"\\(?:sub)*section\*?\{([^{}]+)\}", tex)
     headings = list(re.finditer(r"(?m)^[ \t]*(?:[a-z]|\d+)(?:\.\d+)*[ \t]+(?:"
                                + "|".join(re.escape(table_text(t)) for t in titles) + r")[ \t]*$", pdf))
     matches = [i for i, h in enumerate(headings) if re.fullmatch(
         r"[ \t]*(?:[a-z]|\d+)(?:\.\d+)*[ \t]+" + re.escape(title.lower()) + r"[ \t]*", h[0])]
-    require(len(matches) == 1, "missing or duplicate PDF subsection: " + title)
+    require(len(matches) == 1, "missing or duplicate PDF section/subsection: " + title)
     i = matches[0]
     end = headings[i + 1].start() if i + 1 < len(headings) else len(pdf)
     return source, pdf[headings[i].end():end]
@@ -1963,11 +1996,13 @@ def deadline_claims(tex, rendered, real, evidence):
         bind("The strongest penalty gives", "The strongest penalty gives the smallest residual; the original coefficient gives the lowest mean score.")
         signs = np.asarray(means["0.005"]["raw"]) - means["0"]["raw"]
         require(np.all(signs[:2] > 0) and signs[2] < 0, "largest-coefficient seed directions changed")
-        bind("At $c_R=", "At $c_R=0.005$, the score is lower than D's at seed 42 and higher at seeds 7 and 13.")
+        scopes = claim_subsection(tex, rendered, "Penalty strength after training")
+        bind_clause(scopes, clause_pattern(prose_text("At $c_R=", source=True)),
+                    "At $c_R=0.005$, the score is lower than D's at seed 42 and higher at seeds 7 and 13.")
 
 
 def learned_toy_claims(tex, rendered, evidence):
-    """Nine ordered fits, same-checkpoint repair, and the atomic reference paragraph."""
+    """Nine ordered fits, raw interval widths, and the atomic reference paragraph."""
     learned, reference = evidence
     rows = {}
     for name in learned["fit_order"]:
@@ -1975,11 +2010,19 @@ def learned_toy_claims(tex, rendered, evidence):
         key = (fit["config"]["arm"], format(fit["config"]["c_r"], "g"))
         require(key not in rows, "duplicate learned composite ID")
         raw = fit["raw"]["secondary"]
-        rows[key] = [f"{fit[k]['mean_energy']:.4f}" for k in ("raw", "corrected")]
+        rows[key] = [f"{fit['raw']['mean_energy']:.4f}"]
         rows[key] += [f"{raw['r_obs_mean']['mean']:.4f}",
                       f"{100 * raw['frac_support_violation_beyond_rounding']['mean']:.1f}",
-                      f"{100 * raw['cov90_mean']['mean']:.1f}"]
+                      f"{100 * raw['cov90_mean']['mean']:.1f}",
+                      f"{raw['width90_mean']['mean']:.4f}"]
     bind_table(tex, rendered, "tab:learnedtoy", rows, ("Procedure",))
+    require(any("Raw predictions" in row for row in source_table_rows(tex, "tab:learnedtoy")),
+            "learned source header must identify raw predictions")
+    first_arm = re.escape(next(iter(rows))[0])
+    pdf_header = re.split(r"(?m)^[ \t]*" + first_arm + r"[ \t]+[-+]?\d",
+                          rendered_table(tex, rendered, "tab:learnedtoy"), maxsplit=1)[0]
+    require(re.search(r"(?m)^[ \t]*Raw predictions[ \t]*$", pdf_header) is not None,
+            "learned PDF header must identify raw predictions")
     scopes = claim_subsection(tex, rendered, "Training diffusion models on the same HMM")
     bind_clause(scopes, r"compares [^\s]+ fits", "compares nine fits to the stationary chain with 50 DDIM evaluations for sampling.")
     caption = float_caption(tex, "tab:learnedtoy")
@@ -1987,10 +2030,11 @@ def learned_toy_claims(tex, rendered, evidence):
     cap_scopes = (caption, pdf_caption)
     bind_clause(cap_scopes, r"[^\s]+ diffusion fits", "Nine diffusion fits to the stationary hidden Markov model after 5{,}000 optimizer updates at seed 7.")
     for anchor, expected in (
-        ("Evaluation uses", "Evaluation uses 288 windows and 39 samples per window; clipping acts on these same ensembles."),
+        ("Evaluation uses", "Evaluation uses 288 windows and 39 samples per window."),
         (r"Raw \|R\|", "Raw $|R|$ is the mean absolute residual of the observation identity in HMM units."),
         ("The inequality column", "The inequality column gives the percentage of generated bins that fail a moment inequality beyond rounding tolerance, separately from the equality residual."),
-        ("Coverage averages", "Coverage averages the five primary coordinates and twelve positions."),
+        ("Coverage and width average", "Coverage and width average the five primary coordinates and twelve positions."),
+        ("Width is", "Width is the mean difference between inclusive order statistics 2 and 38 of 39 raw predictions in standardized primary coordinates."),
         ("The independent exact conditional ensemble", "The independent exact conditional ensemble has "
          f"{100 * reference['secondary']['cov90_mean']['mean']:g}\\% coverage for the inclusive nominal 90\\% intervals."),
     ):
@@ -2152,11 +2196,14 @@ def cancellation_claims(tex, rendered, record):
         bind_clause(scopes, anchor, expected)
 
 
-def detailed_table_values(real, observations):
-    """98 rows, 494 data cells / 534 scalars, excluding the identifying seed column."""
+def detailed_table_values(real, observations, deadline=None):
+    """Original detailed tables, plus independently selected Gaussian regression rows."""
     comparison, summary = real
     methods = summary["methods"]
     def metric(label, name):
+        if label.startswith("regression_"):
+            kind = label.removeprefix("regression_")
+            return deadline["gaussian"]["supplemental_metrics"][kind][name]["month_balanced"]
         return methods[label]["metrics"][name]["month_balanced"]
     tables = {label: {} for label in DETAIL_LABELS}
     for arm in bootstrap.ARMS:
@@ -2175,9 +2222,10 @@ def detailed_table_values(real, observations):
         pair = comparison["comparisons"][arm + "_raw_minus_" + baseline.replace("Gaussian", "gaussian") + "_" + kind]
         tables["tab:contrasts"][row] = [f"{pair['mean_diff']:.4f}", vector(pair["year_95"]),
                                       vector(pair["twoyear_95"]), vector(pair["seed_diffs"], "()")]
-    names = ("D", "I-S", "O-S", "G5", "Gaussian", "Interpolation", "Persistence")
+    names = ("D", "I-S", "O-S", "G5", "Gaussian",
+             *(("Gaussian regression",) if deadline is not None else ()), "Interpolation", "Persistence")
     for name in names:
-        arm = MAIN_ROWS[name]
+        arm = "regression" if name == "Gaussian regression" else MAIN_ROWS[name]
         for kind in ("raw", "corrected", *(('corrected_at_raw_checkpoint',) if name == "D" else ())):
             label = arm + "_" + kind
             row = name + " " + ({"corrected": "clipped", "corrected_at_raw_checkpoint": "clipped, raw weights"}.get(kind, kind))
@@ -2217,8 +2265,8 @@ def detailed_table_values(real, observations):
     return tables
 
 
-def detailed_tables(tex, rendered, real, observations):
-    tables = detailed_table_values(real, observations)
+def detailed_tables(tex, rendered, real, observations, deadline=None):
+    tables = detailed_table_values(real, observations, deadline)
     for label, values in tables.items():
         bind_table(tex, rendered, label, values, ("Arm", "Method", "Contrast", "Procedure", "Representation", "Stratum", "Year"))
     return tables
@@ -2806,8 +2854,9 @@ def verify(paper_dir=PAPER):
         training_strata = report.check("TRAIN sensitivity provenance and all 21 TEST groups",
                                        lambda: validate_sensitivity(paper_dir, real, observations))
         if tex is not None and rendered is not None:
-            report.check("nine detailed tables: 98 rows, 494 cells / 534 scalars",
-                         lambda: detailed_tables(tex, rendered, real, observations))
+            detail_counts = "104 rows, 525 cells / 565 scalars" if deadline is not None else "98 rows, 494 cells / 534 scalars"
+            report.check("nine detailed tables: " + detail_counts,
+                         lambda: detailed_tables(tex, rendered, real, observations, deadline))
         else:
             report.add("nine detailed tables", False, "requires manuscript and PDF")
     else:
@@ -2830,7 +2879,7 @@ def verify(paper_dir=PAPER):
     else:
         report.add("toy table and main-text numerical claims", False, "unfinished: requires manuscript, PDF and toy evidence")
     if tex is not None and rendered is not None and learned is not None:
-        report.check("learned toy table: 45 cells, composite IDs, caption and atomic coverage paragraph",
+        report.check("learned toy table: 45 cells, composite IDs, raw widths, caption and atomic coverage paragraph",
                      lambda: learned_toy_claims(tex, rendered, learned))
     else:
         report.add("learned toy table and coverage paragraph", False, "requires manuscript, PDF and learned evidence")

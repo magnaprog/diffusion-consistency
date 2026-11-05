@@ -98,8 +98,11 @@ def test_axes_preserve_signed_values(evidence, tmp_path):
         assert len(fig.axes) == 2
         assert fig.axes[0].get_xscale() == "log"
         assert fig.axes[1].get_xscale() == "symlog"
-        np.testing.assert_allclose([p.get_width() for p in fig.axes[1].patches[:5]], [-0.01] * 5)
-        np.testing.assert_allclose([p.get_width() for p in fig.axes[1].patches[5:]], [0.002] * 5)
+        lines = {line.get_label(): line for line in fig.axes[1].lines}
+        np.testing.assert_allclose(lines["Distance to measurements"].get_xdata(), [-0.01] * 5)
+        np.testing.assert_allclose(lines["Negative spread term"].get_xdata(), [0.002] * 5)
+        np.testing.assert_allclose(lines["Energy score"].get_xdata(), [-0.008] * 5)
+        assert not fig.axes[1].patches
         assert "Gaussian\ninterpolation" in [label.get_text() for label in fig.axes[0].get_yticklabels()]
         assert fig.axes[0].get_ylim() == fig.axes[1].get_ylim()
         assert fig.axes[0]._left_title.get_text() == "(a) Mean displacement"
@@ -127,15 +130,15 @@ def test_fresh_render_and_manifest(evidence, tmp_path):
     assert (output / "fig_operator.pdf").read_bytes() == before
 
 
-def test_released_legend_does_not_cover_bars():
+def test_released_legends_stay_outside_the_data_axes():
     manifest = SOURCE.parent / "figures/operator/fig_operator.manifest.json"
     rows = json.loads(manifest.read_text())["plotted_rows"]
     fig = figure.plot(rows)
     try:
         fig.canvas.draw()
         renderer = fig.canvas.get_renderer()
-        axis = fig.axes[1]
-        legend = axis.get_legend().get_window_extent(renderer)
-        assert all(not legend.overlaps(bar.get_window_extent(renderer)) for bar in axis.patches)
+        for axis in fig.axes:
+            legend = axis.get_legend().get_window_extent(renderer)
+            assert all(not legend.overlaps(other.get_window_extent(renderer)) for other in fig.axes)
     finally:
         figure.plt.close(fig)

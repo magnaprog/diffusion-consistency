@@ -93,14 +93,16 @@ def load_rows(path, expected_sha256):
 
 
 def plot(rows):
-    fig, axes = plt.subplots(1, 2, figsize=(4.95, 2.30), sharey=True,
+    fig, axes = plt.subplots(1, 2, figsize=(4.95, 2.65), sharey=True,
                              gridspec_kw={"width_ratios": (1, 1.35)})
-    fig.subplots_adjust(left=.18, right=.98, bottom=.32, top=.86, wspace=.30)
+    fig.subplots_adjust(left=.18, right=.98, bottom=.37, top=.88, wspace=.30)
     a, b = axes
     for index, row in enumerate(rows):
         a.plot(row["seed_movement"], [index] * len(row["seed_movement"]), "o", markersize=3,
-               color=TERM_COLORS[0], markeredgecolor="#0072B2", markeredgewidth=0.4, zorder=2)
-        a.plot(row["movement"], index, "D", markersize=3.5, color=SUMMARY_COLOR, zorder=3)
+               color=TERM_COLORS[0], markeredgecolor="#0072B2", markeredgewidth=0.4, zorder=2,
+               label="Individual fit" if index == 0 else None)
+        a.plot(row["movement"], index, "D", markersize=3.5, color="0.15", zorder=3,
+               label="Mean or Gaussian ensemble" if index == 0 else None)
     a.set_xscale("log")
     a.set_xticks([0.1, 0.3, 1, 3], ["0.1", "0.3", "1", "3"])
     a.set_yticks(range(len(rows)), [row["label"] for row in rows])
@@ -112,12 +114,14 @@ def plot(rows):
 
     y = np.arange(len(rows))
     b.axvline(0, color="0.45", linewidth=0.7, zorder=0)
-    b.barh(y - 0.19, [r["delta_target"] for r in rows], height=0.36,
-          color=TERM_COLORS[0], label="Distance to measurements")
-    b.barh(y + 0.19, [r["negative_delta_dispersion"] for r in rows], height=0.36,
-          color=TERM_COLORS[1], hatch="///", edgecolor="0.25", linewidth=0.4,
-          label="Negative spread term")
-    b.plot([r["delta_energy"] for r in rows], y, "D", color=SUMMARY_COLOR, markersize=3, label="Score change (b)")
+    b.plot([r["delta_target"] for r in rows], y - 0.19, "o", markersize=3.5,
+           color=TERM_COLORS[0], markeredgecolor="#0072B2", markeredgewidth=0.4,
+           label="Distance to measurements")
+    b.plot([r["negative_delta_dispersion"] for r in rows], y + 0.19, "s", markersize=3.5,
+           color=TERM_COLORS[1], markeredgecolor="0.25", markeredgewidth=0.4,
+           label="Negative spread term")
+    b.plot([r["delta_energy"] for r in rows], y, "D", color=SUMMARY_COLOR, markersize=3,
+           label="Energy score")
     g5 = next(row for row in rows if row["method"] == "G5")
     value = g5["delta_energy"]
     label = f"{value:.5f}" if abs(value) < 0.001 else f"{value:.4f}"
@@ -127,9 +131,10 @@ def plot(rows):
     b.set_xticks([-0.4, -0.02, 0, 0.02, 0.4], ["-0.4", "-0.02", "0", "0.02", "0.4"])
     b.set_xlabel("Clipped − raw")
     b.set_title("(b) Score components", loc="left")
-    b.legend(frameon=False, fontsize=7, loc="lower center", ncol=3,
-             bbox_to_anchor=(.55, .01), bbox_transform=fig.transFigure,
-             columnspacing=1, handlelength=1.2)
+    for ax, position in ((a, .28), (b, .74)):
+        ax.legend(frameon=False, fontsize=7, loc="lower center",
+                  bbox_to_anchor=(position, .01), bbox_transform=fig.transFigure,
+                  handlelength=1.2)
     for ax in axes:
         ax.spines[["top", "right"]].set_visible(False)
         ax.tick_params(length=2, pad=2)

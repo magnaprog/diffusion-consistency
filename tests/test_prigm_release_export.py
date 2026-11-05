@@ -58,6 +58,7 @@ def test_export_has_exact_receipt_and_working_public_entrypoints(source, tmp_pat
     assert {p.relative_to(output).as_posix() for p in output.rglob("*") if p.is_file()} == {
         *receipt["files"], "RELEASE_MANIFEST.json"}
     assert "tests/test_prigm_scientific_argument.py" in receipt["files"]
+    assert "tests/test_prigm_gaussian_supplement.py" in receipt["files"]
     assert len(list((output / "prigm").glob("*.py"))) == 43
     assert len(list((output / exporter.ACCEPTED / "prigm").glob("*.py"))) == 8
     for name in exporter.documentation.NAMES:
