@@ -7,7 +7,7 @@ on Principles of Generative Modeling, NeurIPS 2026. Read the
 and their limits. Acceptance and a local export do not establish that a
 camera-ready revision has been submitted.
 
-`RELEASE_MANIFEST.json` in a copied release directory records every included file's SHA256 and size. The hashes identify the actual copied contents, including any changes made after the recorded Git commit. The manifest checks what was copied; it does not establish that scientific verification or manuscript compilation passed. Recheck edited files and create a new export after further changes.
+`RELEASE_MANIFEST.json` in a copied release directory records every included file's SHA256 and size, including changes made after the recorded Git commit. It does not establish that scientific verification or manuscript compilation passed. Recheck edited files and create a new export after further changes.
 
 ## Install and check the runtime
 
@@ -164,7 +164,7 @@ The figure-generating scripts share `paper/workshops/prigm/prigm.mplstyle`. Figu
 
 Colors have consistent meanings, and markers, line patterns, hatching and subplot labels also identify the quantities. The Okabe-Ito method palette uses blue for D, vermilion for O-S, bluish green for G5 and reddish purple for Gaussian regression.
 
-Figure 4(a) compares G5 with D: sky-blue bars show the distance change, orange hatched bars show the negative spread change, and purple diamonds show the score change. Figure 5(b) compares the same ensembles after and before clipping. It uses blue circles and orange squares for the two score components, with purple diamonds for their sum. Point symbols avoid implying additive bar lengths on its symmetric logarithmic axis. Figure 5(a) uses black diamonds for mean displacement. These component colors are distinct from the method palette. The scientific inputs, plotted numerical values, workshop manuscript template and body fonts remain unchanged.
+Figure 4(a) compares G5 with D: sky-blue bars show the distance change, orange hatched bars show the negative spread change, and purple diamonds show the score change. Figure 5(b) compares the same ensembles after and before clipping. It uses blue circles and orange squares for the two score components, with purple diamonds for their sum. Point symbols avoid implying additive bar lengths on its symmetric logarithmic axis. Figure 5(a) uses black diamonds for mean displacement. These component colors are distinct from the method palette.
 
 The generators resolve DejaVu Serif without a default-font fallback and embed
 TrueType subsets in the PDFs. No separate installation of plotting fonts is needed to generate
@@ -186,7 +186,7 @@ Inspect `paper/workshops/prigm/main.log` after the final LaTeX pass. When it
 requests another pass for cross-references, repeat the same `pdflatex` command
 from the paper directory and then rerun the verifier. Resolve undefined
 references or citations before packaging. The current manuscript has four main
-pages and 29 pages in total. Its bibliography uses `unsrtnat` to number entries
+pages and 28 pages in total. Its bibliography uses `unsrtnat` to number entries
 in first-citation order. Apply the same checks when compiling each extracted
 archive; the final log determines whether another LaTeX pass is needed.
 

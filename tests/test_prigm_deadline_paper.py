@@ -157,6 +157,73 @@ def test_math_commands_and_discretionary_hyphens_keep_their_meaning():
         gate.bind_clause((source, rendered.replace("max", "min")), anchor, source)
 
 
+@pytest.mark.parametrize("title", ["Penalty strength", "Penalty strength after training"])
+@pytest.mark.parametrize("command,number", [("section", "I"), ("subsection", "I.1")])
+def test_heading_alias_keeps_section_boundary(title, command, number):
+    tex = "\\" + command + "{" + title + "}\nAt $c_R=0.005$, valid.\n\\subsection{Next}\nOutside."
+    pdf = number + " " + title + "\nAt cR=0.005, valid.\nI.2 Next\nOutside."
+    source, rendered = gate.claim_subsection(tex, pdf, "Penalty strength", "Penalty strength after training")
+    assert "valid" in source and "valid" in rendered
+    assert "Outside" not in source and "Outside" not in rendered
+
+
+@pytest.mark.parametrize("scope", ["source", "PDF"])
+@pytest.mark.parametrize("damage", ["missing", "duplicate", "alternate_duplicate", "mismatch"])
+def test_heading_alias_requires_one_matching_source_and_pdf_heading(scope, damage):
+    current, old = "Penalty strength", "Penalty strength after training"
+    tex = "\\section{" + current + "}\nClaim.\n\\section{Next}\nOutside."
+    pdf = "I " + current + "\nClaim.\nJ Next\nOutside."
+    heading = "\\section{" + current + "}" if scope == "source" else "I " + current
+    other = "\\section{" + old + "}" if scope == "source" else "I " + old
+    replacement = {"missing": "", "duplicate": heading + "\n" + heading,
+                   "alternate_duplicate": heading + "\n" + other, "mismatch": other}[damage]
+    if scope == "source":
+        tex = tex.replace(heading, replacement, 1)
+    else:
+        pdf = pdf.replace(heading, replacement, 1)
+    match = "headings differ" if damage == "mismatch" else "missing or duplicate " + scope
+    with pytest.raises(ValueError, match=match):
+        gate.claim_subsection(tex, pdf, current, old)
+
+
+@pytest.mark.parametrize("title", ["Penalty strength", "Penalty strength after training"])
+@pytest.mark.parametrize("target,next_command,target_number,next_number", [
+    ("section", "subsection", "I", "I.1"),
+    ("subsection", "section", "I.1", "J"),
+])
+@pytest.mark.parametrize("scenario", ["inside", "outside", "missing", "renamed", "duplicate", "before_target"])
+def test_claim_scope_requires_next_source_heading_in_pdf(title, target, next_command, target_number, next_number, scenario):
+    claim = "The coefficient is 0.005."
+    tex = ("\\" + target + "{" + title + "}\n" + claim
+           + "\n\\" + next_command + "{Next}\nOutside.")
+    heading = next_number + " Next"
+    boundary = "" if scenario == "missing" else heading
+    if scenario == "renamed":
+        boundary = next_number + " Unexpected"
+    elif scenario == "duplicate":
+        boundary += "\n" + heading
+    pdf = target_number + " " + title + "\n"
+    if scenario == "inside":
+        pdf += claim + "\n" + boundary + "\nOutside."
+    elif scenario == "before_target":
+        pdf = heading + "\n" + pdf + claim
+    else:
+        # The correct source clause is absent from the PDF target section; a
+        # valid copy beyond the next boundary must never satisfy its binding.
+        pdf += boundary + "\n" + claim
+    def check():
+        scopes = gate.claim_subsection(tex, pdf, "Penalty strength", "Penalty strength after training")
+        gate.bind_clause(scopes, "The coefficient is", claim)
+    if scenario == "inside":
+        check()
+    elif scenario == "outside":
+        with pytest.raises(ValueError, match="PDF: missing or duplicate clause"):
+            check()
+    else:
+        with pytest.raises(ValueError, match="next PDF section/subsection"):
+            check()
+
+
 @pytest.fixture(scope="module")
 def public_claims(public_originals):
     if shutil.which("pdftotext") is None:
@@ -166,6 +233,17 @@ def public_claims(public_originals):
     tex = (gate.PAPER / "main.tex").read_text()
     rendered = subprocess.check_output(["pdftotext", "-layout", str(gate.PAPER / "main.pdf"), "-"]).decode()
     return tex, rendered, real, evidence
+
+
+@pytest.fixture(scope="module")
+def public_toy():
+    return gate.validate_toy(gate.PAPER)
+
+
+@pytest.fixture(scope="module")
+def public_cancellation(public_originals):
+    real, observations, *_ = public_originals
+    return gate.validate_sensitivity(gate.PAPER, real, observations)
 
 
 def test_current_deadline_tables_and_prose_match_source_and_pdf(public_claims):
@@ -195,7 +273,7 @@ def test_fixed_final_score_coefficient_anchor_keeps_other_contexts(public_claims
     changed = original[:match.start()] + wrong + original[match.end():]
     if duplicate_location == "after_section":
         # The paper has later sections; a valid clause there cannot rescue this one.
-        later = "Related work on physical constraints in prediction and generation"
+        later = "Related work"
         assert later in original[match.end():]
         changed += "\n" + valid
     changed_scopes = (changed, rendered) if scope == "source" else (tex, changed)
@@ -205,10 +283,10 @@ def test_fixed_final_score_coefficient_anchor_keeps_other_contexts(public_claims
 
 
 @pytest.mark.parametrize("title", [
-    "Penalty strength after training",
-    "Training diffusion models on the same HMM",
-    "How the residual penalty is weighted",
-    "Directional cancellation with thresholds from TRAIN",
+    "Penalty strength",
+    "Diffusion on the HMM",
+    "Penalty weighting",
+    "Directional cancellation",
 ])
 def test_claim_scope_accepts_current_section_and_subsections(public_claims, title):
     tex, rendered, real, evidence = public_claims
@@ -216,13 +294,13 @@ def test_claim_scope_accepts_current_section_and_subsections(public_claims, titl
     source, pdf = gate.claim_subsection(tex, rendered, title)
     assert source.strip() and pdf.strip()
     assert not re.search(r"\\(?:sub)*section\*?\{", source)
-    if title == "Penalty strength after training":
+    if title == "Penalty strength":
         for text, is_source in ((source, True), (pdf, False)):
             normalized = gate.prose_text(text, source=is_source)
             assert len(re.findall(r"at\s+cr\s*=", normalized)) == 1
             assert "even though its coverage is lower" not in normalized
             assert "solar wind reconstruction addresses quantities" not in normalized
-    elif title == "Training diffusion models on the same HMM":
+    elif title == "Diffusion on the HMM":
         assert "even though its coverage is lower" in source
         assert "even though its coverage is lower" in gate.prose_text(pdf)
 
@@ -232,7 +310,7 @@ def test_claim_scope_accepts_current_section_and_subsections(public_claims, titl
 def test_fixed_final_score_section_heading_is_required(public_claims, scope, damage):
     tex, rendered, real, evidence = public_claims
     gate.deadline_claims(tex, rendered, real, evidence)
-    title = "Penalty strength after training"
+    title = "Penalty strength"
     if scope == "source":
         heading = r"\section{" + title + "}"
         assert tex.count(heading) == 1
@@ -301,12 +379,12 @@ def test_wrong_coverage_reference_is_rejected(public_claims, scope, alter_differ
 @pytest.mark.parametrize("scope", ["source", "PDF"])
 @pytest.mark.parametrize("before,after", [
     ('Its prediction intervals still miss too many measurements', 'Its intervals attain nominal coverage'),
-    ('after validation chooses the model', 'after TEST chooses the model'),
+    ('after validation chooses checkpoints', 'after TEST chooses checkpoints'),
     ('the lowest mean score', 'the highest mean energy score'),
-    ('with changes to both the representation and training loss', 'with no change to representation or loss'),
+    ('with changes to both representation and training loss', 'with no change to representation or loss'),
     ('generating fewer coordinates changes the representation, and clipping transforms existing samples', 'generating fewer coordinates leaves the representation unchanged, and clipping preserves existing samples'),
-    ('with little change in their mean energy score', 'with a large improvement in their mean energy score'),
-    ('the subtracted spread term falls by more', 'the subtracted spread term falls by less'),
+    ('with little change in mean score', 'with a large improvement in mean score'),
+    ('yet the spread term falls by more', 'yet the spread term falls by less'),
     ('the available measurements used as input', 'no available measurements used as input'),
     ('with raw and clipped VAL scores of', 'with clipped and raw VAL scores of'),
     ('The mean energy score first falls and then rises', 'the mean energy score first rises and then falls'),
@@ -1270,10 +1348,10 @@ def test_revised_count_cannot_hide_behind_valid_duplicate(public_claims, scope, 
                              changed if scope == 'PDF' else rendered, real, evidence)
 
 
-def test_revised_illustration_and_toy_clauses_match_actual_pdf(public_claims):
+def test_revised_illustration_and_toy_clauses_match_actual_pdf(public_claims, public_toy):
     tex, rendered, _, _ = public_claims
     gate.illustration_claims(tex, rendered)
-    gate.toy_claims(tex, rendered, gate.validate_toy(gate.PAPER))
+    gate.toy_claims(tex, rendered, public_toy)
 
 
 @pytest.mark.parametrize('scope', ['source', 'PDF'])
@@ -1291,17 +1369,102 @@ def test_bad_illustration_seed_cannot_hide_behind_valid_duplicate(public_claims,
 
 
 @pytest.mark.parametrize('scope', ['source', 'PDF'])
-def test_toy_count_contradiction_outside_valid_paragraph_is_rejected(public_claims, scope):
+def test_toy_count_contradiction_outside_valid_paragraph_is_rejected(public_claims, public_toy, scope):
     tex, rendered, _, _ = public_claims
-    evidence = gate.validate_toy(gate.PAPER)
+    evidence = public_toy
     gate.toy_claims(tex, rendered, evidence)
-    false = 'Across 99 cases at t=100, the residual is small.'
+    false = 'Each calculation covers 99 cases at each of four timesteps, giving 144 cases in total.'
     if scope == 'source':
-        tex = tex.replace(r'\section{Conclusion}', false + '\n' + r'\section{Conclusion}', 1)
+        tex = tex.replace(r'\label{app:oracle}', r'\label{app:oracle}' + '\n' + false, 1)
     else:
-        rendered = false + '\n' + rendered
+        rendered, count = re.subn(r'(?m)^([ \t]*D[ \t]+Hidden Markov model[ \t]*)$',
+                                  lambda m: m[0] + '\n' + false, rendered)
+        assert count == 1
     with pytest.raises(ValueError, match=scope + ': missing or duplicate clause'):
         gate.toy_claims(tex, rendered, evidence)
+
+
+@pytest.mark.parametrize("scope", ["source", "PDF"])
+@pytest.mark.parametrize("field,value", [
+    ("100", "1,000"), ("100", "NaN"), ("100", ""), ("100", "1 00"),
+    ("4.17", "4.18"), ("6.958", "6.959"), ("4.164", "4.165"),
+    ("across repeated paths and noise", "for one fixed noisy input"),
+])
+@pytest.mark.parametrize("duplicate_location", ["none", "same_section", "after_section"])
+def test_moved_toy_values_cannot_hide_behind_valid_duplicate(public_claims, public_toy, scope, field, value, duplicate_location):
+    tex, rendered, _, _ = public_claims
+    evidence = public_toy
+    gate.toy_claims(tex, rendered, evidence)
+    original = tex if scope == "source" else rendered
+    matches = list(re.finditer(r"In\s+the\s+comparison\s+across\s+repeated\s+paths\s+and\s+noise\s+at\s+\$?t\s*=\s*100\$?,[\s\S]*?independent\s+conditional\s+samples\.", original))
+    assert len(matches) == 1
+    match = matches[0]
+    valid = match[0]
+    field_pattern = r"\s+".join(map(re.escape, field.split()))
+    changed, count = re.subn(field_pattern, value, valid)
+    assert count == 1
+    if duplicate_location == "same_section":
+        changed += " " + valid
+    changed = original[:match.start()] + changed + original[match.end():]
+    if duplicate_location == "after_section":
+        changed += "\n" + valid
+    error = "missing or duplicate clause" if duplicate_location == "same_section" else "clause differs"
+    with pytest.raises(ValueError, match=scope + ": " + error):
+        gate.toy_claims(changed if scope == "source" else tex,
+                        changed if scope == "PDF" else rendered, evidence)
+
+
+@pytest.mark.parametrize("scope", ["source", "PDF"])
+@pytest.mark.parametrize("value", ["0.044396", "1,000", "NaN"])
+@pytest.mark.parametrize("duplicate_location", ["none", "same_section", "after_section"])
+def test_cancellation_threshold_survives_table_reflow_and_valid_duplicate(
+        public_claims, public_cancellation, scope, value, duplicate_location):
+    tex, rendered, _, _ = public_claims
+    gate.cancellation_claims(tex, rendered, public_cancellation)
+    original = tex if scope == "source" else rendered
+    assert original.count("0.044395") == 1
+    changed = original.replace("0.044395", value, 1)
+    valid = ("High cancellation means strictly above the TRAIN 75th percentile: "
+             "0.044395 for the available intervals and 0.022696 for the missing interval.")
+    if duplicate_location == "same_section":
+        matches = list(re.finditer(r"the\s+analysis\s+is\s+exploratory\.", changed))
+        assert len(matches) == 1
+        end = matches[0].end()
+        changed = changed[:end] + "\n" + valid + changed[end:]
+    elif duplicate_location == "after_section":
+        changed += "\n" + valid
+    error = "missing or duplicate clause" if duplicate_location == "same_section" else "clause differs"
+    with pytest.raises(ValueError, match=scope + ": " + error):
+        gate.cancellation_claims(changed if scope == "source" else tex,
+                                 changed if scope == "PDF" else rendered, public_cancellation)
+
+
+@pytest.mark.parametrize("scope", ["source", "PDF"])
+@pytest.mark.parametrize("field,value", [
+    ("five quantities", "six quantities"),
+    ("deriving the sixth", "deriving the fifth"),
+    ("with changes to both representation and training loss", "with no changes to representation or training loss"),
+    ("mean distance", "maximum distance"),
+])
+@pytest.mark.parametrize("valid_duplicate", [False, True])
+def test_revised_summary_meaning_rejects_false_then_valid_duplicate(public_claims, scope, field, value, valid_duplicate):
+    tex, rendered, real, evidence = public_claims
+    gate.deadline_claims(tex, rendered, real, evidence)
+    original = tex if scope == "source" else rendered
+    clause = ("For Gaussian interpolation, mean distance to the withheld measurements decreases, yet the spread term falls by more and the score rises."
+              if field == "mean distance" else
+              "Generating five quantities and deriving the sixth gives the lowest mean score, with changes to both representation and training loss. Its prediction intervals still miss too many measurements.")
+    matches = list(re.finditer(r"\s+".join(map(re.escape, clause.split())), original))
+    assert len(matches) == 1
+    match = matches[0]
+    valid = match[0]
+    wrong, count = re.subn(r"\s+".join(map(re.escape, field.split())), value, valid)
+    assert count == 1
+    changed = original[:match.start()] + wrong + (" " + valid if valid_duplicate else "") + original[match.end():]
+    error = "missing or duplicate clause" if valid_duplicate else "clause differs"
+    with pytest.raises(ValueError, match=scope + ": " + error):
+        gate.deadline_claims(changed if scope == "source" else tex,
+                             changed if scope == "PDF" else rendered, real, evidence)
 
 
 @pytest.mark.parametrize('scope', ['source', 'PDF'])

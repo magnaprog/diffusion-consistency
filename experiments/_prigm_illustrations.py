@@ -22,9 +22,9 @@ PINS = {
     "evidence/imputation/sample-excerpt.npz": "f3b270d52ea52088fa84414fcb77b6954624913ed474618be245de417034a1cc",
     "evidence/imputation/MANIFEST.json": "4416bd1c76aa849de65595e445edc09d5230f2e0bfd2afc75c30c888697c3c66",
     "figures/fixed_final/fig_fixed_final.manifest.json": "5bd0176437a707c6c3f800103dc6d6b2db08a1905391c6633bb4b195de14d8fb",
-    "figures/imputation/case_120/fig_imputation.manifest.json": "e21aeedb7d47ca127c1c259361b273236472f8043685d0264edf61be87c014b2",
-    "figures/imputation/case_360/fig_imputation.manifest.json": "2e4a7d3255eafac2bcdb5ffe4f7d61116bfd6d51fd152c80bfbb2d998ff42367",
-    "figures/imputation/detail/fig_imputation.manifest.json": "e92c6de66f37090e6989d05ece25c7fdd53b38cd82a05eab5dec93c20c76972e",
+    "figures/imputation/case_120/fig_imputation.manifest.json": "f4ac45f391fe6c9d4dfa6c1d73fb0df64782748d12e702b972f7d268928c6768",
+    "figures/imputation/case_360/fig_imputation.manifest.json": "6aa2027de7f1551aad9ba1717ad96963375023d555b8be521ce9f8005bd1ab8d",
+    "figures/imputation/detail/fig_imputation.manifest.json": "a9cafb7e86e37a5d42e9b9878deaf703b4a745f28b4fa2bb7eca89782f7be9c8",
 }
 METHODS = ("D", "O-S", "G5", "full_flank_gaussian")
 INDICES = (120, 360)
@@ -347,7 +347,7 @@ def validate_illustrations(paper_dir, observations):
             for name in METHODS[start:stop]:
                 limits[name] = [lo - pad, hi + pad]
         detail_cases.append({"case_index": index, "coordinates": coords,
-                             "x_limits": [-10, 65], "y_limits": limits})
+                             "x_limits": [-10, 70], "y_limits": limits})
         target = data["truth"][slot, 18:30, 4]
         q = np.sort(data["samples"][:, slot, :, :, 4], axis=1)
         covered = ((q[:, 1] <= target) & (target <= q[:, 37])).sum(axis=1).tolist()
@@ -365,6 +365,9 @@ def validate_illustrations(paper_dir, observations):
              "provenance": {"path": manifest_name, "sha256": g.digest(g.local(paper, manifest_name))}},
             {"cases": detail_cases, "case_labels": {"120": "ACE · 3 Aug 2010", "360": "Wind · 4 Aug 2020"},
              "y_scale": "linear",
+             "bin_display": {"style": "steps-post", "width_minutes": 5,
+                             "support": "left-closed, right-open",
+                             "interpolation": "none; repeated terminal value closes final bin"},
              "limit_rule": "truth bins 16:32 and ranks 1,37; neural methods share limits, Gaussian separate; padding 8% of range, floor 1e-6",
              "axis_sides": {"neural": "left", "gaussian": "right"}})
     return {"excerpt_sha256": expected["files"]["sample-excerpt.npz"],

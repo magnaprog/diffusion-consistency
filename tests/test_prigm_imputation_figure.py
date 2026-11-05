@@ -7,7 +7,8 @@ variance predictions are intentional: the renderer must display them.
 
 Tests inspect the plotted lines and filled intervals, hashes, and axis
 limits. The detail view keeps a shared scale for the three neural methods
-and a separate visible right axis for Gaussian regression. Passing these
+and a separate visible right axis for Gaussian regression. The detail steps
+cover each full five-minute bin without interpolation or extrapolation. Passing these
 checks says nothing about the scientific calibration of the invented data.
 """
 import hashlib
@@ -367,25 +368,41 @@ def test_detail_artists_show_all_intervals_on_declared_scales(bundle):
                 else:
                     assert not any(t.get_visible() for t in ax.get_yticklabels())
                 np.testing.assert_array_equal(ax.get_ylim(), expected)
-                assert ax.get_xlim() == (-10, 65)
+                assert ax.get_xlim() == (-10, 70)
                 lines = {line.get_gid(): line for line in ax.lines}
                 assert set(lines) == {"median", "zero", "observed_left", "observed_right", "withheld_truth"}
-                np.testing.assert_array_equal(lines["median"].get_ydata(), ordered[col, 19])
-                np.testing.assert_array_equal(lines["median"].get_xdata(), np.arange(0, 60, 5))
+                np.testing.assert_array_equal(lines["median"].get_ydata(),
+                                              np.r_[ordered[col, 19], ordered[col, 19, -1]])
+                np.testing.assert_array_equal(lines["median"].get_xdata(), np.arange(0, 65, 5))
+                assert lines["median"].get_drawstyle() == "steps-post"
                 np.testing.assert_array_equal(lines["zero"].get_ydata(), [0, 0])
                 vertices = ax.collections[0].get_paths()[0].vertices
-                for i, x in enumerate(range(0, 60, 5)):
-                    np.testing.assert_array_equal(np.unique(vertices[vertices[:, 0] == x, 1]),
-                                                  ordered[col, [1, 37], i])
+                assert vertices[:, 0].min() == 0 and vertices[:, 0].max() == 60
+                # Intersect the actual polygon with each bin midpoint. A linear
+                # fill or a five-minute shift gives different endpoint values.
+                for i, x in enumerate(np.arange(0, 60, 5) + 2.5):
+                    crossing = []
+                    for start, end in zip(vertices, vertices[1:]):
+                        if min(start[0], end[0]) < x < max(start[0], end[0]):
+                            fraction = (x - start[0]) / (end[0] - start[0])
+                            crossing.append(start[1] + fraction * (end[1] - start[1]))
+                    np.testing.assert_array_equal(np.unique(crossing), ordered[col, [1, 37], i])
                 for key, part in (("observed_left", slice(16, 18)),
                                   ("withheld_truth", slice(18, 30)), ("observed_right", slice(30, 32))):
-                    np.testing.assert_array_equal(lines[key].get_ydata(), arrays["truth"][slot, part, 4])
-                    np.testing.assert_array_equal(lines[key].get_xdata(), np.arange(48)[part] * 5 - 90)
+                    values = arrays["truth"][slot, part, 4]
+                    starts = np.arange(48)[part] * 5 - 90
+                    np.testing.assert_array_equal(lines[key].get_ydata(), np.r_[values, values[-1]])
+                    np.testing.assert_array_equal(lines[key].get_xdata(), np.r_[starts, starts[-1] + 5])
+                    assert lines[key].get_drawstyle() == "steps-post"
+                assert lines["observed_left"].get_xdata()[-1] == 0
+                assert lines["withheld_truth"].get_xdata()[[0, -1]].tolist() == [0, 60]
+                assert lines["observed_right"].get_xdata()[[0, -1]].tolist() == [60, 70]
                 displayed = np.concatenate([ordered[col, [1, 19, 37]].ravel(),
                                             arrays["truth"][slot, 16:32, 4]])
                 assert expected[0] < displayed.min() <= displayed.max() < expected[1]
             assert case["y_limits"][METHODS[0]] == case["y_limits"][METHODS[1]] == case["y_limits"][METHODS[2]]
             assert case["y_limits"][METHODS[3]] != case["y_limits"][METHODS[0]]
+        assert fig._suptitle.get_text() == "Scalar variance"
         assert fig.texts[2].get_text() == "Time from start of missing hour (min)"
         assert "Gaussian uses the right axis" in fig.texts[1].get_text()
         assert len(fig.legends) == 1
@@ -410,6 +427,9 @@ def test_detail_cli_manifest(bundle):
     manifest = json.loads((output / "fig_imputation.manifest.json").read_text())
     assert manifest["cases"] == figure.detail_coordinates(figure.load_cases(*inputs))
     assert manifest["y_scale"] == "linear"
+    assert manifest["bin_display"] == {
+        "style": "steps-post", "width_minutes": 5, "support": "left-closed, right-open",
+        "interpolation": "none; repeated terminal value closes final bin"}
     assert manifest["style"] == {"path": "prigm.mplstyle",
                                  "sha256": digest(SOURCE.with_name("prigm.mplstyle"))}
     for name, expected in manifest["output_sha256"].items():

@@ -123,15 +123,31 @@ def test_committed_evidence(observations):
 @pytest.mark.parametrize("keys,value", [
     (["case_labels", "120"], "Wind · 3 Aug 2010"),
     (["cases", 0, "y_limits", "D", 0], -99.),
-    (["cases", 1, "x_limits", 1], 70),
+    (["cases", 1, "x_limits", 1], 65),
+    (["bin_display", "style"], "steps-pre"),
+    (["bin_display", "width_minutes"], 10),
+    (["bin_display", "support"], "left-open, right-closed"),
+    (["bin_display", "interpolation"], "linear between bin starts"),
     (["cases", 0, "y_limits", "full_flank_gaussian", 0], 0.),
     (["axis_sides", "gaussian"], "left"),
     (["cases", 0, "coordinates", "methods", "D", "median", 0, 4], 999.),
     (["y_scale"], "symlog"),
 ])
 def test_detail_tampering_rejected(paper, observations, unpinned, keys, value):
+    illustrations.validate_illustrations(paper, observations)
     mutate_json(paper, "figures/imputation/detail/fig_imputation.manifest.json", keys, value)
     with pytest.raises(ERRORS):
+        illustrations.validate_illustrations(paper, observations)
+
+
+@pytest.mark.parametrize("field", ["style", "width_minutes", "support", "interpolation"])
+def test_detail_bin_metadata_is_required(paper, observations, unpinned, field):
+    illustrations.validate_illustrations(paper, observations)
+    path = paper / "figures/imputation/detail/fig_imputation.manifest.json"
+    record = gate.read_json(path)
+    del record["bin_display"][field]
+    write_json(path, record)
+    with pytest.raises(ERRORS, match="bin_display"):
         illustrations.validate_illustrations(paper, observations)
 
 
@@ -140,9 +156,9 @@ def test_independent_pins_are_literal():
         EXCERPT: "f3b270d52ea52088fa84414fcb77b6954624913ed474618be245de417034a1cc",
         PROVENANCE: "4416bd1c76aa849de65595e445edc09d5230f2e0bfd2afc75c30c888697c3c66",
         FIXED: "5bd0176437a707c6c3f800103dc6d6b2db08a1905391c6633bb4b195de14d8fb",
-        CASE: "e21aeedb7d47ca127c1c259361b273236472f8043685d0264edf61be87c014b2",
-        CASE.replace("120", "360"): "2e4a7d3255eafac2bcdb5ffe4f7d61116bfd6d51fd152c80bfbb2d998ff42367",
-        "figures/imputation/detail/fig_imputation.manifest.json": "e92c6de66f37090e6989d05ece25c7fdd53b38cd82a05eab5dec93c20c76972e",
+        CASE: "f4ac45f391fe6c9d4dfa6c1d73fb0df64782748d12e702b972f7d268928c6768",
+        CASE.replace("120", "360"): "6aa2027de7f1551aad9ba1717ad96963375023d555b8be521ce9f8005bd1ab8d",
+        "figures/imputation/detail/fig_imputation.manifest.json": "a9cafb7e86e37a5d42e9b9878deaf703b4a745f28b4fa2bb7eca89782f7be9c8",
     }
 
 

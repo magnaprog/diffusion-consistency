@@ -129,15 +129,12 @@ def load_calibration(path, digest):
 
 
 def plot(decomposition, tails):
-    # Remove only the repeated assumption footer; keep the plotted panels' size.
-    height, removed = 4.7, .3
-    fig = plt.figure(figsize=(5.5, height))
-    grid = fig.add_gridspec(2, 2, height_ratios=(0.85, 1), left=.12, right=.97,
-                           bottom=(.22 * 5 - removed) / height,
-                           top=(.94 * 5 - removed) / height, hspace=.60, wspace=.20)
-    a = fig.add_subplot(grid[0, :])
-    b = fig.add_subplot(grid[1, 0])
-    c = fig.add_subplot(grid[1, 1], sharey=b)
+    fig = plt.figure(figsize=(5.5, 3.0))
+    grid = fig.add_gridspec(1, 3, left=.10, right=.99, bottom=.43,
+                           top=.86, wspace=.43)
+    a = fig.add_subplot(grid[0, 0])
+    b = fig.add_subplot(grid[0, 1])
+    c = fig.add_subplot(grid[0, 2], sharey=b)
     x = np.arange(4)
     a.axhline(0, color="0.45", linewidth=.7, zorder=0)
     a.bar(x - .18, [r["delta_target"] for r in decomposition], .34,
@@ -147,15 +144,17 @@ def plot(decomposition, tails):
           label="Negative spread term")
     a.plot(x, [r["delta_energy"] for r in decomposition], "D", color=SUMMARY_COLOR, markersize=3.5,
            label="Energy score", gid="energy_difference")
-    a.set_xticks(x, ["Seed 7", "Seed 13", "Seed 42", "Mean"])
+    a.set_xticks(x, ["7", "13", "42", "Mean"])
+    a.set_xlabel("Training seed")
     a.set_ylabel("Score difference")
-    a.set_title("(a) G5 − D: score components", loc="left")
+    a.set_title("(a) G5 − D", loc="left")
     a.margins(y=.32)
-    a.legend(frameon=False, fontsize=7, ncol=3, loc="upper center",
-             handlelength=1.4, columnspacing=1.2)
+    a.legend(frameon=False, fontsize=7, loc="upper left",
+             bbox_to_anchor=(-.30, -.40), handlelength=1.4)
 
     upper = 10.
-    for ax, outcome, title in ((b, 0, "(b) Below nominal 90% interval"), (c, 2, "(c) Above nominal 90% interval")):
+    for ax, outcome, title in ((b, 0, "(b) Below nominal\n90% interval"),
+                               (c, 2, "(c) Above nominal\n90% interval")):
         ax.axhline(5, linestyle="--", color="0.35", linewidth=.8, gid="tail_reference")
         for index, name in enumerate(METHODS):
             row = tails[name]
@@ -186,11 +185,8 @@ def plot(decomposition, tails):
         ax.set_axisbelow(True)
     handles = [Patch(facecolor=color, hatch=hatch, edgecolor="white", linewidth=0)
                for color, hatch in zip(COLORS, HATCHES)]
-    fig.legend(handles, LABELS, frameon=False, fontsize=7, ncol=4, loc="lower center",
-               bbox_to_anchor=(.53, (.125 * 5 - removed) / height), columnspacing=1.3, handletextpad=.4)
-    fig.text(.53, (.095 * 5 - removed) / height,
-             "Bars: mean of three diffusion fits or one Gaussian. Gray dots: individual fits.",
-             ha="center", fontsize=7)
+    fig.legend(handles, LABELS, frameon=False, fontsize=7, ncol=2, loc="upper center",
+               bbox_to_anchor=(.72, .30), columnspacing=1.3, handletextpad=.4)
     return fig
 
 
@@ -226,7 +222,7 @@ def main(argv=None):
         "pointwise_intervals_plotted": False,
         "seed_dots": {"seeds": list(SEEDS), "offsets_within_bar": [-.035, 0, .035],
                       "color": "0.4", "scope": "individual fixed neural models; not confidence intervals"},
-        "figure_inches": [5.5, 4.7], "interval_order_statistics": [2, 38],
+        "figure_inches": [5.5, 3.0], "interval_order_statistics": [2, 38],
         "axes": {"a": "linear; G5 minus D in 60 TRAIN-standardized coordinates; target minus dispersion",
                  "b": "linear percent; target strictly below second order statistic",
                  "c": "linear percent; target strictly above 38th order statistic"},

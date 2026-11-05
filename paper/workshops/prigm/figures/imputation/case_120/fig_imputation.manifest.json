@@ -3,7 +3,7 @@
   "figure": "fig_imputation",
   "source": {
     "path": "fig_imputation.py",
-    "sha256": "4bdf21b8f4d16846814b781b807849288c99b53badd632bb6413b2bf7fe6afdd"
+    "sha256": "815a62313f2aa42880547f950ce0ed0535f51b738e963e549323adc16083b6ab"
   },
   "style": {
     "path": "prigm.mplstyle",
@@ -2686,7 +2686,7 @@
   "scope": "Raw draws, no pooled seeds, smoothing, sampling or clipping. Nominal marginal bands are not a calibration claim. Examples selected after TEST exposure.",
   "matplotlib_version": "3.10.9",
   "output_sha256": {
-    "fig_imputation.pdf": "5f9530789f7f4931505a040ead2107825a6c5d156f5dc7ff14377f10313eb888",
+    "fig_imputation.pdf": "1cfef41a8ceee5c270a11cb91904a893caaa075d8e800030d0a6a660646df8f9",
     "fig_imputation.png": "4d541f33978b56f6cde94e00abb789d2dd0ee87a148702081ac35473c48d5b23"
   },
   "y_limits": [
