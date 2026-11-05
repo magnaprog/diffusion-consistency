@@ -14,7 +14,7 @@
     },
     "calibration": {
       "path": "fig_calibration.py",
-      "sha256": "93cb36ed8b7fc15b4565b93efe395861912f8057373375c87081569f0c48a087"
+      "sha256": "3cf063cbb4ced500a702959e70c667cd910d0eac615ade613c93feadc664f6e0"
     }
   },
   "style": {

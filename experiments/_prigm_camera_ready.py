@@ -20,8 +20,8 @@ CALIBRATION_PINS = {
     "PROTOCOL.json": "00f15fae93bbb01846ec53ab726815464a28c7708d9ee79109ead0e7363899b5",
 }
 FIGURE_PINS = {
-    "fig_overview": "b526f9b0270378785388a6fdbbe1b86e96039d54f7ab29bd6a0cb69e86e2d0ec",
-    "fig_calibration": "aa39c366feedf5770309a8515fba0eacfc8d884d3cd51a41b947783ba7c9a4af",
+    "fig_overview": "85389f43f82e616a618692eea3e6790d661a3ae9090832dbd839dc285afee9d7",
+    "fig_calibration": "57b789fc0a50a9fbb4aa570eaf38819a3142744e0db77c1460f0275a33af056b",
     "fig_checkpoints": "8c56aaac2b5fb2e1a0c3525b909884b01ebbd0efe334894b92395d887390fe2f",
 }
 

@@ -72,6 +72,7 @@ MUTATIONS = (
     ('The mean energy score first falls and then rises', 'the mean energy score first rises and then falls'),
     ('Available measurements retain their values during sampling', 'changes the available measurements'),
     ('with short line breaks', 'joining the transitions'),
+    ('Horizontal steps span the five minutes represented by each bin statistic', 'Horizontal steps span the one minute represented by each bin statistic'),
 )
 
 
@@ -104,6 +105,18 @@ def test_bad_variance_claim_cannot_hide_behind_valid_duplicate(prose, side):
     clause = "predictions below it are physically impossible because variance is nonnegative."
     assert values[side].count(clause) == 1
     values[side] = values[side].replace(clause, clause.replace("impossible", "possible"), 1) + "\n" + clause
+    location = "source" if side == 0 else "PDF"
+    with pytest.raises(ValueError, match=location + ": missing or duplicate clause"):
+        gate.illustration_claims(*values)
+
+
+@pytest.mark.parametrize("side", [0, 1], ids=["source", "rendered"])
+def test_bad_bin_width_claim_cannot_hide_behind_valid_duplicate(prose, side):
+    values = list(prose)
+    gate.illustration_claims(*values)
+    clause = "Horizontal steps span the five minutes represented by each bin statistic, with time relative to the missing hour."
+    assert values[side].count(clause) == 1
+    values[side] = values[side].replace(clause, clause.replace("five", "ten") + " " + clause, 1)
     location = "source" if side == 0 else "PDF"
     with pytest.raises(ValueError, match=location + ": missing or duplicate clause"):
         gate.illustration_claims(*values)
@@ -163,6 +176,8 @@ def test_bad_interval_endpoints_cannot_hide_behind_valid_duplicate(prose, side):
 @pytest.mark.parametrize("clause,slot", [
     (r"Figures~\ref{fig:imputation120} and \ref{fig:imputation360} show predictions before clipping.", r"\ref{fig:imputation120}"),
     (r"Figures~\ref{fig:imputation120} and \ref{fig:imputation360} show predictions before clipping.", r"\ref{fig:imputation360}"),
+    (r"Figures~\ref{fig:imputation120} and \ref{fig:imputation360} show them separately from the twelve predicted bins, with short line breaks from $-5$ to $0$ minutes and from $55$ to $60$ minutes.", r"\ref{fig:imputation120}"),
+    (r"Figures~\ref{fig:imputation120} and \ref{fig:imputation360} show them separately from the twelve predicted bins, with short line breaks from $-5$ to $0$ minutes and from $55$ to $60$ minutes.", r"\ref{fig:imputation360}"),
     ("Windows 120 and 360, counting from zero, are the midpoints of the two halves of the ordered list of 480 windows.", "120"),
     ("Windows 120 and 360, counting from zero, are the midpoints of the two halves of the ordered list of 480 windows.", "360"),
     ("Diffusion uses seed 7.", "7"),

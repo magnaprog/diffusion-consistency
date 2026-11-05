@@ -4,6 +4,8 @@ At each coordinate and bin, the twentieth sorted draw gives the median and
 draws 2 and 38 give a nominal 90% interval. These marginal medians can form
 a curve absent from the 39 trajectories. The variance detail uses a common
 scale for D, O-S and G5 in each row and a separate scale for Gaussian regression.
+Its steps show the full five-minute support of each statistic, not interpolated
+values or a continuous magnetic trajectory.
 """
 from __future__ import annotations
 
@@ -238,12 +240,17 @@ def detail_coordinates(data):
             for name in group:
                 limits[name] = [lower - padding, upper + padding]
         cases.append({"case_index": index, "coordinates": coords,
-                      "x_limits": [-10, 65], "y_limits": limits})
+                      "x_limits": [-10, 70], "y_limits": limits})
     return cases
 
 
+def _bin_steps(x, y):
+    """Extend bin-start values to the right edge for a post-step display."""
+    return np.append(x, x[-1] + 5), np.append(y, y[-1])
+
+
 def plot_detail(data):
-    """Two cases; Gaussian intervals use a separate, fully displayed right axis."""
+    """Show full bin supports; retain separate Gaussian limits and raw values."""
     cases = detail_coordinates(data)
     with plt.rc_context(RC):
         fig, axes = plt.subplots(2, 4, figsize=(5.5, 3.8), sharex=True)
@@ -255,16 +262,18 @@ def plot_detail(data):
                 x = np.asarray(pred["x"])
                 ax.axvspan(0, 60, color="0.5", alpha=0.08, linewidth=0, gid="gap")
                 ax.axhline(0, color="0.6", linewidth=0.5, zorder=1, gid="zero")
-                ax.fill_between(x, np.asarray(pred["low"])[:, 4],
-                                np.asarray(pred["high"])[:, 4], color=COLORS[col],
+                edges, low = _bin_steps(x, np.asarray(pred["low"])[:, 4])
+                _, high = _bin_steps(x, np.asarray(pred["high"])[:, 4])
+                ax.fill_between(edges, low, high, step="post", color=COLORS[col],
                                 alpha=0.16, linewidth=0, gid="nominal90")
-                ax.plot(x, np.asarray(pred["median"])[:, 4], color=COLORS[col],
-                        linewidth=1.1, gid="median")
+                ax.plot(*_bin_steps(x, np.asarray(pred["median"])[:, 4]),
+                        drawstyle="steps-post", color=COLORS[col], linewidth=1.1, gid="median")
                 for key in ("observed_left", "withheld_truth", "observed_right"):
                     part = coords[key]
                     xx = np.asarray(part["x"])
                     keep = (xx >= -10) & (xx <= 65)
-                    ax.plot(xx[keep], np.asarray(part["y"])[keep, 4], color="black",
+                    ax.plot(*_bin_steps(xx[keep], np.asarray(part["y"])[keep, 4]),
+                            drawstyle="steps-post", color="black",
                             linestyle="--" if key == "withheld_truth" else "-",
                             linewidth=0.9, gid=key)
                 ax.set(xlim=case["x_limits"], ylim=case["y_limits"][name], xticks=[0, 30, 60])
@@ -281,7 +290,7 @@ def plot_detail(data):
                     ax.spines["right"].set_visible(True)
                 else:
                     ax.tick_params(axis="y", labelleft=False)
-        fig.suptitle("Variance of magnetic field magnitude over five minutes", fontsize=8, y=0.99)
+        fig.suptitle("Scalar variance", fontsize=8, y=0.99)
         fig.text(0.5, 0.89, "D, O-S and G5 share each row's scale; Gaussian uses the right axis.",
                  ha="center", fontsize=7)
         fig.supxlabel("Time from start of missing hour (min)", y=0.145, fontsize=8)
@@ -332,6 +341,9 @@ def main(argv=None):
                     "cases": detail_coordinates(data), "case_labels": DETAIL_LABELS, "y_scale": "linear",
                     "limit_rule": "truth bins 16:32 and ranks 1,37; neural methods share limits, Gaussian separate; padding 8% of range, floor 1e-6",
                     "axis_sides": {"neural": "left", "gaussian": "right"},
+                    "bin_display": {"style": "steps-post", "width_minutes": 5,
+                                    "support": "left-closed, right-open",
+                                    "interpolation": "none; repeated terminal value closes final bin"},
                     "matplotlib_version": matplotlib.__version__, "output_sha256": {}}
         fig = plot_detail(data)
         try:

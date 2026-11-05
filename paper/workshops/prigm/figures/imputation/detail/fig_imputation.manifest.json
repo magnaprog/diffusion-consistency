@@ -3,7 +3,7 @@
   "figure": "fig_imputation",
   "source": {
     "path": "fig_imputation.py",
-    "sha256": "4bdf21b8f4d16846814b781b807849288c99b53badd632bb6413b2bf7fe6afdd"
+    "sha256": "815a62313f2aa42880547f950ce0ed0535f51b738e963e549323adc16083b6ab"
   },
   "style": {
     "path": "prigm.mplstyle",
@@ -2650,7 +2650,7 @@
       },
       "x_limits": [
         -10,
-        65
+        70
       ],
       "y_limits": {
         "D": [
@@ -5301,7 +5301,7 @@
       },
       "x_limits": [
         -10,
-        65
+        70
       ],
       "y_limits": {
         "D": [
@@ -5333,9 +5333,15 @@
     "neural": "left",
     "gaussian": "right"
   },
+  "bin_display": {
+    "style": "steps-post",
+    "width_minutes": 5,
+    "support": "left-closed, right-open",
+    "interpolation": "none; repeated terminal value closes final bin"
+  },
   "matplotlib_version": "3.10.9",
   "output_sha256": {
-    "fig_imputation.pdf": "8e8d827cffd5052306dcc7902fccf4acee5f907e8a23a91c50456865d0c9858f",
-    "fig_imputation.png": "f2357204cd436202c867404e59ebd1dd06510e3db7bfcdb411110ca4edb1f59e"
+    "fig_imputation.pdf": "669b9e90726e2547c3711ce8120bd66cf920d68e3dc1bccd4fc77514ff8ba6ca",
+    "fig_imputation.png": "0e345175c6b82cad59a7928941efdb40f6652ec9a21f87e10a2edfc7337480ea"
   }
 }

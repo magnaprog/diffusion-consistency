@@ -1,7 +1,7 @@
 """Plot residuals and scores for a hidden Markov model with an exact conditional law.
 
 The first subplot compares denoiser outputs with conditional draws on repeated
-contexts; the adjacent subplot shows their mean absolute residual. The bottom
+contexts; the adjacent subplot shows their mean absolute residual. The third
 subplot evaluates generated ensembles on 288 windows. Its line
 uses exact_reference.mean_energy, a different quantity from the conditional
 expected score in the first subplot. Both are finite Monte Carlo estimates.
@@ -206,11 +206,8 @@ def plot_evidence(context_rows, sampler_rows, reference, residuals):
     if any(value <= 0 for value in residual_values):
         raise ValueError("mean absolute residual must be positive for the logarithmic axis")
     with plt.rc_context(STYLE):
-        fig = plt.figure(figsize=(5.5, 5.0))
-        grid = fig.add_gridspec(2, 2, hspace=1.1, wspace=0.48)
-        axes = (fig.add_subplot(grid[0, 0]), fig.add_subplot(grid[0, 1]),
-                fig.add_subplot(grid[1, :]))
-        fig.subplots_adjust(left=0.13, right=0.99, top=0.93, bottom=0.18)
+        fig, axes = plt.subplots(1, 3, figsize=(5.5, 2.85))
+        fig.subplots_adjust(left=0.10, right=0.98, top=0.88, bottom=0.35, wspace=0.70)
         # Markers only: no interpolation or fitted trend between measured budgets.
         axes[0].plot(t, [row["mean_es_vs_ref"] for row in context_rows], "s",
                      color=COLORS[2], markersize=4, label="Denoising estimate")
@@ -231,15 +228,15 @@ def plot_evidence(context_rows, sampler_rows, reference, residuals):
                          xytext=(-4, -11), textcoords="offset points", ha="right", fontsize=7)
         budgets = [row["denoiser_evaluations_per_draw"] for row in sampler_rows]
         axes[2].plot(budgets, [row["mean_energy"] for row in sampler_rows], "s",
-                     color=COLORS[2], markersize=4, label="DDIM estimates")
+                     color=COLORS[2], markersize=4, label="DDIM samples")
         axes[2].axhline(reference["mean_energy"], color=COLORS[3], linestyle="--",
                        label="Exact conditional samples")
         axes[2].set_xticks(budgets)
         axes[2].set_xlabel("Denoiser evaluations")
-        axes[2].set_title("(c) Sampling", loc="left", fontsize=8)
+        axes[2].set_title("(c) DDIM sampling", loc="left", fontsize=8)
         for ax in (axes[0], axes[2]):
             ax.set_ylabel("Mean energy score")
-            ax.legend(loc="upper center", bbox_to_anchor=(0.5, -0.36), fontsize=7,
+            ax.legend(loc="upper right", bbox_to_anchor=(1.05, -0.36), fontsize=7,
                       frameon=False, handlelength=2)
         for ax in axes:
             ax.spines[["top", "right"]].set_visible(False)

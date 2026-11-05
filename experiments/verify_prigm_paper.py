@@ -1384,6 +1384,36 @@ def toy_claims(tex, rendered, evidence):
     gap = means["two_step"] - means["exact_reference"]
     require(gap > 0 and all(abs(means[f"ddim_{n}"] - means["exact_reference"]) < gap for n in (25, 50, 100)),
             "toy sampler comparison directions changed")
+    mantissa, exponent = f"{context['mean_abs_r_star']:.2e}".split("e")
+    residual = mantissa + r"\times10^{" + str(int(exponent)) + "}"
+    if re.search(r"\\section\{Hidden Markov model\}", strip_comments(tex)):
+        # The presentation revision moves the numeric denoising example to the
+        # appendix. Select by heading, never by the numbers being verified.
+        scopes = claim_subsection(tex, rendered, "Hidden Markov model")
+        bind_clause(scopes, "Each calculation covers",
+                    "Each calculation covers 36 cases at each of four timesteps, giving 144 cases in total.")
+        bind_clause(scopes, "In the comparison",
+                    "In the comparison across repeated paths and noise at $t=100$, the estimates have mean absolute $R_{\\mathrm{obs}}="
+                    + residual + f"$ in HMM units and energy score {context['mean_es_vs_ref']:.3f}, compared with "
+                    + f"{context['mean_reference_self_energy_mc']:.3f} for independent conditional samples.")
+        bind_clause(scopes, "These are finite", "These are finite Monte Carlo estimates.")
+        number = re.findall(r"\\label\{(tab:[^}]+)\}", strip_comments(tex)).index("tab:oracle") + 1
+        table_scopes = (scopes[0].replace(r"\ref{tab:oracle}", str(number)), scopes[1])
+        bind_clause(table_scopes, "Table" + r"\s+[^\s]+\s+compares sampling methods",
+                    "Table~" + str(number)
+                    + " compares sampling methods on these 288 windows, using stationary end states, the same available information and 39 samples per method.")
+        source = tex[:tex.index("\\bibliography{")]
+        main_pdf = re.split(r"(?m)^[ \t]*References[ \t]*$", pdf_without_line_numbers(rendered))[0]
+        main_scopes = (source, main_pdf)
+        bind_clause(main_scopes, "The hidden Markov example separates",
+                    "The hidden Markov example separates denoising from sampling")
+        bind_clause(main_scopes, "Its exact denoiser",
+                    "Its exact denoiser averages over the unknown switching probability.")
+        bind_clause(main_scopes, "Across repeated hidden paths",
+                    "Across repeated hidden paths and forward noise, estimates from two evaluations can have small residuals and a poor energy score.")
+        bind_clause(main_scopes, "Complete DDIM sampling also",
+                    "Complete DDIM sampling also performs poorly with two evaluations; scores with 25, 50 or 100 lie close to the finite estimate for the conditional distribution")
+        return
     source = tex[:tex.index("\\bibliography{")]
     paragraphs = [p for p in re.split(r"\n\s*\n", source) if "The hidden Markov example examines sampling" in p]
     require(len(paragraphs) == 1, "missing unique main-text toy diagnostic paragraph")
@@ -1408,8 +1438,6 @@ def toy_claims(tex, rendered, evidence):
                              prose_text(match["figure"][captions[0].end():]).replace("±", "+-")) is not None,
                 "toy interruption caption differs")
         main_rendered = main_rendered[:match.start()] + "with " + main_rendered[match.end():]
-    mantissa, exponent = f"{context['mean_abs_r_star']:.2e}".split("e")
-    residual = mantissa + r"\times10^{" + str(int(exponent)) + "}"
     clauses = (
         (r"Across [^\s]+ cases", "Across 36 cases at $t=100$, two evaluations give estimates with mean absolute $R_{\\mathrm{obs}}="
          + residual + f"$ in HMM units, but energy score {context['mean_es_vs_ref']:.3f} versus "
@@ -1807,21 +1835,38 @@ def clause_pattern(text):
     return r"\s*".join(token_pattern(token) for token in tokens)
 
 
-def claim_subsection(tex, rendered, title):
-    """One named section or subsection and its PDF heading, ending at the next heading."""
+def claim_subsection(tex, rendered, title, *alternate_titles):
+    """One section across accepted heading names; source and PDF must use the same name."""
     tex = strip_comments(tex)
-    markers = list(re.finditer(r"\\(?:sub)*section\*?\{" + re.escape(title) + r"\}", tex))
+    accepted = (title, *alternate_titles)
+    markers = list(re.finditer(r"\\(?:sub)*section\*?\{(" + "|".join(map(re.escape, accepted)) + r")\}", tex))
     require(len(markers) == 1, "missing or duplicate source section/subsection: " + title)
-    source = re.split(r"\\(?:sub)*section\*?\{", tex[markers[0].end():], maxsplit=1)[0]
+    selected = markers[0][1]
+    remainder = tex[markers[0].end():]
+    next_source = re.search(r"\\(?:sub)*section\*?\{([^{}]+)\}", remainder)
+    source = remainder[:next_source.start()] if next_source else remainder
     pdf = table_text(pdf_without_line_numbers(rendered))
-    titles = re.findall(r"\\(?:sub)*section\*?\{([^{}]+)\}", tex)
+    titles = [*re.findall(r"\\(?:sub)*section\*?\{([^{}]+)\}", tex), *accepted]
     headings = list(re.finditer(r"(?m)^[ \t]*(?:[a-z]|\d+)(?:\.\d+)*[ \t]+(?:"
                                + "|".join(re.escape(table_text(t)) for t in titles) + r")[ \t]*$", pdf))
+    accepted_pdf = "|".join(re.escape(table_text(t)) for t in accepted)
     matches = [i for i, h in enumerate(headings) if re.fullmatch(
-        r"[ \t]*(?:[a-z]|\d+)(?:\.\d+)*[ \t]+" + re.escape(title.lower()) + r"[ \t]*", h[0])]
+        r"[ \t]*(?:[a-z]|\d+)(?:\.\d+)*[ \t]+(?:" + accepted_pdf + r")[ \t]*", h[0])]
     require(len(matches) == 1, "missing or duplicate PDF section/subsection: " + title)
     i = matches[0]
-    end = headings[i + 1].start() if i + 1 < len(headings) else len(pdf)
+    require(re.fullmatch(r"[ \t]*(?:[a-z]|\d+)(?:\.\d+)*[ \t]+"
+                         + re.escape(table_text(selected)) + r"[ \t]*", headings[i][0]) is not None,
+            "source and PDF section/subsection headings differ: " + title)
+    if next_source is not None:
+        next_pattern = (r"[ \t]*(?:[a-z]|\d+)(?:\.\d+)*[ \t]+"
+                        + re.escape(table_text(next_source[1])) + r"[ \t]*")
+        boundaries = [j for j, heading in enumerate(headings) if re.fullmatch(next_pattern, heading[0])]
+        require(len(boundaries) == 1 and boundaries[0] == i + 1,
+                "missing, duplicate or misplaced next PDF section/subsection: " + next_source[1])
+        end = headings[boundaries[0]].start()
+    else:
+        require(i == len(headings) - 1, "unexpected PDF section/subsection after final source heading")
+        end = len(pdf)
     return source, pdf[headings[i].end():end]
 
 
@@ -1853,7 +1898,7 @@ def deadline_claims(tex, rendered, real, evidence):
     bind_table(tex, rendered, "tab:operators", expected, ("Procedure",))
     def bind(anchor, expected_clause):
         pattern = clause_pattern(prose_text(anchor, source=True))
-        if anchor == "The marginal":
+        if anchor in ("The marginal", "A residual penalty", "Generating"):
             pattern = r"(?:^|(?<=\. ))" + pattern
         bind_clause((tex, rendered), pattern, expected_clause)
     selection = evidence["D_selection"]
@@ -1875,17 +1920,17 @@ def deadline_claims(tex, rendered, real, evidence):
     require(plotted["G5"]["movement"] > 0
             and plotted["gaussian"]["negative_delta_dispersion"] > -plotted["gaussian"]["delta_target"] > 0,
             "clipping displacement and spread directions changed")
-    bind("It moves G5's samples", "It moves G5's samples with little change in their mean energy score.")
-    bind("For Gaussian interpolation, it", "For Gaussian interpolation, it brings samples closer to the withheld measurements, but the subtracted spread term falls by more, increasing the score.")
+    bind("G5's samples move", "G5's samples move with little change in mean score.")
+    bind("For Gaussian interpolation,", "For Gaussian interpolation, mean distance to the withheld measurements decreases, yet the spread term falls by more and the score rises.")
     # Tables retain the numerical results omitted from the conceptual abstract.
     difference = real[0]["arm_means"]["D_raw"] - real[0]["arm_means"]["O-S_raw"]
     require(difference > 0, "selected penalty improvement direction changed")
-    bind("Conditional diffusion experiments", "Conditional diffusion experiments examine how enforcing this relation affects predictive accuracy.")
+    bind("Conditional diffusion experiments", "Conditional diffusion experiments examine whether enforcing this relation improves predictive accuracy.")
     bind("Here, a penalty", "Here, a penalty changes training, generating fewer coordinates changes the representation, and clipping transforms existing samples.")
-    bind("A residual penalty", "A residual penalty improves the energy score at the end of training, but most of its mean advantage disappears after validation chooses the model.")
+    bind("A residual penalty", "A residual penalty lowers the energy score at the final training stage; most of its mean advantage disappears after validation chooses checkpoints.")
     require(real[1]['methods']['G5_raw']['metrics']['cov90_mean']['month_balanced'] < .9,
             "G5 coverage no longer falls below nominal")
-    bind("Generating fewer statistics", "Generating fewer statistics and computing the remaining quantity algebraically gives the lowest mean score, with changes to both the representation and training loss. Its prediction intervals still miss too many measurements.")
+    bind("Generating", "Generating five quantities and deriving the sixth gives the lowest mean score, with changes to both representation and training loss. Its prediction intervals still miss too many measurements.")
     g5, boundary = (operator["methods"][name]["metrics"] for name in ("G5", "gaussian"))
     data_only = operator["methods"]["D"]["metrics"]
     target_reduction = data_only["raw_target_term"]["month_balanced"] - g5["raw_target_term"]["month_balanced"]
@@ -1996,7 +2041,7 @@ def deadline_claims(tex, rendered, real, evidence):
         bind("The strongest penalty gives", "The strongest penalty gives the smallest residual; the original coefficient gives the lowest mean score.")
         signs = np.asarray(means["0.005"]["raw"]) - means["0"]["raw"]
         require(np.all(signs[:2] > 0) and signs[2] < 0, "largest-coefficient seed directions changed")
-        scopes = claim_subsection(tex, rendered, "Penalty strength after training")
+        scopes = claim_subsection(tex, rendered, "Penalty strength", "Penalty strength after training")
         bind_clause(scopes, clause_pattern(prose_text("At $c_R=", source=True)),
                     "At $c_R=0.005$, the score is lower than D's at seed 42 and higher at seeds 7 and 13.")
 
@@ -2023,7 +2068,7 @@ def learned_toy_claims(tex, rendered, evidence):
                           rendered_table(tex, rendered, "tab:learnedtoy"), maxsplit=1)[0]
     require(re.search(r"(?m)^[ \t]*Raw predictions[ \t]*$", pdf_header) is not None,
             "learned PDF header must identify raw predictions")
-    scopes = claim_subsection(tex, rendered, "Training diffusion models on the same HMM")
+    scopes = claim_subsection(tex, rendered, "Diffusion on the HMM", "Training diffusion models on the same HMM")
     bind_clause(scopes, r"compares [^\s]+ fits", "compares nine fits to the stationary chain with 50 DDIM evaluations for sampling.")
     caption = float_caption(tex, "tab:learnedtoy")
     pdf_caption = re.split(r"\n[ \t]*\n", rendered_table(tex, rendered, "tab:learnedtoy").strip(), maxsplit=1)[0]
@@ -2093,7 +2138,7 @@ def residual_weight_claims(paper_dir, tex, rendered):
         ("Both residuals and both estimators", "Both residuals and both estimators are evaluated at t in (1,25,50,100) without changing the model weights."),
     ):
         bind_clause(gradient_scopes, anchor, expected)
-    scopes = claim_subsection(tex, rendered, "How the residual penalty is weighted")
+    scopes = claim_subsection(tex, rendered, "Penalty weighting", "How the residual penalty is weighted")
     bind_clause(scopes, "A constant", "A constant $c_R$ still gives different relative penalty weights across noise levels.")
     bind_clause(scopes, clause_pattern(prose_text(r"With $\lambda_t", source=True)), r"With $\lambda_t=c_R/(2\Sigma_t)$ and $c_R=0.0005$, the ratios $\lambda_t/w_t$ at $t=1,25,50,100$ are "
                 + f"{ratios[0]:.4f}, {ratios[1]:.6f}, {ratios[2]:.6f}, and {ratios[3]:.1f}.")
@@ -2128,24 +2173,26 @@ def residual_weight_claims(paper_dir, tex, rendered):
 
 def cancellation_claims(tex, rendered, record):
     """Bind published TRAIN cutoffs and validated TEST reductions, not a TRAIN refit."""
-    scopes = claim_subsection(tex, rendered, "Directional cancellation with thresholds from TRAIN")
-    # A page-top annual table can interrupt the seed or training-count sentence. Rejoin only
-    # its complete source-matching caption, header and rows; the detailed-table
-    # gate separately binds these cells to the numerical evidence.
+    scopes = claim_subsection(tex, rendered, "Directional cancellation", "Directional cancellation with thresholds from TRAIN")
+    # Page-top strata and annual tables can interrupt a clause after reflow.
+    # Remove only a complete source-matching caption, header and every row;
+    # the detailed-table gate separately binds these cells to the evidence.
     text = prose_text(scopes[1])
-    interruptions = list(re.finditer(
-        r"(?P<prefix>all\s+[^\s]+\s+seed|every one of the\s+[^\s]+\s+overlapping training windows)"
-        r"\s+(?P<table>table \d+:[\s\S]*?)\s+(?=differences are|contributes equally)", text))
-    if interruptions:
-        require(len(interruptions) == 1, "ambiguous annual table in cancellation prose")
-        labels = re.findall(r"\\label\{(tab:[^}]+)\}", strip_comments(tex))
-        require(labels.count("tab:years") == 1, "cancellation interruption requires annual table")
-        expected = (f"Table {labels.index('tab:years') + 1}: " + float_caption(tex, "tab:years")
-                    + " " + " ".join(" ".join(row) for row in source_table_rows(tex, "tab:years")))
-        match = interruptions[0]
-        require(re.fullmatch(clause_pattern(prose_text(expected, source=True)), match["table"]) is not None,
-                "cancellation interruption table differs")
-        scopes = (scopes[0], text[:match.start()] + match["prefix"] + " " + text[match.end():])
+    labels = re.findall(r"\\label\{(tab:[^}]+)\}", strip_comments(tex))
+    for label in ("tab:strata", "tab:years"):
+        require(labels.count(label) == 1, "cancellation interruption requires unique table: " + label)
+        number = labels.index(label) + 1
+        starts = list(re.finditer(r"\btable\s+" + str(number) + r"\s*:", text))
+        if not starts:
+            continue
+        require(len(starts) == 1, "ambiguous table in cancellation prose")
+        expected = (f"Table {number}: " + float_caption(tex, label)
+                    + " " + " ".join(" ".join(row) for row in source_table_rows(tex, label)))
+        match = re.match(clause_pattern(prose_text(expected, source=True)) + r"(?![\w\d])",
+                         text[starts[0].start():])
+        require(match is not None, "cancellation interruption table differs")
+        text = text[:starts[0].start()] + " " + text[starts[0].start() + match.end():]
+    scopes = (scopes[0], text)
     cutoffs, groups = record["cutoffs"], record["groups"]
     n = record["arrays"]["TRAIN"]["n_windows"]
     for cutoff in cutoffs.values():
@@ -2441,6 +2488,8 @@ def illustration_claims(tex, rendered):
     # A malformed number must remain visible even beside a correct duplicate.
     bind_clause((tex, rendered), clause_pattern("Figures") + r"\s+[^\s]+\s+and\s+[^\s]+\s+" + clause_pattern("show predictions"),
                 f"Figures~{case_numbers[0]} and {case_numbers[1]} show predictions before clipping.")
+    bind_clause((tex, rendered), clause_pattern("Figures") + r"\s+[^\s]+\s+and\s+[^\s]+\s+" + clause_pattern("show them separately"),
+                f"Figures~{case_numbers[0]} and {case_numbers[1]} show them separately from the twelve predicted bins, with short line breaks from $-5$ to $0$ minutes and from $55$ to $60$ minutes.")
     bind_clause((tex, rendered), r"windows\s+[^\s]+\s+and\s+[^,\s]+\s*,\s*" + clause_pattern("counting from"),
                 "Windows 120 and 360, counting from zero, are the midpoints of the two halves of the ordered list of 480 windows.")
     # Distinguish the standalone selection sentence from the longer caption
@@ -2479,12 +2528,12 @@ def illustration_claims(tex, rendered):
         ('the right gives mean absolute', 'the right gives mean absolute $R_{\\mathrm{obs}}$ in nT$^2$.'),
         ('Colored lines show marginal medians', 'Colored lines show marginal medians, bands show nominal 90\\% intervals, and thin lines show ensemble members 0, 1 and 2.'),
         ('Colored lines show empirical medians', 'Colored lines show empirical medians, and bands show nominal 90\\% marginal predictive intervals from all 39 samples.'),
+        ('Horizontal steps span', 'Horizontal steps span the five minutes represented by each bin statistic, with time relative to the missing hour.'),
         ('A stronger penalty', f'A stronger penalty reduces the mean absolute residual, but its effect on predictive accuracy changes with its strength (Figure~{fixed_number}). The mean energy score first falls and then rises.'),
         ('Reconstruction from ACE', 'Reconstruction from ACE measurements on 3 August 2010, TEST window 120.'),
         ('The $v_s$ axis is linear', 'The $v_s$ axis is linear within $0.05$ nT$^2$ of zero and logarithmic outside, so equal vertical distances can represent different absolute errors in that row.'),
         ('Reconstruction from Wind', 'Reconstruction from Wind measurements on 4 August 2020, TEST window 360.'),
         ('Available measurements retain', 'Available measurements retain their values during sampling.'),
-        ('The plots show them separately', 'The plots show them separately from the twelve predicted bins, with short line breaks from $-5$ to $0$ minutes and from $55$ to $60$ minutes.'),
     )
     for anchor, expected in clauses:
         pattern = clause_pattern(prose_text(anchor, source=True))

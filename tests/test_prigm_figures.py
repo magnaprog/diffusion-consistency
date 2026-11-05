@@ -252,9 +252,13 @@ def test_hmm_existing_values_reach_all_three_axes_exactly(figures):
         assert list(c.lines[0].get_ydata()) == [oracle["methods"][name]["mean_energy"]
                                               for name, _ in module.SAMPLERS]
         assert list(c.lines[1].get_ydata()) == [oracle["methods"]["exact_reference"]["mean_energy"]] * 2
+        assert a.lines[0].get_label() == "Denoising estimate"
+        assert c.lines[0].get_label() == "DDIM samples"
         assert a.lines[1].get_label() == c.lines[1].get_label() == "Exact conditional samples"
         assert b.texts[0].get_text() == r"$4.17\times 10^{-5}$"
-        assert c.get_position().width > a.get_position().width
+        assert a.get_position().y0 == b.get_position().y0 == c.get_position().y0
+        assert a.get_position().x1 < b.get_position().x0
+        assert b.get_position().x1 < c.get_position().x0
     finally:
         plt.close(fig)
 

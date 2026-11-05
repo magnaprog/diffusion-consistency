@@ -4,7 +4,7 @@
   "protocol_sha256": "25d0cdefdd5dbb160c32c7b5f4a6053bab99e4a9f64832d9eb6502232bf24e6b",
   "source": {
     "path": "fig_calibration.py",
-    "sha256": "93cb36ed8b7fc15b4565b93efe395861912f8057373375c87081569f0c48a087"
+    "sha256": "3cf063cbb4ced500a702959e70c667cd910d0eac615ade613c93feadc664f6e0"
   },
   "inputs": {
     "operator": {
@@ -742,7 +742,7 @@
   },
   "figure_inches": [
     5.5,
-    4.7
+    3.0
   ],
   "interval_order_statistics": [
     2,
@@ -761,7 +761,7 @@
   "matplotlib_version": "3.10.9",
   "numpy_version": "2.4.4",
   "output_sha256": {
-    "fig_calibration.pdf": "9be1460827b7dc26370bfde8b6f65e67af1aef16a97f716b80b764d40d667348",
-    "fig_calibration.png": "33473cc95c222c1bdfbea1d14deb1905ba74016b1e69ee418ed22d96ee395e3d"
+    "fig_calibration.pdf": "4808b45afe28c9e9aaf6ba9fe9cb20965483c85de85c5f979c68d798284ae414",
+    "fig_calibration.png": "e0be194cdd94d80626a3c7d18722222528d30a7e87b52abcb0cab53cd8f67eff"
   }
 }

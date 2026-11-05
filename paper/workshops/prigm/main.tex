@@ -34,20 +34,22 @@
 \maketitle
 
 \begin{abstract}
-Solar wind imputation involves uncertainty in both the mean magnetic field and its fluctuations. A variance identity links these statistics, while their probabilities depend on the available measurements. Conditional diffusion experiments examine how enforcing this relation affects predictive accuracy. A residual penalty improves the energy score at the end of training, but most of its mean advantage disappears after validation chooses the model. Generating fewer statistics and computing the remaining quantity algebraically gives the lowest mean score, with changes to both the representation and training loss. Its prediction intervals still miss too many measurements. For some baselines, clipping brings samples closer to the data but worsens the score because it reduces the ensemble spread term by more. A separate example uses an exact denoiser to show how a sampling approximation can produce estimates with small residuals while misrepresenting the conditional distribution. An algebraic restriction narrows the possible outcomes; estimating their probabilities remains a separate statistical problem.
+Reconstructing a missing solar wind interval involves both physical restrictions and uncertainty about the withheld values. A variance identity links the mean magnetic field, magnitude and fluctuations. Conditional diffusion experiments examine whether enforcing this relation improves predictive accuracy. A residual penalty lowers the energy score at the final training stage; most of its mean advantage disappears after validation chooses checkpoints. Generating five quantities and deriving the sixth gives the lowest mean score, with changes to both representation and training loss. Its prediction intervals still miss too many measurements. Clipping can worsen the score even as the mean distance to the withheld measurements falls, because the spread term decreases by more. A sampling approximation with an exact denoiser also gives small residuals while misrepresenting the conditional distribution. Satisfying the identity restricts the possible magnetic statistics. Estimating their probabilities from the available measurements remains a separate problem.
 \end{abstract}
 
 \section{Introduction}
 
-Missing solar wind measurements complicate estimates of magnetic turbulence \citep{wrench2022statistics}. Field vectors with large magnitudes can have a small mean when their directions differ. The same mean can accompany different fluctuations. Here, conditional diffusion infers the joint distribution of six magnetic statistics throughout a missing hour, using measurements before and after it. They describe the mean field, magnitude and variances in successive bins of five minutes.\footnote{Available at: \url{https://github.com/magnaprog/diffusion-consistency}}
+Missing solar wind measurements complicate estimates of magnetic turbulence \citep{wrench2022statistics}. A small mean field can accompany large vectors pointing in different directions, so reconstructing the mean alone leaves fluctuations unresolved. Conditional diffusion here predicts the joint distribution of six magnetic statistics in successive bins of five minutes throughout a missing hour, using measurements on both sides.\footnote{Available at: \url{https://github.com/magnaprog/diffusion-consistency}}
 
-The variance identity expresses one statistic in terms of the other five. It follows from averaging vectors, independently of plasma dynamics, while many probability distributions can satisfy it. Applying the identity during training raises a further issue: a conditional mean can have a nonzero residual even when every possible realization satisfies the relation.
+A variance identity expresses one statistic in terms of the other five. It follows from vector averaging, independently of plasma dynamics. Many distributions satisfy this relation, and the mean of a conditional distribution can fail it even when every possible realization obeys it. This distinction matters when a residual penalty is evaluated at a denoiser's prediction.
 
 The experiments combine conditional diffusion \citep{tashiro2021csdi} with the residual objective and sampling approximation of Physics-Informed Diffusion Models \citep{bastek2025pidm}. Earlier work examines residual minimization and distribution matching \citep{baldan2025physics}, or constructs outputs satisfying algebraic constraints \citep{beucler2021constraints}. Here, a penalty changes training, generating fewer coordinates changes the representation, and clipping transforms existing samples. Comparing these operations across training stages, and testing a sampler whose denoiser is available by calculation, shows how algebraic consistency and predictive accuracy can respond differently.
 
 
 
-\section{Magnetic statistics and data}
+\section{Magnetic moments}
+
+\subsection{Identity and uncertainty}
 
 Let $B_1,\ldots,B_5$ be consecutive OMNI vector averages, each over one minute, from the same spacecraft in geocentric solar ecliptic coordinates. Define
 \begin{equation}
@@ -68,7 +70,7 @@ Write $r=\|\mu\|$. Five vectors in three dimensions, including possible zero vec
  v_v=m^2+v_s-r^2.
  \label{eq:support}
 \end{equation}
-Appendix~\ref{app:support} proves sufficiency. The equality and inequalities play different roles. Deriving $v_v$ enforces the equality while preserving the other five variables and their primary score. Clipping also brings $m$ and $v_s$ into the ranges in Equation~\ref{eq:support}, which can change that score.
+Appendix~\ref{app:support} proves sufficiency. Deriving $v_v$ enforces the equality while preserving the other five variables and their primary score. The inequalities further restrict which moments five vectors can realize. Clipping brings $m$ and $v_s$ into those ranges and can change the score.
 
 The same identity behaves differently when applied to a conditional mean. For conditioning information $Y$,
 \begin{equation}
@@ -78,13 +80,17 @@ The same identity behaves differently when applied to a conditional mean. For co
 \end{equation}
 Either sign is possible, even when every possible sample satisfies the identity. Thus, a nonzero residual at the denoiser's mean prediction can arise from conditional uncertainty. Evaluating residuals at individual samples instead checks the algebraic relation in each possible realization \citep{bastek2025pidm}.
 
-\paragraph{Data construction.} OMNI combines solar wind measurements from several spacecraft \citep{king2005solar}. The inputs here come from its modified high resolution product \citep{nasamodifiedomni}, whose timestamps estimate arrival at the bow shock nose \citep{papitashvili2020omni}. Propagation and averaging precede masking, so the reconstruction concerns this arrival-time record. Magnitudes are Euclidean norms of the vector components. Each window spans four hours in 48 bins of five minutes. Masking the central twelve bins leaves 90 minutes of conditioning data on each side. Complete windows use one spacecraft within one month, retaining 12.77\% of possible training starts.
+\subsection{Data}
 
-The study covers twenty years, 2005 through 2024, with separate training, test and validation periods within each year and unused dates between them. Normalization uses distinct training bins. Evaluation uses windows without overlap and limits their number per month, giving 319 validation and 480 test windows. Appendix~\ref{app:quality} gives the calendar periods and sampling procedure.
+ OMNI combines solar wind measurements from several spacecraft \citep{king2005solar}. The inputs here come from its modified high resolution product \citep{nasamodifiedomni}, whose timestamps estimate arrival at the bow shock nose \citep{papitashvili2020omni}. Propagation and averaging precede masking, so the reconstruction concerns this arrival-time record. Magnitudes are Euclidean norms of the vector components. Each window spans four hours in 48 bins of five minutes. Masking the central twelve bins leaves 90 minutes of conditioning data on each side. Complete windows use one spacecraft within one month, retaining 12.77\% of possible training starts.
+
+The study spans 2005 through 2024, with separate training, test and validation periods in each year and unused dates between them. Normalization uses distinct training bins. Limits on the number of nonoverlapping windows per month give 319 validation and 480 test windows. Appendix~\ref{app:quality} gives the sampling procedure.
 
 \section{Models and evaluation}
 
-\paragraph{Training.} D uses diffusion to generate all six variables \citep{ho2020ddpm}. I-S adds a penalty on $R_{\mathrm{inst}}$; O-S adds one on the variance identity $R_{\mathrm{obs}}$. G5 generates five variables and derives $v_v$ after sampling. All four models receive all six variables in the available intervals. Training and sampling add noise only within the missing hour and preserve the available measurements.
+\subsection{Training}
+
+ D uses diffusion to generate all six variables \citep{ho2020ddpm}. I-S adds a penalty on $R_{\mathrm{inst}}$; O-S adds one on the variance identity $R_{\mathrm{obs}}$. G5 generates five variables and derives $v_v$ after sampling. All four models receive all six variables in the available intervals. Training and sampling add noise only within the missing hour and preserve the available measurements.
 
 For standardized state $u$ in the missing hour, the training objective adapts \citet{bastek2025pidm} by combining mean squared error, weighted by Min-SNR-5 \citep{hang2023minsnr}, with a residual term:
 \begin{equation}
@@ -94,14 +100,18 @@ For standardized state $u$ in the missing hour, the training objective adapts \c
 \end{equation}
 Here $\hat u_0$ estimates the original signal. Two denoiser evaluations give $z^*_{0,k}$ in physical units, except at $t=1$, where the first estimate is reused. The data weight is $w_t=\min(\operatorname{SNR}_t,5)$; $\Sigma_t$ is the diffusion posterior variance, with $\Sigma_1:=\Sigma_2$. The scale $B_{\mathrm{ref}}^2$ averages $m^2+v_s$ over distinct training bins. A cosine schedule uses 100 steps \citep{nichol2021improved}. D and G5 use $c_R=0$; I-S and O-S use $c_R=0.0005$.
 
-Each method uses three training seeds, with model weights saved at five stages. These states, or checkpoints, have the same update counts across methods (Appendix~\ref{app:protocol}). The penalty adds denoiser evaluations and computational cost. The test period had been examined during earlier development; the comparison retains the original settings and penalty coefficient without further tuning on that period.
+Each method has three training runs, with checkpoints at five common update counts (Appendix~\ref{app:protocol}). The penalty adds denoiser evaluations and computational cost. TEST had been examined during earlier development; this comparison retains the original settings and penalty coefficient without further tuning.
 
-The energy score evaluates the joint predictive distribution through Euclidean distances; lower scores are better \citep{gneiting2007strictly}. The primary score uses $(\mu_x,\mu_y,\mu_z,m,v_s)$ at twelve hidden positions after standardization using training data. For $K$ independent draws from a fixed predictive distribution, an unbiased estimate subtracts half the mean distance between distinct draws from their mean distance to the withheld values. The pairwise mean uses all $K(K-1)$ ordered pairs. The two terms measure proximity to observations and separation within the ensemble. Monthly means receive equal weight. Continuous ranked probability scores, interval coverage and width assess individual coordinates (Appendix~\ref{app:protocol}).
+\subsection{Evaluation}
+
+The energy score evaluates the joint predictive distribution through Euclidean distances; lower scores are better \citep{gneiting2007strictly}. The primary score uses $(\mu_x,\mu_y,\mu_z,m,v_s)$ at twelve hidden positions, standardized using training data. For $K$ independent draws from a fixed predictive distribution, an unbiased estimate subtracts half the mean distance between distinct draws from their mean distance to the withheld values. The pairwise mean uses all $K(K-1)$ ordered pairs. The score balances proximity to observations against separation among predictions. Monthly means receive equal weight. Continuous ranked probability scores, interval coverage and width assess individual coordinates (Appendix~\ref{app:protocol}).
 Diffusion results average three training seeds, with coverage calculated separately for each ensemble. Intervals for score differences are calculated by resampling years or consecutive groups of two years with replacement, using the same resampled years for both methods. They measure temporal variation for the existing fits and samples. Grouping test cases by withheld outcomes uses information available only after the missing values are revealed.
 
-\paragraph{Model selection and baselines.} Validation compares ensembles of 39 samples from 25 denoising diffusion implicit model (DDIM) evaluations with $\eta=0$ \citep{song2021ddim}. It minimizes the energy score with equal month weights, choosing checkpoints separately before and after clipping; ties favor the earlier state. Test ensembles use 39 samples and 50 evaluations.
+\subsection{Validation and baselines}
 
-Linear interpolation connects the measurements immediately before and after the missing hour; persistence repeats the preceding bin. Gaussian interpolation adds a Gaussian residual fitted on training data, with covariance shrinkage $\rho=0$. Gaussian regression uses the full available context to predict the residual mean and uses the same residual covariance for every window, then derives $v_v$. Validation chooses its ridge and covariance shrinkage parameters (Appendix~\ref{app:extension}).
+ Validation compares ensembles of 39 samples from 25 denoising diffusion implicit model (DDIM) evaluations with $\eta=0$ \citep{song2021ddim}. It minimizes the energy score with equal month weights, choosing checkpoints separately before and after clipping; ties favor the earlier state. Test ensembles use 39 samples and 50 evaluations.
+
+Linear interpolation connects the measurements adjoining the missing hour; persistence repeats the preceding bin. Gaussian interpolation adds a Gaussian residual fitted on training data, with covariance shrinkage $\rho=0$. Gaussian regression uses the full context to predict the residual mean, shares one residual covariance across windows and derives $v_v$. Validation chooses its ridge and covariance shrinkage parameters (Appendix~\ref{app:extension}).
 
 \begin{table}[!htbp]
 \centering
@@ -124,22 +134,22 @@ Gaussian regression & 1.935 & 2.035 & 94.0 & 93.5 & 0.000 & 74.6 \\
 \end{tabular}
 \end{table}
 
-\section{Results and interpretation}
+\section{Results}
 
 The penalty comparison depends on when the models are evaluated (Table~\ref{tab:main}, Figure~\ref{fig:overview}a). At the final update, O-S with the original coefficient has a lower raw energy score than D for all three seeds.
 
 Validation chooses earlier D checkpoints, leaving little mean difference: O-S minus D is $-0.0028$, with a 95\% interval of $[-0.0346,0.0242]$ from resampling years. Relative intervals from both resampling schemes remain within the original $\pm2\%$ comparison range for these three fits.
 
-G5 has the lowest mean primary score: O-S minus G5 is 0.1002, with interval $[0.0712,0.1391]$ from resampling years. Both the O-S/D and O-S/G5 comparisons reverse sign across seeds. G5 changes the representation and training loss together, so the comparison includes both effects. Algebraic completion alone would preserve the five primary quantities and their score for the same samples. Most of G5's mean improvement over D appears in the spread term, with different contributions at each seed (Figure~\ref{fig:calibration}). Its intervals still cover too few measurements, especially for variance in field magnitude (Figure~\ref{fig:overview}b), and nearly half of its raw bins fail the moment inequalities.
+G5 has the lowest mean primary score: O-S minus G5 is 0.1002, with interval $[0.0712,0.1391]$ from resampling years. Both the O-S/D and O-S/G5 comparisons reverse sign across seeds. G5 changes representation and training loss together. Completing the same samples alone would preserve their five primary quantities and score. Most of G5's mean improvement over D comes from the spread term, with different contributions at each seed (Figure~\ref{fig:calibration}). Its intervals still cover too few measurements, especially for variance in field magnitude (Figure~\ref{fig:overview}b), and nearly half of its raw bins fail the moment inequalities.
 
 
 
 \begin{samepage}
-The clipping comparison transforms each sample in an existing ensemble (Table~\ref{tab:operators}). Model weights and evaluation windows stay the same. It moves G5's samples with little change in their mean energy score. For Gaussian interpolation, it brings samples closer to the withheld measurements, but the subtracted spread term falls by more, increasing the score. D's change in Table~\ref{tab:main} also includes a different checkpoint chosen after clipping (Figure~\ref{fig:operator}).
+Clipping the same ensembles isolates its effect from model choice (Table~\ref{tab:operators}). G5's samples move with little change in mean score. For Gaussian interpolation, mean distance to the withheld measurements decreases, yet the spread term falls by more and the score rises. D's change in Table~\ref{tab:main} also includes a different checkpoint chosen after clipping (Figure~\ref{fig:operator}).
 \par
 \end{samepage}
 
-The hidden Markov example examines sampling without error from fitting the denoiser (Figure~\ref{fig:hmm}). Its exact denoiser averages over the unknown switching probability. New hidden paths and independent forward noise give a distribution of estimates for each available context. Across 36 cases at $t=100$, two evaluations give estimates with mean absolute $R_{\mathrm{obs}}=4.17\times10^{-5}$ in HMM units, but energy score 6.958 versus 4.164 for independent conditional samples. Separately, DDIM sampling on 288 windows gives a poor score with two evaluations and scores close to the conditional reference with 25, 50, or 100 (Table~\ref{tab:oracle}). All scores have finite sampling error.
+The hidden Markov example separates denoising from sampling (Figure~\ref{fig:hmm}). Its exact denoiser averages over the unknown switching probability. Across repeated hidden paths and forward noise, estimates from two evaluations can have small residuals and a poor energy score. Complete DDIM sampling also performs poorly with two evaluations; scores with 25, 50 or 100 lie close to the finite estimate for the conditional distribution (Table~\ref{tab:oracle}).
 
 \begin{figure}[!b]
  \centering
@@ -150,7 +160,7 @@ The hidden Markov example examines sampling without error from fitting the denoi
 
 \section{Conclusion}
 
-Moment consistency is a property of each magnetic realization; predictive accuracy also concerns how probability is distributed among realizations. The comparisons show how this distinction enters training, representation and sampling. Proper scores and interval coverage quantify differences that remain after the algebraic relation is satisfied. The empirical ranking concerns three seeds and hours masked in complete records from a test period examined earlier. Naturally missing records, later years and other interval lengths would test how far it extends.
+The magnetic identity restricts individual realizations, while prediction assigns probabilities among them. Training penalties, algebraic completion and clipping act on different parts of that task. Their comparison shows why moment consistency, proper scores and interval coverage convey different information. The empirical ranking concerns three training seeds and hours masked in complete records from a test period examined earlier. Naturally missing records, later years and other interval lengths would test its reach.
 
 \clearpage
 \begin{ack}
@@ -162,7 +172,7 @@ This work extends research carried out at the Jet Propulsion Laboratory, Califor
 \clearpage
 \appendix
 
-\section{Realizability of magnetic moments and energy}
+\section{Realizable moments}
 \label{app:support}
 
 The upper bound on $v_s$ follows from the lengths of the five vectors. Let $a_j=\|B_j\|$, with total length $\sum_j a_j=5m$. Their sum can have length $5r$ precisely when $\max(0,2\max_j a_j-5m)\le5r\le5m$. Hence, each length is at most $5(m+r)/2$. With the total fixed, the sum of squared lengths is largest when two lengths are $5(m+r)/2$ and $5(m-r)/2$ and the other three are zero. Taking these two vectors as opposite multiples of one unit vector gives the required resultant. Therefore, $m^2+v_s\le5(m^2+r^2)/2$, which gives the upper bound in Equation~\ref{eq:support}.
@@ -173,7 +183,7 @@ The common quantity $Q=m^2+v_s=\|\mu\|^2+v_v$ is the mean squared magnitude of t
 
 Averaging $Q$ across consecutive bins preserves the mean squared magnitude over the combined interval. This property also holds numerically for all 97{,}699 eligible intervals of 15 minutes that begin on a UTC quarter hour within the union of training windows: the calculation from three bins differs from that using the original fifteen vectors by at most $9.09\times10^{-13}\,\mathrm{nT}^2$. Replacing each bin by its mean vector discards its vector variance and reduces the result by $0.8943\,\mathrm{nT}^2$ on average.
 
-\section{OMNI measurements and evaluation sample}
+\section{Data and sampling}
 \label{app:quality}
 
 
@@ -186,11 +196,11 @@ Which intervals remain complete depends on propagation as well as solar wind con
 
 The duration between observing times, DBOT, is the difference between the inferred spacecraft observing times of successive records on the OMNI arrival-time grid. A negative value indicates an apparent reversal between these two orderings. Across the training dates, negative DBOT occurs in 555{,}719 of the 4{,}298{,}363 valid magnetic minutes with known DBOT, and in at least one minute of 55{,}339 of the 300{,}392 eligible bins. The phase front normal interpolation field measures the percentage of contributions to a minute magnetic average whose propagation normal was interpolated \citep{nasamodifiedomni}. These minute counts include valid magnetic records outside eligible training windows.
 
-The completeness criteria retain 122{,}309 of the 957{,}720 possible training starts. A possible start lies on the grid of five minutes and places all four hours inside a calendar month assigned to training. The retained windows contain 163{,}988 distinct bins that can occur in the missing interval. Availability varies between years, with 11{,}340 starts in 2005 and 2{,}568 in 2014. The contribution of solar activity to these differences has not been established.
+The completeness criteria retain 122{,}309 of the 957{,}720 possible training starts. A possible start lies on the grid of five minutes and places all four hours inside a calendar month assigned to training. The retained windows contain 163{,}988 distinct bins that can occur in the missing interval. Availability varies between years, with 11{,}340 starts in 2005 and 2{,}568 in 2014. Solar activity's contribution to these differences remains uncertain.
 
 In each year from 2005 through 2024, training uses 15 January through 30 June, test uses August and September, and validation uses 1 November through 17 December. Unused dates separate these periods. Within each evaluation month, complete, nonoverlapping windows of four hours are formed in chronological order. From $N$ windows, $q=\min(N,q_0)$ are retained at indices $\lfloor(j+0.5)N/q\rfloor$ for $j=0,\ldots,q-1$, with $q_0=8$ for VAL and $q_0=12$ for TEST. The indices spread the evaluation windows across this sequence, and the quota limits differences in monthly sample counts. Eligibility still depends on completeness.
 
-\section{Diffusion training and evaluation}
+\section{Training and evaluation}
 \label{app:protocol}
 
 The four methods each have three fits, allowing comparisons across training seeds at the same update counts. Each fit receives 29{,}636 optimizer updates with batches of 128, using one batch gradient per update. This corresponds to 31 passes through the training data, including the shorter batch at the end of each pass.
@@ -213,13 +223,13 @@ The residual estimators use different approximations to the original data. M eva
 
 To examine how the penalty enters optimization, the gradient comparison evaluates the weighted data and residual terms on the same batches before clipping the total gradient. For each seed, the same eight TRAIN and eight VAL windows are used at the first and final O-S checkpoints, with noise seed 7003 and $c_R=0.0005$. Both residuals and both estimators are evaluated at $t\in\{1,25,50,100\}$ without changing the model weights. Norms and angles describe the relative size and direction of these gradients; undefined ratios and angles remain missing.
 
-\subsection{How the residual penalty is weighted}
+\subsection{Penalty weighting}
 
 A constant $c_R$ still gives different relative penalty weights across noise levels. With $\lambda_t=c_R/(2\Sigma_t)$ and $c_R=0.0005$, the ratios $\lambda_t/w_t$ at $t=1,25,50,100$ are 0.1239, 0.004183, 0.008642, and 1030.7. The large final ratio accompanies a Min-SNR data weight of $2.429\times10^{-7}$. To understand the effect on optimization, the derivatives of both loss terms also matter.
 
 At the final O-S checkpoints, the ratio of residual to data gradient norms ranges from 315 to 1799 on TRAIN and 214 to 1266 on VAL at $t=100$. At $t=25$, the ranges are 0.0081 to 0.0267 and 0.0103 to 0.0465. Each range spans three seeds, with eight windows per seed. In absolute terms, however, the TRAIN residual-gradient norm at $t=100$ is only $7.379\times10^{-5}$ to $4.401\times10^{-4}$, compared with 0.1396 to 0.4587 at $t=1$. Thus, a large ratio can accompany a small gradient. Optimizer updates combine noise levels and clip the total gradient afterward. These ratios describe the loss gradients at individual noise levels; their effect on prediction quality also depends on the rest of the training trajectory.
 
-\subsection{Choosing checkpoints and prior use of test data}
+\subsection{Validation and test history}
 
 All models were refitted after revisions to the evaluation. The sampler now supplies the same available measurements during training and inference, and the HMM calculation averages over the switching probability that is unknown to the prediction methods. These revisions change both the fits and their evaluation, so differences from earlier scores cannot be attributed to either change separately. The test period had already been examined before this comparison.
 
@@ -229,7 +239,7 @@ The original superiority criterion compares raw O-S with raw D, raw G5, and D an
 
 For O-S minus D, resampling groups of two consecutive years gives an interval of $[-0.0345,0.0233]$. The intervals describe temporal variation separately for each comparison, conditional on the existing fits and draws. They omit adjustment for multiple comparisons and variation from new training seeds.
 
-\subsection{Training stage and checkpoint choice}
+\subsection{Training stage}
 \label{app:checkpoints}
 
 Validation originally used fewer denoiser evaluations than TEST. The checkpoint analysis asks whether that difference affects model choice. It evaluates all five states of D and O-S at each training seed, using the original weights, windows, 39 samples and evaluation seed 7. Thirty validation ensembles with 50 evaluations reuse the initial noise from the original ensembles with 25. Their validation scores determine the model choices before additional TEST samples are generated. TEST then evaluates all thirty model states with 50 evaluations (Figure~\ref{fig:checkpoints}). This analysis still concerns the test period examined earlier.
@@ -252,13 +262,13 @@ Repeating checkpoint choice also tests whether this sensitivity changes the O-S/
  \label{fig:checkpoints}
 \end{figure}
 
-\section{A stationary hidden Markov model with a known distribution}
+\section{Hidden Markov model}
 \label{app:oracle}
 
 \begin{figure}[t]
  \centering
  \includegraphics[width=\linewidth]{figures/hmm/fig_hmm.pdf}
-\caption{The stationary hidden Markov model separates residual size from distributional accuracy. Subplots (a,b) use the same 36 cases at each timestep, each with 128 conditional paths and independent noise. (a) Squares give the mean energy score of denoising estimates; open circles estimate the expected score of the conditional distribution using an independent random stream. (b) Mean absolute residual on a logarithmic axis. The first two means are near floating point precision. The estimator uses one denoiser evaluation at $t=1$ and two at the other timesteps. (c) Complete DDIM sampling uses 39 samples on each of 288 windows, a separate evaluation population. The dashed line gives the score of independent samples from the exact conditional distribution. All scores are finite Monte Carlo estimates.}
+\caption{The stationary hidden Markov model separates residual size from distributional accuracy. Subplots (a,b) use the same 36 cases at each timestep, each with 128 conditional paths and independent noise. (a) Squares give the mean energy score of denoising estimates; open circles estimate the expected score of the conditional distribution using an independent random stream. (b) Mean absolute residual on a logarithmic axis. The first two means are near floating point precision. The estimator uses one denoiser evaluation at $t=1$ and two at the other timesteps. (c) Complete DDIM sampling with the exact denoiser uses 39 samples on each of 288 windows, a separate evaluation population. The dashed line gives the score of independent samples from the exact conditional distribution. All scores are finite Monte Carlo estimates.}
  \label{fig:hmm}
 \end{figure}
 
@@ -305,9 +315,9 @@ Exact denoiser, 100 evaluations & 4.2567 \\
 \end{tabular}
 \end{table}
 
-The denoising comparison distinguishes two conditioning sets. For one fixed noisy input, it examines the estimate and the posterior given that input and the available context. Figure~\ref{fig:hmm}(a) instead holds only the end states and vector geometry fixed: each estimate starts from a new hidden path and independent forward noise, and its distribution is compared with independent paths from the conditional distribution for that same context. The reference uses a separate random stream. Each calculation covers 36 cases at each of four timesteps, giving 144 cases in total. A posterior concentrated on one path at low noise can be correct for that noisy input. The separate comparison across repeated paths and noise assesses the distribution given the available context.
+The denoising comparison distinguishes two conditioning sets. For one fixed noisy input, it examines the estimate and the posterior given that input and the available context. Figure~\ref{fig:hmm}(a) instead holds only the end states and vector geometry fixed: each estimate starts from a new hidden path and independent forward noise, and its distribution is compared with independent paths from the conditional distribution for that same context. The reference uses a separate random stream. Each calculation covers 36 cases at each of four timesteps, giving 144 cases in total. In the comparison across repeated paths and noise at $t=100$, the estimates have mean absolute $R_{\mathrm{obs}}=4.17\times10^{-5}$ in HMM units and energy score 6.958, compared with 4.164 for independent conditional samples. These are finite Monte Carlo estimates. A posterior concentrated on one path at low noise can be correct for that noisy input. The separate comparison across repeated paths and noise assesses the distribution given the available context.
 
-\subsection{Training diffusion models on the same HMM}
+\subsection{Diffusion on the HMM}
 
 The learned models test how these residual objectives behave during training. Each fit uses 4{,}096 windows generated at seed 106 by cycling through the nine $(\alpha,p)$ combinations, a U-Net with channel widths 32/64/64, batches of 128, and 5{,}000 optimizer updates at seed 7. The remaining optimizer and diffusion settings follow Appendix~\ref{app:protocol}. Table~\ref{tab:learnedtoy} compares nine fits to the stationary chain with 50 DDIM evaluations for sampling. M and S denote the mean estimate and the estimate from two denoiser evaluations defined in Appendix~\ref{app:protocol}. At both coefficients, the identity penalty gives primary scores close to D, whereas omitting the variances gives higher scores with either estimator. These comparisons concern one training seed and its existing samples; variation across training seeds remains outside this comparison. The earlier models with independent end states belong to a separate analysis. The mean 90\% interval width is greater for I-S at $c_R=0.005$ than for D, even though its coverage is lower.
 
@@ -337,7 +347,7 @@ The estimate used in the residual loss and the distribution produced at inferenc
 
 Discreteness also matters for interval coverage. The exact conditional ensembles in Table~\ref{tab:oracle} give coverage of 100.0\% and 97.49\% under the nominal 90\% and 50\% conventions, with mean widths 1.4581 and 1.3485 in standardized coordinates. The intervals include their endpoints, so tied values can raise coverage above the values expected for a continuous distribution. This explains why the nominal percentages alone would mischaracterize calibration in this toy.
 
-\section{Prediction scores and interval coverage}
+\section{Scores and coverage}
 \label{app:details}
 
 Here and in Appendix~\ref{app:strata}, Gaussian denotes interpolation with a Gaussian residual fit on TRAIN. Rows explicitly labeled Gaussian regression use the wider available context, as described in Appendix~\ref{app:extension}. Both Gaussian methods use one ensemble per window.
@@ -395,7 +405,7 @@ O-S $-$ Gaussian & -0.2402 & $[-0.5298,-0.0481]$ & $[-0.4539,-0.0882]$ & $(-0.16
 \end{tabular}
 \end{table}
 
-\subsection{Interval coverage, width, and score contributions}
+\subsection{Spread and coverage}
 
 Similar primary scores conceal differences in interval coverage. O-S falls farther below 90\% coverage than D by 2.8 percentage points, exceeding the prespecified threshold of two percentage points (Table~\ref{tab:calibration}). Gaussian interpolation is closer to 90\%, but its 50\% intervals contain substantially more than half of the measurements. These percentages describe coverage across the test set.
 
@@ -405,7 +415,7 @@ G5's mean score improvement over D is largely accounted for by its larger spread
 
 The score can improve through different changes in these two terms. At seed 13, G5 reduces both distance to the measurements and spread; the larger decrease in distance lowers the score. At seed 42, both terms increase, and the larger increase in the spread term lowers the score. This arithmetic explains the score differences for the existing predictions. Representation and training loss change together in G5; varying them separately would distinguish their effects on learning.
 
-\paragraph{Where observations fall outside the intervals.}
+\subsection{Interval errors}
 G5's nominal 90\% intervals cover only 40.5\% of the $v_s$ observations. To show the direction of the errors, the calculation separates observations below the second smallest of 39 samples, between the second and 38th inclusive, and above the 38th. When ensemble members and the observation are independent samples from the same continuous conditional distribution, each observation rank is equally likely. The expected fractions are then 5\%, 90\% and 5\%.
 
 For each fit, all TEST windows contribute: fractions are averaged over positions, then over windows in each month, with equal weights for months and for fits of the same method. Examining each variable and each tail complements the proper score \citep{gneiting2007calibration}: an overall coverage percentage can combine errors in opposite directions.
@@ -510,13 +520,13 @@ Persistence clipped & 2.7925 & 3.6601 & 2.6284 & 0.0 & 0.0000 \\
 \end{tabular}
 \end{table}
 
-\subsection{Vector increments at the edges and inside the missing interval}
+\subsection{Vector increments}
 
 At the two edges of the missing hour, vector increments connect indices 17 to 18 and 29 to 30. Table~\ref{tab:geometry} gives their mean magnitudes and the RMSE of individual predictions, calculated across 39 samples within each window and then averaged over months and seeds. This RMSE combines error of the predictive mean with predictive spread. It describes edge behavior, while the proper scores assess distributional accuracy.
 
 The withheld record has mean increment magnitudes of 1.0460 nT at the left edge, 1.0539 nT at the right edge, and 1.0831 nT inside the missing hour. Interpolation imposes a smooth connection between the available measurements. Comparison with the withheld increments tests how well that smooth connection represents the actual variation.
 
-All four diffusion procedures produce larger mean increments at the two edges than the withheld record. D, I-S and O-S also have smaller mean increments inside the missing hour; G5 is close to the observed internal value. Both Gaussian methods exceed all three observed increment means. This comparison separates variation inside the predictions from abrupt transitions where they meet the available measurements.
+All four diffusion procedures produce larger mean increment magnitudes at the two edges than the withheld record. D, I-S and O-S also have smaller means inside the missing hour; G5 is close to the observed internal value. Both Gaussian methods exceed all three observed means. This comparison separates variation inside the predictions from abrupt transitions where they meet the available measurements.
 
 The variogram score examines dependence through differences between coordinates, using exponent $1/2$ \citep{scheuerer2015variogram}. This calculation weights 175 pairs equally: 55 connect adjacent times within a primary quantity and 120 connect different quantities at the same time. For pair $(i,j)$, let $d_k=|x_{k,i}-x_{k,j}|^{1/2}$. The contribution is $(|y_i-y_j|^{1/2}-\bar d)^2-s_d^2/K$, with $K=39$ and variance $s_d^2$ computed using divisor $K-1$. The squared term compares the transformed difference in the measurements with the ensemble mean. For independent samples, that estimate has variance $\operatorname{Var}(d_k)/K$; subtracting $s_d^2/K$ removes its upward Monte Carlo bias in expectation. The final score averages these contributions. It complements the energy score by emphasizing differences between coordinates.
 
@@ -524,7 +534,7 @@ The variogram score examines dependence through differences between coordinates,
 
 \begin{table}[ht]
 \centering
-\caption{Vector increments and variogram scores before clipping. Increment magnitudes and RMSE use nT. Observed mean increments are 1.0460 at the left edge, 1.0539 at the right edge and 1.0831 inside the missing hour. RMSE is calculated across the 39 individual predictions in each window, then averaged over months and seeds; it includes both predictive spread and error of the predictive mean. The variogram uses the 175 standardized coordinate pairs defined in the text and the finite-ensemble bias correction. Clipping retains the vector increments when the model weights stay the same, while its changes to $m$ and $v_s$ can alter the variogram. D also changes vector predictions through the separate validation choice of checkpoint at seed 7. Gaussian denotes interpolation with a Gaussian residual.}
+\caption{Vector increments and variogram scores before clipping. Increment magnitudes and RMSE use nT. Observed mean increment magnitudes are 1.0460 at the left edge, 1.0539 at the right edge and 1.0831 inside the missing hour. RMSE is calculated across the 39 individual predictions in each window, then averaged over months and seeds; it includes both predictive spread and error of the predictive mean. The variogram uses the 175 standardized coordinate pairs defined in the text and the finite-ensemble bias correction. Clipping retains the vector increments when the model weights stay the same, while its changes to $m$ and $v_s$ can alter the variogram. D also changes vector predictions through the separate validation choice of checkpoint at seed 7. Gaussian denotes interpolation with a Gaussian residual.}
 \label{tab:geometry}
 \setlength{\tabcolsep}{5.5pt}
 \begin{tabular}{lrrrrrr}
@@ -544,7 +554,7 @@ Persistence & 0.1003 & 0.0000 & 3.2730 & 0.0000 & 1.0460 & 3.1140 \\
 \end{tabular}
 \end{table}
 
-\subsection{Numerical precision when transforming observations}
+\subsection{Numerical precision}
 \label{app:numerics}
 
 Normalization and its inverse introduce rounding error even in physically realizable data. Table~\ref{tab:roundtrip} compares these errors in the 5{,}760 hidden observation bins. The affine transform uses TRAIN statistics. One calculation retains double precision throughout; another converts the standardized values to single precision before returning to double precision for the inverse transform and scoring. The representation with five coordinates then obtains $v_v$ by algebraic completion. Every route preserves the inequalities for these observations. Computing $v_v$ this way can make the equality residual zero while rounding error remains in the primary coordinates.
@@ -565,7 +575,7 @@ Single precision, five coordinates & $4.977\times10^{-7}$ & 0 & 0 \\
 \end{tabular}
 \end{table}
 
-\section{Variation across spacecraft, years, and magnetic conditions}
+\section{Variation across test cases}
 \label{app:strata}
 
 Table~\ref{tab:strata} examines how the primary score varies with spacecraft, calendar period and magnetic conditions. For each subgroup, the score averages first over windows within a month and then equally over the months present. Combining subgroup scores by window count can give a different result from the overall test score.
@@ -633,7 +643,7 @@ Year & D & I-S & O-S & G5 & Gaussian \\
 \end{tabular}
 \end{table}
 
-\subsection{Directional cancellation with thresholds from TRAIN}
+\subsection{Directional cancellation}
 
 Directional cancellation occurs when the norm of the mean vector is smaller than the mean of the individual magnitudes. The cancellation analysis examines whether the variance identity penalty behaves differently under these conditions. For each bin, define $C=(m^2-\|\mu\|^2)/m^2$, with $C=0$ when $m=0$, and $A=(m^2-\|\mu\|^2)/B_{\mathrm{ref}}^2$. Both measures are dimensionless: $C$ expresses cancellation relative to the bin's squared mean magnitude, while $A$ uses the common TRAIN scale.
 
@@ -652,10 +662,10 @@ High cancellation during the missing hour identifies 121 windows. O-S minus D is
 
 Combining high cancellation during the missing hour with the lowest energy quartile leaves seven windows from five years. Their scores describe this small subset of TEST outcomes. Interpreting them as evidence of conditional predictive superiority depends on accounting for the rule that uses withheld values to form the groups.
 
-\section{Clipping samples to satisfy moment constraints and Gaussian regression}
+\section{Clipping and Gaussian regression}
 \label{app:extension}
 
-\subsection{Algebraic completion and clipping of existing samples}
+\subsection{Completion and clipping}
 
 Algebraic completion changes only $v_v$. Because the primary energy score uses the other five quantities, it has exactly the same value for every ensemble before and after completion. The following comparisons retain the models, samples and windows, using model weights chosen by raw validation score. They isolate the effect of changing existing predictions. Training G5 also changes the representation and loss, so its score comparison includes those effects.
 
@@ -705,7 +715,7 @@ For D, Table~\ref{tab:operators} attributes an energy score change of $-0.00637$
  \label{fig:operator}
 \end{figure}
 
-\subsection{Multivariate Gaussian regression}
+\subsection{Gaussian regression}
 
 Gaussian regression uses the measurements before and after the missing hour to estimate departures from interpolation. Its input $X$ contains all 216 standardized available coordinates; $Y$ contains the 60 primary residuals from interpolation between bins 17 and 30, divided by the corresponding TRAIN scales. Fitting $W$ and an unpenalized intercept $b$ on TRAIN minimizes $\|Y-XW-b\|_F^2/N+\lambda\|W\|_F^2$, with equal weight for all 122{,}309 overlapping windows.
 
@@ -723,7 +733,7 @@ Before clipping, Gaussian regression has a vector energy score of 1.5728 over 36
 
 For both Gaussian baselines, clipping brings samples closer to the withheld measurements but reduces the spread term by more. Subtracting that smaller term raises the primary energy score. The samples now satisfy the moment constraints, yet their distribution receives a worse score. Interval coverage answers how often individual intervals contain measurements; the energy score also responds to the joint arrangement of the predictions.
 
-\section{Penalty strength after training}
+\section{Penalty strength}
 \label{app:fixedfinal}
 
 The coefficient comparison evaluates every model after 29{,}636 training steps, using $c_R\in\{0,0.00005,0.0005,0.005\}$ at seeds 7, 13 and 42 in Table~\ref{tab:fixedfinal}. Zero gives D, and positive coefficients apply O-S's variance identity penalty. The final D and O-S models contribute six fits in total; the two additional coefficients contribute six more. Evaluation uses the same 480 windows, 39 samples and 50 DDIM evaluations as the main experiment. Each comparison evaluates an ensemble before and after clipping.
@@ -772,7 +782,7 @@ At the original coefficient, O-S has a lower energy score than D at the end of a
 \par
 \end{samepage}
 
-\section{Related work on physical constraints in prediction and generation}
+\section{Related work}
 
 Solar wind reconstruction addresses quantities at several scales. Gaussian process regression estimates upstream plasma and magnetic conditions at Mars between MAVEN observations, with uncertainty that depends on the available sampling \citep{azari2024virtual}. Feedforward networks estimate second-order structure functions from incomplete magnetic records \citep{wrench2022statistics}, while conditional diffusion generates future coronal EUV images \citep{francisco2024corona}. Here, prediction concerns magnetic moments across a missing hour, conditional on measurements on both sides. Different orderings of the minute vectors give the same moments within each bin.
 
@@ -786,7 +796,7 @@ Nonlinear averaging also enters physical observation models. PGDM compares arith
 
 Residual weights can also adapt during training. PILD uses a Laplace likelihood whose scale depends on residual magnitude, estimating conditional moments of that magnitude from minibatch statistics with exponential averaging \citep{zeng2026pild}. Physics-Based Flow Matching evaluates residuals after integrating the flow to $t=1$ and combines gradients of the flow matching and residual losses through ConFIG \citep{baldan2025physics}. These objectives offer alternatives to the constant residual coefficient examined here.
 
-\section{Two examples of magnetic reconstruction}
+\section{Reconstruction examples}
 \label{app:imputation}
 
 Figures~\ref{fig:imputation120} and \ref{fig:imputation360} show two missing hours from TEST in physical units. Windows 120 and 360, counting from zero, are the midpoints of the two halves of the ordered list of 480 windows. Position determines their choice independently of model error, although TEST had already been examined. Diffusion uses seed 7. Every method uses the fit that minimizes raw validation score; Gaussian regression samples use seed 13.
@@ -795,9 +805,9 @@ Every method receives the same surrounding measurements and is compared with the
 
 The horizontal axes mark the starts of bins of five minutes, relative to the missing hour. Figures~\ref{fig:imputation120} and \ref{fig:imputation360} show predictions before clipping. Within each figure, the methods share a vertical scale for each quantity. For $v_s$, a symmetric logarithmic scale accommodates both small measured variances and Gaussian predictions outside the physical range. The reconstructed statistics describe five minutes of measurements; different sequences of minute averages can produce the same statistics.
 
-Available measurements retain their values during sampling. The plots show them separately from the twelve predicted bins, with short line breaks from $-5$ to $0$ minutes and from $55$ to $60$ minutes. Each neighboring bin contains a different set of five vectors. The variance identity constrains the moments inside a bin, while the conditional model learns their dependence across time. The elevated variance predictions are model errors; Figure~\ref{fig:imputationdetail} shows them on linear scales.
+Available measurements retain their values during sampling. Figures~\ref{fig:imputation120} and \ref{fig:imputation360} show them separately from the twelve predicted bins, with short line breaks from $-5$ to $0$ minutes and from $55$ to $60$ minutes. Each neighboring bin contains a different set of five vectors. The variance identity constrains the moments inside a bin, while the conditional model learns their dependence across time. The elevated variance predictions are model errors; Figure~\ref{fig:imputationdetail} shows them on linear scales.
 
-The scalar variance $v_s$ is the variance of the magnitudes of five vector averages, each taken over one minute. In both examples, diffusion generally places its median above the withheld variance, which often falls outside the nominal intervals. In TEST window 120, every diffusion method covers $v_s$ in zero of the twelve hidden bins. In window 360, D, O-S and G5 cover zero, one and two bins, respectively. The aggregate coverage results show the same shortfall from nominal coverage for this quantity.
+The scalar variance $v_s$ is the variance of the magnitudes of five vector averages, each taken over one minute. Its predictive interval describes uncertainty about that statistic. In both examples, diffusion generally places its median above the withheld variance, which often falls outside the nominal intervals. In TEST window 120, every diffusion method covers $v_s$ in zero of the twelve hidden bins. In window 360, D, O-S and G5 cover zero, one and two bins, respectively. The aggregate coverage results show the same shortfall from nominal coverage for this quantity.
 
 Gaussian regression's wider intervals contain all twelve withheld values in both windows. The model uses one residual covariance for every context. Its Gaussian distribution also assigns probability to negative $v_s$, even though variance is nonnegative. These examples show both the broad uncertainty intervals and the impossible values that accompany them.
 
@@ -818,7 +828,7 @@ Gaussian regression's wider intervals contain all twelve withheld values in both
 \begin{figure}[p]
  \centering
  \includegraphics[width=\linewidth]{figures/imputation/detail/fig_imputation.pdf}
- \caption{Scalar variance $v_s$ in the same two missing hours. Each value is the variance of the magnitudes of five consecutive vector averages, each over one minute. D, O-S and G5 share a linear scale in each row; Gaussian regression uses a separate linear scale on the right. Vertical distances can be compared directly among the three diffusion methods within a row. Axis limits include every displayed measurement, median and interval endpoint. Solid black lines show available observations, and dashed black lines show withheld measurements. Colored lines show empirical medians, and bands show nominal 90\% marginal predictive intervals from all 39 samples. Times mark bin starts relative to the missing hour. The horizontal gray line marks zero; predictions below it are physically impossible because variance is nonnegative. The much wider Gaussian intervals contain all twelve withheld values in each of these two hours.}
+ \caption{Scalar variance $v_s$ in the same two missing hours. Each value is the variance of the magnitudes of five consecutive vector averages, each over one minute. D, O-S and G5 share a linear scale in each row; Gaussian regression uses a separate linear scale on the right. Vertical distances can be compared directly among the three diffusion methods within a row. Axis limits include every displayed measurement, median and interval endpoint. Solid black lines show available observations, and dashed black lines show withheld measurements. Colored lines show empirical medians, and bands show nominal 90\% marginal predictive intervals from all 39 samples. Horizontal steps span the five minutes represented by each bin statistic, with time relative to the missing hour. The horizontal gray line marks zero; predictions below it are physically impossible because variance is nonnegative. The much wider Gaussian intervals contain all twelve withheld values in each of these two hours.}
  \label{fig:imputationdetail}
 \end{figure}
 
