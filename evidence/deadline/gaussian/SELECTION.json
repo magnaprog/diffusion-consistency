@@ -1,0 +1,21 @@
+{
+  "extension_protocol_sha256": "8456fdae42a086fa9cb11dbc4bc4da9d54d5a3fe233aff6ed6d4bb30d25d0090",
+  "fit_payload_sha256": "53e7b28d0fecc03c1fcf37d13179c8a438fbfa3e3b3a6dd9da88c5d8c6600487",
+  "schema_version": 1,
+  "selected": {
+    "corrected": {
+      "lambda": 0.1,
+      "month_balanced_primary_es": 1.8345273602837995,
+      "rho": 0.0
+    },
+    "raw": {
+      "lambda": 0.1,
+      "month_balanced_primary_es": 1.732752492464018,
+      "rho": 0.0
+    }
+  },
+  "selected_union": [
+    "lambda_0.1_rho_0"
+  ],
+  "validation_sha256": "d625ceb29b2cf38b4dc0714bfb4655fd9c1c51069693bdc6c365431c5c16bef4"
+}

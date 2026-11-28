@@ -1,0 +1,18 @@
+{
+  "study": "G5 supervision on measured vector variance",
+  "base_commit": "b23eddb82a062b442e6bf4e9072866555b263b32",
+  "seeds": [71, 73, 79],
+  "arms": ["G5", "G5aux"],
+  "training_inputs": {
+    "train.npz": "23df2e95daa7e0e24cb5602ed722bb9649b16bd47cb7b127f51929611d619e8a",
+    "val.npz": "5729ffb163f9bf485fa679f7027b5c61f1d15c8da1438d369aede9fc5804e3a6"
+  },
+  "intervention": "Both arms use the five-output G5 denoiser and the original weighted five-channel loss. G5aux adds the mean squared error of the derived vector variance against the stored measured sixth channel in the twelve hidden bins, scaled by the square of its TRAIN standard deviation and multiplied by the original diffusion time weight divided by five. Use the first clean estimate, with no clipping. No coefficient search.",
+  "pairing": "Within each seed use identical network initialization, chronological batches, timesteps, noise, optimizer, and sampler noise. Use all 122309 TRAIN windows. Five candidate epochs 3, 10, 17, 24, 31, 956 optimizer steps per epoch.",
+  "selection": "Choose each arm and seed separately using lowest raw five-coordinate validation energy score, weighted equally by year-month, 319 windows, 39 samples and 25 DDIM evaluations. Exact ties favor earlier epochs.",
+  "holdout": "Use the modified OMNI ASCII file omni_min2025.asc from NASA SPDF. Include all twelve calendar months, irrespective of their historical role. Apply original magnetic quality and same-spacecraft rules. Within each month pack four-hour windows without overlap and select up to 12 using the original deterministic spread-through-month rule. Freeze selected model identities before scoring. Report omissions explicitly.",
+  "sampler": "Raw predictions, 39 samples per window, 50 DDIM evaluations on holdout. Use shared deterministic per-window noise, evaluation seed 7. Validation split key VAL. Use a separate 2025 split key.",
+  "primary": "G5aux minus G5 fair energy score for the 60 standardized primary values, equal weights across represented calendar months and across the three fits. Negative favors auxiliary supervision.",
+  "secondary": "Fair marginal CRPS of derived vector variance in physical units (nT squared), averaged over the twelve hidden bins, windows within month, months, and fits. Report nominal 90 percent inclusive coverage and interval width for vector variance, with ranks 2 and 38 of 39. Show all paired seed differences and monthly differences. Months and the three fits in one year provide descriptive sensitivity; no population significance or equivalence claim.",
+  "interpretation": "This intervention changes the gradient through the derived quantity and preserves the number of network outputs. It isolates the effect of this particular auxiliary target within G5. It cannot attribute the entire historical D versus G5 difference to a missing loss term."
+}

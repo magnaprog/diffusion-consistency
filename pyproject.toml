@@ -1,0 +1,30 @@
+[build-system]
+requires = ["setuptools>=77.0.3"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "diffusion-constraints"
+version = "0.1.0"
+description = "Conditional diffusion experiments for missing solar wind measurements"
+readme = "README.md"
+requires-python = ">=3.10"
+license = "MIT"
+dynamic = ["dependencies"]
+
+[project.optional-dependencies]
+test = ["pytest"]
+
+[tool.setuptools]
+packages = ["prigm", "analysis", "experiments", "experiments.g5_auxiliary"]
+include-package-data = false
+
+[tool.setuptools.package-dir]
+prigm = "src/prigm"
+analysis = "src/analysis"
+experiments = "src/experiments"
+
+[tool.setuptools.package-data]
+"experiments.g5_auxiliary" = ["protocol.json"]
+
+[tool.setuptools.dynamic]
+dependencies = {file = ["requirements.txt"]}

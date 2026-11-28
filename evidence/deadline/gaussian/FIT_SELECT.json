@@ -1,0 +1,12 @@
+{
+  "files": {
+    "EXTENSION.json": "8456fdae42a086fa9cb11dbc4bc4da9d54d5a3fe233aff6ed6d4bb30d25d0090",
+    "FIT.json": "9bec3b01505c590ef0c722612e74dba9ac6f278d4e040dc68e221bf84255664b",
+    "FIT.npz": "53e7b28d0fecc03c1fcf37d13179c8a438fbfa3e3b3a6dd9da88c5d8c6600487",
+    "SELECTION.json": "8d74709e109015a272acb6bd217216ac0145ff6a6edb8e6ea3a5dd8843df3353",
+    "VALIDATION.json": "d625ceb29b2cf38b4dc0714bfb4655fd9c1c51069693bdc6c365431c5c16bef4"
+  },
+  "phase": "FIT_SELECTED",
+  "schema_version": 1,
+  "source_protocol_sha256": "25d0cdefdd5dbb160c32c7b5f4a6053bab99e4a9f64832d9eb6502232bf24e6b"
+}

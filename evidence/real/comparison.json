@@ -1,0 +1,3818 @@
+{
+  "arm_means": {
+    "D_corrected": 1.869488707229096,
+    "D_corrected_at_raw_checkpoint": 1.8813214897998334,
+    "D_raw": 1.8876865331291945,
+    "G5_corrected": 1.7843912023380266,
+    "G5_corrected_at_raw_checkpoint": 1.7843912023380266,
+    "G5_raw": 1.7847457456308968,
+    "I-S_corrected": 1.8760951166604383,
+    "I-S_corrected_at_raw_checkpoint": 1.8760951166604383,
+    "I-S_raw": 1.8815610247257901,
+    "O-S_corrected": 1.8661759062262167,
+    "O-S_corrected_at_raw_checkpoint": 1.8661759062262167,
+    "O-S_raw": 1.8849013455702182,
+    "gaussian_corrected": 2.2293629456444677,
+    "gaussian_raw": 2.1251433376550892,
+    "interpolation_corrected": 2.3928404874972697,
+    "interpolation_raw": 2.3928404874972697,
+    "persistence_corrected": 3.0665280175338063,
+    "persistence_raw": 3.0665280175338063
+  },
+  "arrays": {
+    "ids_sha256": "959f350174ad87972f98d4ff27777ea385e01b5c095a0a2b24371ceebbabccc6",
+    "n_windows": 480,
+    "normalization_sha256": "2e1479739e82cc6cd4764fedbb4d7bb856b2c8f8ed7b28efe6f69fe3c135d364",
+    "sha256": "2cbe75399a190d1522379701cced5c74718aaced251bdf4179f246b72b46c1c7",
+    "split": "TEST"
+  },
+  "comparison_scope": "Primary O-S comparisons are distinguished for the preplanned repair of a historically exposed test study, not a restored blind confirmation. Expanded and correction comparisons are exploratory multiple comparisons. Percentile intervals are marginal, not familywise corrected.",
+  "comparisons": {
+    "D_corrected_at_raw_checkpoint_minus_D_raw": {
+      "baseline": "D_raw",
+      "baseline_fixed_models": 3,
+      "baseline_mean": 1.8876865331291945,
+      "descriptive_gates": {
+        "both_difference_intervals_below_zero": true,
+        "observed_improvement_at_least_2_percent": false,
+        "strict_relative_equivalence_within_2_percent_both_intervals": true
+      },
+      "estimand": "support_correction_minus_raw_at_raw_selected_weights",
+      "family": "exploratory_same_checkpoint_correction",
+      "mean_diff": -0.00636504332936146,
+      "method": "D_corrected_at_raw_checkpoint",
+      "method_fixed_models": 3,
+      "method_mean": 1.8813214897998334,
+      "rel_mean_vs_base": -0.0033718751591717967,
+      "rel_twoyear_95": [
+        -0.00511382774834878,
+        -0.0013769732617907012
+      ],
+      "rel_twoyear_undefined_replicates": 0,
+      "rel_year_95": [
+        -0.0049127719262970415,
+        -0.0016841509155497015
+      ],
+      "rel_year_undefined_replicates": 0,
+      "relative_point_status": "defined",
+      "seed_diffs": [
+        -0.007301368881950099,
+        -0.00843342840282979,
+        -0.0033603327033044916
+      ],
+      "seeds_agree_neg": true,
+      "twoyear_95": [
+        -0.010793965248007542,
+        -0.002333363796306133
+      ],
+      "year_95": [
+        -0.010279440611827072,
+        -0.002887146872737918
+      ]
+    },
+    "D_corrected_minus_D_raw": {
+      "baseline": "D_raw",
+      "baseline_fixed_models": 3,
+      "baseline_mean": 1.8876865331291945,
+      "descriptive_gates": {
+        "both_difference_intervals_below_zero": true,
+        "observed_improvement_at_least_2_percent": false,
+        "strict_relative_equivalence_within_2_percent_both_intervals": true
+      },
+      "estimand": "independently_validation_selected_corrected_minus_raw",
+      "family": "exploratory_selected_correction",
+      "mean_diff": -0.018197825900098847,
+      "method": "D_corrected",
+      "method_fixed_models": 3,
+      "method_mean": 1.869488707229096,
+      "rel_mean_vs_base": -0.009640279559515921,
+      "rel_twoyear_95": [
+        -0.017876695511626656,
+        -0.0021334345550886903
+      ],
+      "rel_twoyear_undefined_replicates": 0,
+      "rel_year_95": [
+        -0.0177957478772723,
+        -0.001252612152388414
+      ],
+      "rel_year_undefined_replicates": 0,
+      "relative_point_status": "defined",
+      "seed_diffs": [
+        -0.04279971659416226,
+        -0.00843342840282979,
+        -0.0033603327033044916
+      ],
+      "seeds_agree_neg": true,
+      "twoyear_95": [
+        -0.0354560295982063,
+        -0.0036970907746140345
+      ],
+      "year_95": [
+        -0.036388829583424175,
+        -0.0021476590096042272
+      ]
+    },
+    "D_corrected_minus_G5_corrected": {
+      "baseline": "G5_corrected",
+      "baseline_fixed_models": 3,
+      "baseline_mean": 1.7843912023380266,
+      "descriptive_gates": {
+        "both_difference_intervals_below_zero": false,
+        "observed_improvement_at_least_2_percent": false,
+        "strict_relative_equivalence_within_2_percent_both_intervals": false
+      },
+      "estimand": "validation_selected_procedures",
+      "family": "exploratory_multiple_comparisons",
+      "mean_diff": 0.08509750489106922,
+      "method": "D_corrected",
+      "method_fixed_models": 3,
+      "method_mean": 1.869488707229096,
+      "rel_mean_vs_base": 0.04768993748656061,
+      "rel_twoyear_95": [
+        0.030013180254844216,
+        0.07232299493358481
+      ],
+      "rel_twoyear_undefined_replicates": 0,
+      "rel_year_95": [
+        0.03234878891705095,
+        0.068282442407547
+      ],
+      "rel_year_undefined_replicates": 0,
+      "relative_point_status": "defined",
+      "seed_diffs": [
+        0.1908302185920423,
+        0.03237932178714309,
+        0.03208297429402229
+      ],
+      "seeds_agree_neg": false,
+      "twoyear_95": [
+        0.05234818778012756,
+        0.13879624578260935
+      ],
+      "year_95": [
+        0.05464622328617356,
+        0.12654587286621047
+      ]
+    },
+    "D_corrected_minus_G5_raw": {
+      "baseline": "G5_raw",
+      "baseline_fixed_models": 3,
+      "baseline_mean": 1.7847457456308968,
+      "descriptive_gates": {
+        "both_difference_intervals_below_zero": false,
+        "observed_improvement_at_least_2_percent": false,
+        "strict_relative_equivalence_within_2_percent_both_intervals": false
+      },
+      "estimand": "validation_selected_procedures",
+      "family": "exploratory_multiple_comparisons",
+      "mean_diff": 0.08474296159819901,
+      "method": "D_corrected",
+      "method_fixed_models": 3,
+      "method_mean": 1.869488707229096,
+      "rel_mean_vs_base": 0.047481811796247136,
+      "rel_twoyear_95": [
+        0.029685850390643302,
+        0.07239038314928788
+      ],
+      "rel_twoyear_undefined_replicates": 0,
+      "rel_year_95": [
+        0.03215385220565434,
+        0.06817401919016629
+      ],
+      "rel_year_undefined_replicates": 0,
+      "relative_point_status": "defined",
+      "seed_diffs": [
+        0.19115183119199886,
+        0.035961017026154174,
+        0.027116036576444014
+      ],
+      "seeds_agree_neg": false,
+      "twoyear_95": [
+        0.05154171616838799,
+        0.1390300392874174
+      ],
+      "year_95": [
+        0.05429187388351898,
+        0.12609604295230423
+      ]
+    },
+    "D_corrected_minus_gaussian_corrected": {
+      "baseline": "gaussian_corrected",
+      "baseline_fixed_models": 1,
+      "baseline_mean": 2.2293629456444677,
+      "descriptive_gates": {
+        "both_difference_intervals_below_zero": true,
+        "observed_improvement_at_least_2_percent": true,
+        "strict_relative_equivalence_within_2_percent_both_intervals": false
+      },
+      "estimand": "validation_selected_procedures",
+      "family": "exploratory_multiple_comparisons",
+      "mean_diff": -0.35987423841537186,
+      "method": "D_corrected",
+      "method_fixed_models": 3,
+      "method_mean": 1.869488707229096,
+      "rel_mean_vs_base": -0.1614246971846654,
+      "rel_twoyear_95": [
+        -0.21831012437528138,
+        -0.10191345520916222
+      ],
+      "rel_twoyear_undefined_replicates": 0,
+      "rel_year_95": [
+        -0.24852263086347065,
+        -0.0808732349899865
+      ],
+      "rel_year_undefined_replicates": 0,
+      "relative_point_status": "defined",
+      "seed_diffs": [
+        -0.3146396683526933,
+        -0.40806520827714143,
+        -0.3569178386162808
+      ],
+      "seeds_agree_neg": true,
+      "twoyear_95": [
+        -0.5622894291950442,
+        -0.21079970135613904
+      ],
+      "year_95": [
+        -0.6373746857937703,
+        -0.16970784507457712
+      ]
+    },
+    "D_corrected_minus_gaussian_raw": {
+      "baseline": "gaussian_raw",
+      "baseline_fixed_models": 1,
+      "baseline_mean": 2.1251433376550892,
+      "descriptive_gates": {
+        "both_difference_intervals_below_zero": true,
+        "observed_improvement_at_least_2_percent": true,
+        "strict_relative_equivalence_within_2_percent_both_intervals": false
+      },
+      "estimand": "validation_selected_procedures",
+      "family": "exploratory_multiple_comparisons",
+      "mean_diff": -0.2556546304259934,
+      "method": "D_corrected",
+      "method_fixed_models": 3,
+      "method_mean": 1.869488707229096,
+      "rel_mean_vs_base": -0.12029994678292431,
+      "rel_twoyear_95": [
+        -0.1841572824985444,
+        -0.055018945220123225
+      ],
+      "rel_twoyear_undefined_replicates": 0,
+      "rel_year_95": [
+        -0.21686377948593025,
+        -0.03328359147500818
+      ],
+      "rel_year_undefined_replicates": 0,
+      "relative_point_status": "defined",
+      "seed_diffs": [
+        -0.21042006036331484,
+        -0.303845600287763,
+        -0.25269823062690233
+      ],
+      "seeds_agree_neg": true,
+      "twoyear_95": [
+        -0.45806567697731376,
+        -0.10808612009278919
+      ],
+      "year_95": [
+        -0.534548622883269,
+        -0.0662492687450509
+      ]
+    },
+    "D_raw_minus_G5_corrected": {
+      "baseline": "G5_corrected",
+      "baseline_fixed_models": 3,
+      "baseline_mean": 1.7843912023380266,
+      "descriptive_gates": {
+        "both_difference_intervals_below_zero": false,
+        "observed_improvement_at_least_2_percent": false,
+        "strict_relative_equivalence_within_2_percent_both_intervals": false
+      },
+      "estimand": "validation_selected_procedures",
+      "family": "exploratory_multiple_comparisons",
+      "mean_diff": 0.10329533079116808,
+      "method": "D_raw",
+      "method_fixed_models": 3,
+      "method_mean": 1.8876865331291945,
+      "rel_mean_vs_base": 0.057888276211978486,
+      "rel_twoyear_95": [
+        0.03434703715679728,
+        0.08778970008661995
+      ],
+      "rel_twoyear_undefined_replicates": 0,
+      "rel_year_95": [
+        0.03786171626809365,
+        0.07979063106172196
+      ],
+      "rel_year_undefined_replicates": 0,
+      "relative_point_status": "defined",
+      "seed_diffs": [
+        0.23362993518620456,
+        0.04081275018997288,
+        0.035443306997326784
+      ],
+      "seeds_agree_neg": false,
+      "twoyear_95": [
+        0.060093595260419026,
+        0.1683120900561998
+      ],
+      "year_95": [
+        0.06271146360586627,
+        0.15183134958475902
+      ]
+    },
+    "D_raw_minus_G5_raw": {
+      "baseline": "G5_raw",
+      "baseline_fixed_models": 3,
+      "baseline_mean": 1.7847457456308968,
+      "descriptive_gates": {
+        "both_difference_intervals_below_zero": false,
+        "observed_improvement_at_least_2_percent": false,
+        "strict_relative_equivalence_within_2_percent_both_intervals": false
+      },
+      "estimand": "validation_selected_procedures",
+      "family": "exploratory_multiple_comparisons",
+      "mean_diff": 0.10294078749829787,
+      "method": "D_raw",
+      "method_fixed_models": 3,
+      "method_mean": 1.8876865331291945,
+      "rel_mean_vs_base": 0.05767812460138905,
+      "rel_twoyear_95": [
+        0.033892661910581004,
+        0.08789628790380218
+      ],
+      "rel_twoyear_undefined_replicates": 0,
+      "rel_year_95": [
+        0.03763991963756908,
+        0.07976129848198388
+      ],
+      "rel_year_undefined_replicates": 0,
+      "relative_point_status": "defined",
+      "seed_diffs": [
+        0.23395154778616112,
+        0.044394445428983964,
+        0.030476369279748505
+      ],
+      "seeds_agree_neg": false,
+      "twoyear_95": [
+        0.05931680258586218,
+        0.16851903375027164
+      ],
+      "year_95": [
+        0.06238535051976754,
+        0.15176588433179058
+      ]
+    },
+    "D_raw_minus_gaussian_corrected": {
+      "baseline": "gaussian_corrected",
+      "baseline_fixed_models": 1,
+      "baseline_mean": 2.2293629456444677,
+      "descriptive_gates": {
+        "both_difference_intervals_below_zero": true,
+        "observed_improvement_at_least_2_percent": true,
+        "strict_relative_equivalence_within_2_percent_both_intervals": false
+      },
+      "estimand": "validation_selected_procedures",
+      "family": "exploratory_multiple_comparisons",
+      "mean_diff": -0.341676412515273,
+      "method": "D_raw",
+      "method_fixed_models": 3,
+      "method_mean": 1.8876865331291945,
+      "rel_mean_vs_base": -0.15326190523746264,
+      "rel_twoyear_95": [
+        -0.20861718653823627,
+        -0.09272022836717475
+      ],
+      "rel_twoyear_undefined_replicates": 0,
+      "rel_year_95": [
+        -0.23816612518874442,
+        -0.07237438923712929
+      ],
+      "rel_year_undefined_replicates": 0,
+      "relative_point_status": "defined",
+      "seed_diffs": [
+        -0.27183995175853104,
+        -0.39963177987431164,
+        -0.3535575059129763
+      ],
+      "seeds_agree_neg": true,
+      "twoyear_95": [
+        -0.5369589733662563,
+        -0.19266694693068614
+      ],
+      "year_95": [
+        -0.6116952760135752,
+        -0.1512654657524714
+      ]
+    },
+    "D_raw_minus_gaussian_raw": {
+      "baseline": "gaussian_raw",
+      "baseline_fixed_models": 1,
+      "baseline_mean": 2.1251433376550892,
+      "descriptive_gates": {
+        "both_difference_intervals_below_zero": true,
+        "observed_improvement_at_least_2_percent": true,
+        "strict_relative_equivalence_within_2_percent_both_intervals": false
+      },
+      "estimand": "validation_selected_procedures",
+      "family": "exploratory_multiple_comparisons",
+      "mean_diff": -0.23745680452589454,
+      "method": "D_raw",
+      "method_fixed_models": 3,
+      "method_mean": 1.8876865331291945,
+      "rel_mean_vs_base": -0.11173684161366144,
+      "rel_twoyear_95": [
+        -0.17415086891075302,
+        -0.04588335021372147
+      ],
+      "rel_twoyear_undefined_replicates": 0,
+      "rel_year_95": [
+        -0.20549396355780378,
+        -0.02446985108631183
+      ],
+      "rel_year_undefined_replicates": 0,
+      "relative_point_status": "defined",
+      "seed_diffs": [
+        -0.16762034376915258,
+        -0.2954121718849332,
+        -0.24933789792359784
+      ],
+      "seeds_agree_neg": true,
+      "twoyear_95": [
+        -0.43290250645882455,
+        -0.08969693390902868
+      ],
+      "year_95": [
+        -0.5085420093343483,
+        -0.048590406945729005
+      ]
+    },
+    "G5_corrected_at_raw_checkpoint_minus_G5_raw": {
+      "baseline": "G5_raw",
+      "baseline_fixed_models": 3,
+      "baseline_mean": 1.7847457456308968,
+      "descriptive_gates": {
+        "both_difference_intervals_below_zero": false,
+        "observed_improvement_at_least_2_percent": false,
+        "strict_relative_equivalence_within_2_percent_both_intervals": true
+      },
+      "estimand": "support_correction_minus_raw_at_raw_selected_weights",
+      "family": "exploratory_same_checkpoint_correction",
+      "mean_diff": -0.000354543292870213,
+      "method": "G5_corrected_at_raw_checkpoint",
+      "method_fixed_models": 3,
+      "method_mean": 1.7843912023380266,
+      "rel_mean_vs_base": -0.0001986519893593494,
+      "rel_twoyear_95": [
+        -0.0006015324871481884,
+        0.0001717358446292975
+      ],
+      "rel_twoyear_undefined_replicates": 0,
+      "rel_year_95": [
+        -0.0007176575198760583,
+        0.00040531873301919954
+      ],
+      "rel_year_undefined_replicates": 0,
+      "relative_point_status": "defined",
+      "seed_diffs": [
+        0.00032161259995655556,
+        0.0035816952390110846,
+        -0.004966937717578279
+      ],
+      "seeds_agree_neg": false,
+      "twoyear_95": [
+        -0.0009780329707177794,
+        0.0003310376152173163
+      ],
+      "year_95": [
+        -0.0012922121845515445,
+        0.0007107451846007802
+      ]
+    },
+    "G5_corrected_minus_G5_raw": {
+      "baseline": "G5_raw",
+      "baseline_fixed_models": 3,
+      "baseline_mean": 1.7847457456308968,
+      "descriptive_gates": {
+        "both_difference_intervals_below_zero": false,
+        "observed_improvement_at_least_2_percent": false,
+        "strict_relative_equivalence_within_2_percent_both_intervals": true
+      },
+      "estimand": "independently_validation_selected_corrected_minus_raw",
+      "family": "exploratory_selected_correction",
+      "mean_diff": -0.000354543292870213,
+      "method": "G5_corrected",
+      "method_fixed_models": 3,
+      "method_mean": 1.7843912023380266,
+      "rel_mean_vs_base": -0.0001986519893593494,
+      "rel_twoyear_95": [
+        -0.0006015324871481884,
+        0.0001717358446292975
+      ],
+      "rel_twoyear_undefined_replicates": 0,
+      "rel_year_95": [
+        -0.0007176575198760583,
+        0.00040531873301919954
+      ],
+      "rel_year_undefined_replicates": 0,
+      "relative_point_status": "defined",
+      "seed_diffs": [
+        0.00032161259995655556,
+        0.0035816952390110846,
+        -0.004966937717578279
+      ],
+      "seeds_agree_neg": false,
+      "twoyear_95": [
+        -0.0009780329707177794,
+        0.0003310376152173163
+      ],
+      "year_95": [
+        -0.0012922121845515445,
+        0.0007107451846007802
+      ]
+    },
+    "G5_corrected_minus_gaussian_corrected": {
+      "baseline": "gaussian_corrected",
+      "baseline_fixed_models": 1,
+      "baseline_mean": 2.2293629456444677,
+      "descriptive_gates": {
+        "both_difference_intervals_below_zero": true,
+        "observed_improvement_at_least_2_percent": true,
+        "strict_relative_equivalence_within_2_percent_both_intervals": false
+      },
+      "estimand": "validation_selected_procedures",
+      "family": "exploratory_multiple_comparisons",
+      "mean_diff": -0.44497174330644107,
+      "method": "G5_corrected",
+      "method_fixed_models": 3,
+      "method_mean": 1.7843912023380266,
+      "rel_mean_vs_base": -0.19959591782746167,
+      "rel_twoyear_95": [
+        -0.26899748921899125,
+        -0.1304104236442847
+      ],
+      "rel_twoyear_undefined_replicates": 0,
+      "rel_year_95": [
+        -0.28567844686534327,
+        -0.12465315626819665
+      ],
+      "rel_year_undefined_replicates": 0,
+      "relative_point_status": "defined",
+      "seed_diffs": [
+        -0.5054698869447356,
+        -0.4404445300642845,
+        -0.3890008129103031
+      ],
+      "seeds_agree_neg": true,
+      "twoyear_95": [
+        -0.6981348292330521,
+        -0.2714672191373268
+      ],
+      "year_95": [
+        -0.7320546613361477,
+        -0.26234608962492584
+      ]
+    },
+    "G5_corrected_minus_gaussian_raw": {
+      "baseline": "gaussian_raw",
+      "baseline_fixed_models": 1,
+      "baseline_mean": 2.1251433376550892,
+      "descriptive_gates": {
+        "both_difference_intervals_below_zero": true,
+        "observed_improvement_at_least_2_percent": true,
+        "strict_relative_equivalence_within_2_percent_both_intervals": false
+      },
+      "estimand": "validation_selected_procedures",
+      "family": "exploratory_multiple_comparisons",
+      "mean_diff": -0.3407521353170626,
+      "method": "G5_corrected",
+      "method_fixed_models": 3,
+      "method_mean": 1.7843912023380266,
+      "rel_mean_vs_base": -0.16034313040411333,
+      "rel_twoyear_95": [
+        -0.23806485817619827,
+        -0.08552048140824593
+      ],
+      "rel_twoyear_undefined_replicates": 0,
+      "rel_year_95": [
+        -0.2549131245315095,
+        -0.0800508255062564
+      ],
+      "rel_year_undefined_replicates": 0,
+      "relative_point_status": "defined",
+      "seed_diffs": [
+        -0.40125027895535714,
+        -0.33622492207490606,
+        -0.2847812049209246
+      ],
+      "seeds_agree_neg": true,
+      "twoyear_95": [
+        -0.5947440072051974,
+        -0.16877711626420755
+      ],
+      "year_95": [
+        -0.6280988888460675,
+        -0.15973020854218048
+      ]
+    },
+    "G5_raw_minus_gaussian_corrected": {
+      "baseline": "gaussian_corrected",
+      "baseline_fixed_models": 1,
+      "baseline_mean": 2.2293629456444677,
+      "descriptive_gates": {
+        "both_difference_intervals_below_zero": true,
+        "observed_improvement_at_least_2_percent": true,
+        "strict_relative_equivalence_within_2_percent_both_intervals": false
+      },
+      "estimand": "validation_selected_procedures",
+      "family": "exploratory_multiple_comparisons",
+      "mean_diff": -0.44461720001357086,
+      "method": "G5_raw",
+      "method_fixed_models": 3,
+      "method_mean": 1.7847457456308968,
+      "rel_mean_vs_base": -0.19943688437193444,
+      "rel_twoyear_95": [
+        -0.2690358210045222,
+        -0.13030132366357178
+      ],
+      "rel_twoyear_undefined_replicates": 0,
+      "rel_year_95": [
+        -0.28590614452877855,
+        -0.12435710664978605
+      ],
+      "rel_year_undefined_replicates": 0,
+      "relative_point_status": "defined",
+      "seed_diffs": [
+        -0.5057914995446922,
+        -0.4440262253032956,
+        -0.3840338751927248
+      ],
+      "seeds_agree_neg": true,
+      "twoyear_95": [
+        -0.6981766776835139,
+        -0.27111026271355937
+      ],
+      "year_95": [
+        -0.7325791497749824,
+        -0.2615175320243347
+      ]
+    },
+    "G5_raw_minus_gaussian_raw": {
+      "baseline": "gaussian_raw",
+      "baseline_fixed_models": 1,
+      "baseline_mean": 2.1251433376550892,
+      "descriptive_gates": {
+        "both_difference_intervals_below_zero": true,
+        "observed_improvement_at_least_2_percent": true,
+        "strict_relative_equivalence_within_2_percent_both_intervals": false
+      },
+      "estimand": "validation_selected_procedures",
+      "family": "exploratory_multiple_comparisons",
+      "mean_diff": -0.3403975920241924,
+      "method": "G5_raw",
+      "method_fixed_models": 3,
+      "method_mean": 1.7847457456308968,
+      "rel_mean_vs_base": -0.1601762977549512,
+      "rel_twoyear_95": [
+        -0.23798576895693904,
+        -0.08545389628215803
+      ],
+      "rel_twoyear_undefined_replicates": 0,
+      "rel_year_95": [
+        -0.2549335749588513,
+        -0.07961816545674504
+      ],
+      "rel_year_undefined_replicates": 0,
+      "relative_point_status": "defined",
+      "seed_diffs": [
+        -0.4015718915553137,
+        -0.33980661731391715,
+        -0.27981426720334635
+      ],
+      "seeds_agree_neg": true,
+      "twoyear_95": [
+        -0.5944347005699082,
+        -0.16832724495004858
+      ],
+      "year_95": [
+        -0.6291326816049545,
+        -0.15886013138334482
+      ]
+    },
+    "I-S_corrected_at_raw_checkpoint_minus_I-S_raw": {
+      "baseline": "I-S_raw",
+      "baseline_fixed_models": 3,
+      "baseline_mean": 1.8815610247257901,
+      "descriptive_gates": {
+        "both_difference_intervals_below_zero": true,
+        "observed_improvement_at_least_2_percent": false,
+        "strict_relative_equivalence_within_2_percent_both_intervals": true
+      },
+      "estimand": "support_correction_minus_raw_at_raw_selected_weights",
+      "family": "exploratory_same_checkpoint_correction",
+      "mean_diff": -0.005465908065351632,
+      "method": "I-S_corrected_at_raw_checkpoint",
+      "method_fixed_models": 3,
+      "method_mean": 1.8760951166604383,
+      "rel_mean_vs_base": -0.0029049858035554324,
+      "rel_twoyear_95": [
+        -0.005132154465678656,
+        -0.0007530228029118879
+      ],
+      "rel_twoyear_undefined_replicates": 0,
+      "rel_year_95": [
+        -0.004582346898423042,
+        -0.0011565132088401976
+      ],
+      "rel_year_undefined_replicates": 0,
+      "relative_point_status": "defined",
+      "seed_diffs": [
+        -0.0037794667757637956,
+        -0.012737872635660397,
+        0.00011961521536929531
+      ],
+      "seeds_agree_neg": false,
+      "twoyear_95": [
+        -0.010358038790005708,
+        -0.0013118053462157946
+      ],
+      "year_95": [
+        -0.00917474171387297,
+        -0.002028179358017441
+      ]
+    },
+    "I-S_corrected_minus_D_corrected": {
+      "baseline": "D_corrected",
+      "baseline_fixed_models": 3,
+      "baseline_mean": 1.869488707229096,
+      "descriptive_gates": {
+        "both_difference_intervals_below_zero": false,
+        "observed_improvement_at_least_2_percent": false,
+        "strict_relative_equivalence_within_2_percent_both_intervals": false
+      },
+      "estimand": "validation_selected_procedures",
+      "family": "exploratory_multiple_comparisons",
+      "mean_diff": 0.006606409431342497,
+      "method": "I-S_corrected",
+      "method_fixed_models": 3,
+      "method_mean": 1.8760951166604383,
+      "rel_mean_vs_base": 0.0035338054762226044,
+      "rel_twoyear_95": [
+        -0.02481571867220973,
+        0.026532307663621642
+      ],
+      "rel_twoyear_undefined_replicates": 0,
+      "rel_year_95": [
+        -0.01794004024595267,
+        0.022902522136328957
+      ],
+      "rel_year_undefined_replicates": 0,
+      "relative_point_status": "defined",
+      "seed_diffs": [
+        0.023795462705194392,
+        0.06133051020498281,
+        -0.06530674461614971
+      ],
+      "seeds_agree_neg": false,
+      "twoyear_95": [
+        -0.0517933312741713,
+        0.04616134282854367
+      ],
+      "year_95": [
+        -0.03579640950467922,
+        0.041241332168945606
+      ]
+    },
+    "I-S_corrected_minus_D_raw": {
+      "baseline": "D_raw",
+      "baseline_fixed_models": 3,
+      "baseline_mean": 1.8876865331291945,
+      "descriptive_gates": {
+        "both_difference_intervals_below_zero": false,
+        "observed_improvement_at_least_2_percent": false,
+        "strict_relative_equivalence_within_2_percent_both_intervals": false
+      },
+      "estimand": "validation_selected_procedures",
+      "family": "exploratory_multiple_comparisons",
+      "mean_diff": -0.011591416468756352,
+      "method": "I-S_corrected",
+      "method_fixed_models": 3,
+      "method_mean": 1.8760951166604383,
+      "rel_mean_vs_base": -0.00614054095599305,
+      "rel_twoyear_95": [
+        -0.03906596840384707,
+        0.022623951013233303
+      ],
+      "rel_twoyear_undefined_replicates": 0,
+      "rel_year_95": [
+        -0.0313509915958486,
+        0.017147917109986515
+      ],
+      "rel_year_undefined_replicates": 0,
+      "relative_point_status": "defined",
+      "seed_diffs": [
+        -0.01900425388896787,
+        0.05289708180215302,
+        -0.0686670773194542
+      ],
+      "seeds_agree_neg": false,
+      "twoyear_95": [
+        -0.0824850161851253,
+        0.03931990983994539
+      ],
+      "year_95": [
+        -0.06465202849981441,
+        0.030407230155830647
+      ]
+    },
+    "I-S_corrected_minus_G5_corrected": {
+      "baseline": "G5_corrected",
+      "baseline_fixed_models": 3,
+      "baseline_mean": 1.7843912023380266,
+      "descriptive_gates": {
+        "both_difference_intervals_below_zero": false,
+        "observed_improvement_at_least_2_percent": false,
+        "strict_relative_equivalence_within_2_percent_both_intervals": false
+      },
+      "estimand": "validation_selected_procedures",
+      "family": "exploratory_multiple_comparisons",
+      "mean_diff": 0.09170391432241172,
+      "method": "I-S_corrected",
+      "method_fixed_models": 3,
+      "method_mean": 1.8760951166604383,
+      "rel_mean_vs_base": 0.05139226992503394,
+      "rel_twoyear_95": [
+        0.03731650031262355,
+        0.06895900190115678
+      ],
+      "rel_twoyear_undefined_replicates": 0,
+      "rel_year_95": [
+        0.03506668792980336,
+        0.06855438321314766
+      ],
+      "rel_year_undefined_replicates": 0,
+      "relative_point_status": "defined",
+      "seed_diffs": [
+        0.2146256812972367,
+        0.0937098319921259,
+        -0.03322377032212742
+      ],
+      "seeds_agree_neg": false,
+      "twoyear_95": [
+        0.06790023978228592,
+        0.11540755541390438
+      ],
+      "year_95": [
+        0.06419699586256614,
+        0.1203503653382286
+      ]
+    },
+    "I-S_corrected_minus_G5_raw": {
+      "baseline": "G5_raw",
+      "baseline_fixed_models": 3,
+      "baseline_mean": 1.7847457456308968,
+      "descriptive_gates": {
+        "both_difference_intervals_below_zero": false,
+        "observed_improvement_at_least_2_percent": false,
+        "strict_relative_equivalence_within_2_percent_both_intervals": false
+      },
+      "estimand": "validation_selected_procedures",
+      "family": "exploratory_multiple_comparisons",
+      "mean_diff": 0.0913493710295415,
+      "method": "I-S_corrected",
+      "method_fixed_models": 3,
+      "method_mean": 1.8760951166604383,
+      "rel_mean_vs_base": 0.051183408759016294,
+      "rel_twoyear_95": [
+        0.037096493771845616,
+        0.06873021630556843
+      ],
+      "rel_twoyear_undefined_replicates": 0,
+      "rel_year_95": [
+        0.03509404290575137,
+        0.06814707667002336
+      ],
+      "rel_year_undefined_replicates": 0,
+      "relative_point_status": "defined",
+      "seed_diffs": [
+        0.21494729389719325,
+        0.09729152723113699,
+        -0.0381907080397057
+      ],
+      "seeds_agree_neg": false,
+      "twoyear_95": [
+        0.0672310586252437,
+        0.11532827197653496
+      ],
+      "year_95": [
+        0.06438747375898916,
+        0.11946620925641228
+      ]
+    },
+    "I-S_corrected_minus_I-S_raw": {
+      "baseline": "I-S_raw",
+      "baseline_fixed_models": 3,
+      "baseline_mean": 1.8815610247257901,
+      "descriptive_gates": {
+        "both_difference_intervals_below_zero": true,
+        "observed_improvement_at_least_2_percent": false,
+        "strict_relative_equivalence_within_2_percent_both_intervals": true
+      },
+      "estimand": "independently_validation_selected_corrected_minus_raw",
+      "family": "exploratory_selected_correction",
+      "mean_diff": -0.005465908065351632,
+      "method": "I-S_corrected",
+      "method_fixed_models": 3,
+      "method_mean": 1.8760951166604383,
+      "rel_mean_vs_base": -0.0029049858035554324,
+      "rel_twoyear_95": [
+        -0.005132154465678656,
+        -0.0007530228029118879
+      ],
+      "rel_twoyear_undefined_replicates": 0,
+      "rel_year_95": [
+        -0.004582346898423042,
+        -0.0011565132088401976
+      ],
+      "rel_year_undefined_replicates": 0,
+      "relative_point_status": "defined",
+      "seed_diffs": [
+        -0.0037794667757637956,
+        -0.012737872635660397,
+        0.00011961521536929531
+      ],
+      "seeds_agree_neg": false,
+      "twoyear_95": [
+        -0.010358038790005708,
+        -0.0013118053462157946
+      ],
+      "year_95": [
+        -0.00917474171387297,
+        -0.002028179358017441
+      ]
+    },
+    "I-S_corrected_minus_gaussian_corrected": {
+      "baseline": "gaussian_corrected",
+      "baseline_fixed_models": 1,
+      "baseline_mean": 2.2293629456444677,
+      "descriptive_gates": {
+        "both_difference_intervals_below_zero": true,
+        "observed_improvement_at_least_2_percent": true,
+        "strict_relative_equivalence_within_2_percent_both_intervals": false
+      },
+      "estimand": "validation_selected_procedures",
+      "family": "exploratory_multiple_comparisons",
+      "mean_diff": -0.35326782898402936,
+      "method": "I-S_corrected",
+      "method_fixed_models": 3,
+      "method_mean": 1.8760951166604383,
+      "rel_mean_vs_base": -0.15846133518735153,
+      "rel_twoyear_95": [
+        -0.23350605299304872,
+        -0.08792566289378627
+      ],
+      "rel_twoyear_undefined_replicates": 0,
+      "rel_year_95": [
+        -0.25422767664056983,
+        -0.07540374125912945
+      ],
+      "rel_year_undefined_replicates": 0,
+      "relative_point_status": "defined",
+      "seed_diffs": [
+        -0.2908442056474989,
+        -0.3467346980721586,
+        -0.4222245832324305
+      ],
+      "seeds_agree_neg": true,
+      "twoyear_95": [
+        -0.6044795193926884,
+        -0.18329739996448735
+      ],
+      "year_95": [
+        -0.6535453537380285,
+        -0.1593352011299599
+      ]
+    },
+    "I-S_corrected_minus_gaussian_raw": {
+      "baseline": "gaussian_raw",
+      "baseline_fixed_models": 1,
+      "baseline_mean": 2.1251433376550892,
+      "descriptive_gates": {
+        "both_difference_intervals_below_zero": true,
+        "observed_improvement_at_least_2_percent": true,
+        "strict_relative_equivalence_within_2_percent_both_intervals": false
+      },
+      "estimand": "validation_selected_procedures",
+      "family": "exploratory_multiple_comparisons",
+      "mean_diff": -0.24904822099465088,
+      "method": "I-S_corrected",
+      "method_fixed_models": 3,
+      "method_mean": 1.8760951166604383,
+      "rel_mean_vs_base": -0.11719125791743248,
+      "rel_twoyear_95": [
+        -0.2010311556145558,
+        -0.040607742437111634
+      ],
+      "rel_twoyear_undefined_replicates": 0,
+      "rel_year_95": [
+        -0.2220477182702584,
+        -0.02831661355196842
+      ],
+      "rel_year_undefined_replicates": 0,
+      "relative_point_status": "defined",
+      "seed_diffs": [
+        -0.18662459765812045,
+        -0.24251509008278016,
+        -0.31800497524305205
+      ],
+      "seeds_agree_neg": true,
+      "twoyear_95": [
+        -0.5010687752587732,
+        -0.07985932743767962
+      ],
+      "year_95": [
+        -0.5506419285178035,
+        -0.0569740184395959
+      ]
+    },
+    "I-S_raw_minus_D_corrected": {
+      "baseline": "D_corrected",
+      "baseline_fixed_models": 3,
+      "baseline_mean": 1.869488707229096,
+      "descriptive_gates": {
+        "both_difference_intervals_below_zero": false,
+        "observed_improvement_at_least_2_percent": false,
+        "strict_relative_equivalence_within_2_percent_both_intervals": false
+      },
+      "estimand": "validation_selected_procedures",
+      "family": "exploratory_multiple_comparisons",
+      "mean_diff": 0.01207231749669413,
+      "method": "I-S_raw",
+      "method_fixed_models": 3,
+      "method_mean": 1.8815610247257901,
+      "rel_mean_vs_base": 0.00645755037193425,
+      "rel_twoyear_95": [
+        -0.020129353314855748,
+        0.027549336272034094
+      ],
+      "rel_twoyear_undefined_replicates": 0,
+      "rel_year_95": [
+        -0.013791630360874102,
+        0.02476263620725285
+      ],
+      "rel_year_undefined_replicates": 0,
+      "relative_point_status": "defined",
+      "seed_diffs": [
+        0.027574929480958188,
+        0.07406838284064321,
+        -0.06542635983151901
+      ],
+      "seeds_agree_neg": false,
+      "twoyear_95": [
+        -0.04158666518226216,
+        0.047733467896096095
+      ],
+      "year_95": [
+        -0.02760649308563283,
+        0.04446490691885048
+      ]
+    },
+    "I-S_raw_minus_D_raw": {
+      "baseline": "D_raw",
+      "baseline_fixed_models": 3,
+      "baseline_mean": 1.8876865331291945,
+      "descriptive_gates": {
+        "both_difference_intervals_below_zero": false,
+        "observed_improvement_at_least_2_percent": false,
+        "strict_relative_equivalence_within_2_percent_both_intervals": false
+      },
+      "estimand": "validation_selected_procedures",
+      "family": "preplanned_secondary_repair",
+      "mean_diff": -0.0061255084034047185,
+      "method": "I-S_raw",
+      "method_fixed_models": 3,
+      "method_mean": 1.8815610247257901,
+      "rel_mean_vs_base": -0.003244981778436772,
+      "rel_twoyear_95": [
+        -0.03433949870776316,
+        0.023509617891759836
+      ],
+      "rel_twoyear_undefined_replicates": 0,
+      "rel_year_95": [
+        -0.027217958872856045,
+        0.018697263592608718
+      ],
+      "rel_year_undefined_replicates": 0,
+      "relative_point_status": "defined",
+      "seed_diffs": [
+        -0.015224787113204075,
+        0.06563495443781342,
+        -0.0687866925348235
+      ],
+      "seeds_agree_neg": false,
+      "twoyear_95": [
+        -0.07195859485970123,
+        0.04101225645330418
+      ],
+      "year_95": [
+        -0.05622135495560461,
+        0.03297756177148049
+      ]
+    },
+    "I-S_raw_minus_G5_corrected": {
+      "baseline": "G5_corrected",
+      "baseline_fixed_models": 3,
+      "baseline_mean": 1.7843912023380266,
+      "descriptive_gates": {
+        "both_difference_intervals_below_zero": false,
+        "observed_improvement_at_least_2_percent": false,
+        "strict_relative_equivalence_within_2_percent_both_intervals": false
+      },
+      "estimand": "validation_selected_procedures",
+      "family": "exploratory_multiple_comparisons",
+      "mean_diff": 0.09716982238776335,
+      "method": "I-S_raw",
+      "method_fixed_models": 3,
+      "method_mean": 1.8815610247257901,
+      "rel_mean_vs_base": 0.05445544803204873,
+      "rel_twoyear_95": [
+        0.041868750361804485,
+        0.07016603558595434
+      ],
+      "rel_twoyear_undefined_replicates": 0,
+      "rel_year_95": [
+        0.03878084775513178,
+        0.07112482077079621
+      ],
+      "rel_year_undefined_replicates": 0,
+      "relative_point_status": "defined",
+      "seed_diffs": [
+        0.2184051480730005,
+        0.1064477046277863,
+        -0.03334338553749672
+      ],
+      "seeds_agree_neg": false,
+      "twoyear_95": [
+        0.07497249032833359,
+        0.11863350908011396
+      ],
+      "year_95": [
+        0.07019163411837051,
+        0.12585247820805415
+      ]
+    },
+    "I-S_raw_minus_G5_raw": {
+      "baseline": "G5_raw",
+      "baseline_fixed_models": 3,
+      "baseline_mean": 1.7847457456308968,
+      "descriptive_gates": {
+        "both_difference_intervals_below_zero": false,
+        "observed_improvement_at_least_2_percent": false,
+        "strict_relative_equivalence_within_2_percent_both_intervals": false
+      },
+      "estimand": "validation_selected_procedures",
+      "family": "exploratory_multiple_comparisons",
+      "mean_diff": 0.09681527909489314,
+      "method": "I-S_raw",
+      "method_fixed_models": 3,
+      "method_mean": 1.8815610247257901,
+      "rel_mean_vs_base": 0.05424597835960636,
+      "rel_twoyear_95": [
+        0.04167433075262763,
+        0.06994378989642122
+      ],
+      "rel_twoyear_undefined_replicates": 0,
+      "rel_year_95": [
+        0.03884971627019915,
+        0.07062558466735822
+      ],
+      "rel_year_undefined_replicates": 0,
+      "relative_point_status": "defined",
+      "seed_diffs": [
+        0.21872676067295704,
+        0.11002939986679738,
+        -0.038310323255074996
+      ],
+      "seeds_agree_neg": false,
+      "twoyear_95": [
+        0.07433815285728365,
+        0.11838544922947293
+      ],
+      "year_95": [
+        0.07026196839720446,
+        0.12498702445869964
+      ]
+    },
+    "I-S_raw_minus_gaussian_corrected": {
+      "baseline": "gaussian_corrected",
+      "baseline_fixed_models": 1,
+      "baseline_mean": 2.2293629456444677,
+      "descriptive_gates": {
+        "both_difference_intervals_below_zero": true,
+        "observed_improvement_at_least_2_percent": true,
+        "strict_relative_equivalence_within_2_percent_both_intervals": false
+      },
+      "estimand": "validation_selected_procedures",
+      "family": "exploratory_multiple_comparisons",
+      "mean_diff": -0.34780192091867773,
+      "method": "I-S_raw",
+      "method_fixed_models": 3,
+      "method_mean": 1.8815610247257901,
+      "rel_mean_vs_base": -0.15600955492607535,
+      "rel_twoyear_95": [
+        -0.2299477185622032,
+        -0.08574359335643933
+      ],
+      "rel_twoyear_undefined_replicates": 0,
+      "rel_year_95": [
+        -0.25179648196123555,
+        -0.07271681580236239
+      ],
+      "rel_year_undefined_replicates": 0,
+      "relative_point_status": "defined",
+      "seed_diffs": [
+        -0.2870647388717351,
+        -0.3339968254364982,
+        -0.4223441984477998
+      ],
+      "seeds_agree_neg": true,
+      "twoyear_95": [
+        -0.595889656397336,
+        -0.17826818552196647
+      ],
+      "year_95": [
+        -0.6475333189502571,
+        -0.15341499829446106
+      ]
+    },
+    "I-S_raw_minus_gaussian_raw": {
+      "baseline": "gaussian_raw",
+      "baseline_fixed_models": 1,
+      "baseline_mean": 2.1251433376550892,
+      "descriptive_gates": {
+        "both_difference_intervals_below_zero": true,
+        "observed_improvement_at_least_2_percent": true,
+        "strict_relative_equivalence_within_2_percent_both_intervals": false
+      },
+      "estimand": "validation_selected_procedures",
+      "family": "exploratory_multiple_comparisons",
+      "mean_diff": -0.24358231292929924,
+      "method": "I-S_raw",
+      "method_fixed_models": 3,
+      "method_mean": 1.8815610247257901,
+      "rel_mean_vs_base": -0.1146192393770818,
+      "rel_twoyear_95": [
+        -0.1974617418653609,
+        -0.03835648024162802
+      ],
+      "rel_twoyear_undefined_replicates": 0,
+      "rel_year_95": [
+        -0.21937744041997448,
+        -0.0257723682008019
+      ],
+      "rel_year_undefined_replicates": 0,
+      "relative_point_status": "defined",
+      "seed_diffs": [
+        -0.18284513088235665,
+        -0.22977721744711976,
+        -0.31812459045842134
+      ],
+      "seeds_agree_neg": true,
+      "twoyear_95": [
+        -0.49146463890630365,
+        -0.07509947789154488
+      ],
+      "year_95": [
+        -0.5439456172870275,
+        -0.05118065231268442
+      ]
+    },
+    "O-S_corrected_at_raw_checkpoint_minus_O-S_raw": {
+      "baseline": "O-S_raw",
+      "baseline_fixed_models": 3,
+      "baseline_mean": 1.8849013455702182,
+      "descriptive_gates": {
+        "both_difference_intervals_below_zero": true,
+        "observed_improvement_at_least_2_percent": false,
+        "strict_relative_equivalence_within_2_percent_both_intervals": true
+      },
+      "estimand": "support_correction_minus_raw_at_raw_selected_weights",
+      "family": "exploratory_same_checkpoint_correction",
+      "mean_diff": -0.018725439344001504,
+      "method": "O-S_corrected_at_raw_checkpoint",
+      "method_fixed_models": 3,
+      "method_mean": 1.8661759062262167,
+      "rel_mean_vs_base": -0.009934440010883809,
+      "rel_twoyear_95": [
+        -0.013019893924020457,
+        -0.0073140706609179686
+      ],
+      "rel_twoyear_undefined_replicates": 0,
+      "rel_year_95": [
+        -0.012770534813199489,
+        -0.007526194617377386
+      ],
+      "rel_year_undefined_replicates": 0,
+      "relative_point_status": "defined",
+      "seed_diffs": [
+        -0.04420791876870722,
+        -0.010933094627643136,
+        -0.001035304635654155
+      ],
+      "seeds_agree_neg": true,
+      "twoyear_95": [
+        -0.022518970736725107,
+        -0.014931365765436456
+      ],
+      "year_95": [
+        -0.02219493170840378,
+        -0.015120807757388534
+      ]
+    },
+    "O-S_corrected_minus_D_corrected": {
+      "baseline": "D_corrected",
+      "baseline_fixed_models": 3,
+      "baseline_mean": 1.869488707229096,
+      "descriptive_gates": {
+        "both_difference_intervals_below_zero": false,
+        "observed_improvement_at_least_2_percent": false,
+        "strict_relative_equivalence_within_2_percent_both_intervals": true
+      },
+      "estimand": "validation_selected_procedures",
+      "family": "exploratory_multiple_comparisons",
+      "mean_diff": -0.0033128010028793398,
+      "method": "O-S_corrected",
+      "method_fixed_models": 3,
+      "method_mean": 1.8661759062262167,
+      "rel_mean_vs_base": -0.0017720358459877947,
+      "rel_twoyear_95": [
+        -0.010614838265344288,
+        0.006865480720363257
+      ],
+      "rel_twoyear_undefined_replicates": 0,
+      "rel_year_95": [
+        -0.010705620236738038,
+        0.00676969384440295
+      ],
+      "rel_year_undefined_replicates": 0,
+      "relative_point_status": "defined",
+      "seed_diffs": [
+        -0.003169778489676922,
+        0.061150724925997046,
+        -0.06791934944495814
+      ],
+      "seeds_agree_neg": false,
+      "twoyear_95": [
+        -0.021388121109871327,
+        0.012713831054497615
+      ],
+      "year_95": [
+        -0.02123325342079288,
+        0.012058104776104889
+      ]
+    },
+    "O-S_corrected_minus_D_raw": {
+      "baseline": "D_raw",
+      "baseline_fixed_models": 3,
+      "baseline_mean": 1.8876865331291945,
+      "descriptive_gates": {
+        "both_difference_intervals_below_zero": false,
+        "observed_improvement_at_least_2_percent": false,
+        "strict_relative_equivalence_within_2_percent_both_intervals": false
+      },
+      "estimand": "validation_selected_procedures",
+      "family": "exploratory_multiple_comparisons",
+      "mean_diff": -0.021510626902978187,
+      "method": "O-S_corrected",
+      "method_fixed_models": 3,
+      "method_mean": 1.8661759062262167,
+      "rel_mean_vs_base": -0.01139523248455891,
+      "rel_twoyear_95": [
+        -0.025758708597660312,
+        0.0022354487995173886
+      ],
+      "rel_twoyear_undefined_replicates": 0,
+      "rel_year_95": [
+        -0.025823077950662056,
+        0.0027522225900612415
+      ],
+      "rel_year_undefined_replicates": 0,
+      "relative_point_status": "defined",
+      "seed_diffs": [
+        -0.045969495083839185,
+        0.052717296523167256,
+        -0.07127968214826264
+      ],
+      "seeds_agree_neg": false,
+      "twoyear_95": [
+        -0.052339726789942274,
+        0.003982922635955599
+      ],
+      "year_95": [
+        -0.05295088716911289,
+        0.004827520762742667
+      ]
+    },
+    "O-S_corrected_minus_G5_corrected": {
+      "baseline": "G5_corrected",
+      "baseline_fixed_models": 3,
+      "baseline_mean": 1.7843912023380266,
+      "descriptive_gates": {
+        "both_difference_intervals_below_zero": false,
+        "observed_improvement_at_least_2_percent": false,
+        "strict_relative_equivalence_within_2_percent_both_intervals": false
+      },
+      "estimand": "validation_selected_procedures",
+      "family": "exploratory_multiple_comparisons",
+      "mean_diff": 0.08178470388818988,
+      "method": "O-S_corrected",
+      "method_fixed_models": 3,
+      "method_mean": 1.8661759062262167,
+      "rel_mean_vs_base": 0.04583339336185372,
+      "rel_twoyear_95": [
+        0.029525397558876745,
+        0.06392289712312031
+      ],
+      "rel_twoyear_undefined_replicates": 0,
+      "rel_year_95": [
+        0.03032536334939688,
+        0.06679940830123485
+      ],
+      "rel_year_undefined_replicates": 0,
+      "relative_point_status": "defined",
+      "seed_diffs": [
+        0.18766044010236538,
+        0.09353004671314014,
+        -0.03583637515093585
+      ],
+      "seeds_agree_neg": false,
+      "twoyear_95": [
+        0.04950411929652192,
+        0.12369323344628745
+      ],
+      "year_95": [
+        0.05268088199291755,
+        0.12094208919876764
+      ]
+    },
+    "O-S_corrected_minus_G5_raw": {
+      "baseline": "G5_raw",
+      "baseline_fixed_models": 3,
+      "baseline_mean": 1.7847457456308968,
+      "descriptive_gates": {
+        "both_difference_intervals_below_zero": false,
+        "observed_improvement_at_least_2_percent": false,
+        "strict_relative_equivalence_within_2_percent_both_intervals": false
+      },
+      "estimand": "validation_selected_procedures",
+      "family": "exploratory_multiple_comparisons",
+      "mean_diff": 0.08143016059531967,
+      "method": "O-S_corrected",
+      "method_fixed_models": 3,
+      "method_mean": 1.8661759062262167,
+      "rel_mean_vs_base": 0.04562563647772395,
+      "rel_twoyear_95": [
+        0.029140757020719853,
+        0.06388421832140606
+      ],
+      "rel_twoyear_undefined_replicates": 0,
+      "rel_year_95": [
+        0.030112223667195414,
+        0.06649952907580997
+      ],
+      "rel_year_undefined_replicates": 0,
+      "relative_point_status": "defined",
+      "seed_diffs": [
+        0.18798205270232193,
+        0.09711174195215122,
+        -0.04080331286851413
+      ],
+      "seeds_agree_neg": false,
+      "twoyear_95": [
+        0.0488009519639641,
+        0.1236993577862251
+      ],
+      "year_95": [
+        0.05233662432402762,
+        0.12062260844248786
+      ]
+    },
+    "O-S_corrected_minus_O-S_raw": {
+      "baseline": "O-S_raw",
+      "baseline_fixed_models": 3,
+      "baseline_mean": 1.8849013455702182,
+      "descriptive_gates": {
+        "both_difference_intervals_below_zero": true,
+        "observed_improvement_at_least_2_percent": false,
+        "strict_relative_equivalence_within_2_percent_both_intervals": true
+      },
+      "estimand": "independently_validation_selected_corrected_minus_raw",
+      "family": "exploratory_selected_correction",
+      "mean_diff": -0.018725439344001504,
+      "method": "O-S_corrected",
+      "method_fixed_models": 3,
+      "method_mean": 1.8661759062262167,
+      "rel_mean_vs_base": -0.009934440010883809,
+      "rel_twoyear_95": [
+        -0.013019893924020457,
+        -0.0073140706609179686
+      ],
+      "rel_twoyear_undefined_replicates": 0,
+      "rel_year_95": [
+        -0.012770534813199489,
+        -0.007526194617377386
+      ],
+      "rel_year_undefined_replicates": 0,
+      "relative_point_status": "defined",
+      "seed_diffs": [
+        -0.04420791876870722,
+        -0.010933094627643136,
+        -0.001035304635654155
+      ],
+      "seeds_agree_neg": true,
+      "twoyear_95": [
+        -0.022518970736725107,
+        -0.014931365765436456
+      ],
+      "year_95": [
+        -0.02219493170840378,
+        -0.015120807757388534
+      ]
+    },
+    "O-S_corrected_minus_gaussian_corrected": {
+      "baseline": "gaussian_corrected",
+      "baseline_fixed_models": 1,
+      "baseline_mean": 2.2293629456444677,
+      "descriptive_gates": {
+        "both_difference_intervals_below_zero": true,
+        "observed_improvement_at_least_2_percent": true,
+        "strict_relative_equivalence_within_2_percent_both_intervals": false
+      },
+      "estimand": "validation_selected_procedures",
+      "family": "exploratory_multiple_comparisons",
+      "mean_diff": -0.3631870394182512,
+      "method": "O-S_corrected",
+      "method_fixed_models": 3,
+      "method_mean": 1.8661759062262167,
+      "rel_mean_vs_base": -0.16291068268081424,
+      "rel_twoyear_95": [
+        -0.22373678939592517,
+        -0.09987505364685473
+      ],
+      "rel_twoyear_undefined_replicates": 0,
+      "rel_year_95": [
+        -0.2545286705534299,
+        -0.08021875520999533
+      ],
+      "rel_year_undefined_replicates": 0,
+      "relative_point_status": "defined",
+      "seed_diffs": [
+        -0.3178094468423702,
+        -0.3469144833511444,
+        -0.42483718806123894
+      ],
+      "seeds_agree_neg": true,
+      "twoyear_95": [
+        -0.5766386044447591,
+        -0.20942098882800256
+      ],
+      "year_95": [
+        -0.6538085496163122,
+        -0.16863397822710735
+      ]
+    },
+    "O-S_corrected_minus_gaussian_raw": {
+      "baseline": "gaussian_raw",
+      "baseline_fixed_models": 1,
+      "baseline_mean": 2.1251433376550892,
+      "descriptive_gates": {
+        "both_difference_intervals_below_zero": true,
+        "observed_improvement_at_least_2_percent": true,
+        "strict_relative_equivalence_within_2_percent_both_intervals": false
+      },
+      "estimand": "validation_selected_procedures",
+      "family": "exploratory_multiple_comparisons",
+      "mean_diff": -0.25896743142887274,
+      "method": "O-S_corrected",
+      "method_fixed_models": 3,
+      "method_mean": 1.8661759062262167,
+      "rel_mean_vs_base": -0.12185880681094234,
+      "rel_twoyear_95": [
+        -0.19065343985618452,
+        -0.0540088659518383
+      ],
+      "rel_twoyear_undefined_replicates": 0,
+      "rel_year_95": [
+        -0.2227644394513922,
+        -0.03309201343805932
+      ],
+      "rel_year_undefined_replicates": 0,
+      "relative_point_status": "defined",
+      "seed_diffs": [
+        -0.21358983885299176,
+        -0.24269487536176593,
+        -0.3206175800718605
+      ],
+      "seeds_agree_neg": true,
+      "twoyear_95": [
+        -0.4727161182866217,
+        -0.10708616800180251
+      ],
+      "year_95": [
+        -0.5498921626277697,
+        -0.06565528237475564
+      ]
+    },
+    "O-S_raw_minus_D_corrected": {
+      "baseline": "D_corrected",
+      "baseline_fixed_models": 3,
+      "baseline_mean": 1.869488707229096,
+      "descriptive_gates": {
+        "both_difference_intervals_below_zero": false,
+        "observed_improvement_at_least_2_percent": false,
+        "strict_relative_equivalence_within_2_percent_both_intervals": true
+      },
+      "estimand": "validation_selected_procedures",
+      "family": "primary_O-S_repair",
+      "mean_diff": 0.015412638341122165,
+      "method": "O-S_raw",
+      "method_fixed_models": 3,
+      "method_mean": 1.8849013455702182,
+      "rel_mean_vs_base": 0.008244306735592078,
+      "rel_twoyear_95": [
+        -0.0016849765677861845,
+        0.018016583008588306
+      ],
+      "rel_twoyear_undefined_replicates": 0,
+      "rel_year_95": [
+        -0.001214440398858958,
+        0.017807220376906713
+      ],
+      "rel_year_undefined_replicates": 0,
+      "relative_point_status": "defined",
+      "seed_diffs": [
+        0.0410381402790303,
+        0.07208381955364018,
+        -0.06688404480930399
+      ],
+      "seeds_agree_neg": false,
+      "twoyear_95": [
+        -0.0034297823708770102,
+        0.03204077859360939
+      ],
+      "year_95": [
+        -0.0024366837490069457,
+        0.03123972503737391
+      ]
+    },
+    "O-S_raw_minus_D_raw": {
+      "baseline": "D_raw",
+      "baseline_fixed_models": 3,
+      "baseline_mean": 1.8876865331291945,
+      "descriptive_gates": {
+        "both_difference_intervals_below_zero": false,
+        "observed_improvement_at_least_2_percent": false,
+        "strict_relative_equivalence_within_2_percent_both_intervals": true
+      },
+      "estimand": "validation_selected_procedures",
+      "family": "primary_O-S_repair",
+      "mean_diff": -0.0027851875589766837,
+      "method": "O-S_raw",
+      "method_fixed_models": 3,
+      "method_mean": 1.8849013455702182,
+      "rel_mean_vs_base": -0.0014754502456293486,
+      "rel_twoyear_95": [
+        -0.01684204134605313,
+        0.012995461287138963
+      ],
+      "rel_twoyear_undefined_replicates": 0,
+      "rel_year_95": [
+        -0.016765797382768562,
+        0.014049046035887058
+      ],
+      "rel_year_undefined_replicates": 0,
+      "relative_point_status": "defined",
+      "seed_diffs": [
+        -0.001761576315131963,
+        0.06365039115081039,
+        -0.07024437751260848
+      ],
+      "seeds_agree_neg": false,
+      "twoyear_95": [
+        -0.034462960440700866,
+        0.0232718819523233
+      ],
+      "year_95": [
+        -0.03459878912303925,
+        0.024196675122461802
+      ]
+    },
+    "O-S_raw_minus_G5_corrected": {
+      "baseline": "G5_corrected",
+      "baseline_fixed_models": 3,
+      "baseline_mean": 1.7843912023380266,
+      "descriptive_gates": {
+        "both_difference_intervals_below_zero": false,
+        "observed_improvement_at_least_2_percent": false,
+        "strict_relative_equivalence_within_2_percent_both_intervals": false
+      },
+      "estimand": "validation_selected_procedures",
+      "family": "primary_O-S_repair",
+      "mean_diff": 0.10051014323219139,
+      "method": "O-S_raw",
+      "method_fixed_models": 3,
+      "method_mean": 1.8849013455702182,
+      "rel_mean_vs_base": 0.05632741469499311,
+      "rel_twoyear_95": [
+        0.039818006244040215,
+        0.07422111886678548
+      ],
+      "rel_twoyear_undefined_replicates": 0,
+      "rel_year_95": [
+        0.04027882576485468,
+        0.07766218503901477
+      ],
+      "rel_year_undefined_replicates": 0,
+      "relative_point_status": "defined",
+      "seed_diffs": [
+        0.2318683588710726,
+        0.10446314134078327,
+        -0.034801070515281696
+      ],
+      "seeds_agree_neg": false,
+      "twoyear_95": [
+        0.06773830281213128,
+        0.14202191491795635
+      ],
+      "year_95": [
+        0.07155636628352385,
+        0.1396076677025243
+      ]
+    },
+    "O-S_raw_minus_G5_raw": {
+      "baseline": "G5_raw",
+      "baseline_fixed_models": 3,
+      "baseline_mean": 1.7847457456308968,
+      "descriptive_gates": {
+        "both_difference_intervals_below_zero": false,
+        "observed_improvement_at_least_2_percent": false,
+        "strict_relative_equivalence_within_2_percent_both_intervals": false
+      },
+      "estimand": "validation_selected_procedures",
+      "family": "primary_O-S_repair",
+      "mean_diff": 0.10015559993932117,
+      "method": "O-S_raw",
+      "method_fixed_models": 3,
+      "method_mean": 1.8849013455702182,
+      "rel_mean_vs_base": 0.05611757315264913,
+      "rel_twoyear_95": [
+        0.039478785094301694,
+        0.07417624121282601
+      ],
+      "rel_twoyear_undefined_replicates": 0,
+      "rel_year_95": [
+        0.04015861036268244,
+        0.07735240243712081
+      ],
+      "rel_year_undefined_replicates": 0,
+      "relative_point_status": "defined",
+      "seed_diffs": [
+        0.23218997147102916,
+        0.10804483657979436,
+        -0.039768008232859975
+      ],
+      "seeds_agree_neg": false,
+      "twoyear_95": [
+        0.06714605693310041,
+        0.1422499557046874
+      ],
+      "year_95": [
+        0.07124642446461277,
+        0.1390974424054944
+      ]
+    },
+    "O-S_raw_minus_I-S_raw": {
+      "baseline": "I-S_raw",
+      "baseline_fixed_models": 3,
+      "baseline_mean": 1.8815610247257901,
+      "descriptive_gates": {
+        "both_difference_intervals_below_zero": false,
+        "observed_improvement_at_least_2_percent": false,
+        "strict_relative_equivalence_within_2_percent_both_intervals": false
+      },
+      "estimand": "validation_selected_procedures",
+      "family": "preplanned_secondary_repair",
+      "mean_diff": 0.0033403208444280352,
+      "method": "O-S_raw",
+      "method_fixed_models": 3,
+      "method_mean": 1.8849013455702182,
+      "rel_mean_vs_base": 0.0017752923240503655,
+      "rel_twoyear_95": [
+        -0.014575200966097289,
+        0.020960915231574083
+      ],
+      "rel_twoyear_undefined_replicates": 0,
+      "rel_year_95": [
+        -0.012626310697683774,
+        0.018113673921934696
+      ],
+      "rel_year_undefined_replicates": 0,
+      "relative_point_status": "defined",
+      "seed_diffs": [
+        0.013463210798072112,
+        -0.001984563287003027,
+        -0.0014576849777849787
+      ],
+      "seeds_agree_neg": false,
+      "twoyear_95": [
+        -0.025948729502793717,
+        0.04308366724063919
+      ],
+      "year_95": [
+        -0.023627190492431217,
+        0.0349247028123938
+      ]
+    },
+    "O-S_raw_minus_gaussian_corrected": {
+      "baseline": "gaussian_corrected",
+      "baseline_fixed_models": 1,
+      "baseline_mean": 2.2293629456444677,
+      "descriptive_gates": {
+        "both_difference_intervals_below_zero": true,
+        "observed_improvement_at_least_2_percent": true,
+        "strict_relative_equivalence_within_2_percent_both_intervals": false
+      },
+      "estimand": "validation_selected_procedures",
+      "family": "exploratory_control_comparison",
+      "mean_diff": -0.3444616000742497,
+      "method": "O-S_raw",
+      "method_fixed_models": 3,
+      "method_mean": 1.8849013455702182,
+      "rel_mean_vs_base": -0.15451122516736376,
+      "rel_twoyear_95": [
+        -0.21629447706042354,
+        -0.09145526750866764
+      ],
+      "rel_twoyear_undefined_replicates": 0,
+      "rel_year_95": [
+        -0.24668486681728088,
+        -0.07166797493054088
+      ],
+      "rel_year_undefined_replicates": 0,
+      "relative_point_status": "defined",
+      "seed_diffs": [
+        -0.273601528073663,
+        -0.33598138872350125,
+        -0.4238018834255848
+      ],
+      "seeds_agree_neg": true,
+      "twoyear_95": [
+        -0.5581188118383302,
+        -0.1913824504948888
+      ],
+      "year_95": [
+        -0.6335891364370594,
+        -0.1509255021604674
+      ]
+    },
+    "O-S_raw_minus_gaussian_raw": {
+      "baseline": "gaussian_raw",
+      "baseline_fixed_models": 1,
+      "baseline_mean": 2.1251433376550892,
+      "descriptive_gates": {
+        "both_difference_intervals_below_zero": true,
+        "observed_improvement_at_least_2_percent": true,
+        "strict_relative_equivalence_within_2_percent_both_intervals": false
+      },
+      "estimand": "validation_selected_procedures",
+      "family": "exploratory_control_comparison",
+      "mean_diff": -0.2402419920848712,
+      "method": "O-S_raw",
+      "method_fixed_models": 3,
+      "method_mean": 1.8849013455702182,
+      "rel_mean_vs_base": -0.11304742970888605,
+      "rel_twoyear_95": [
+        -0.1830306442540884,
+        -0.04478117445274116
+      ],
+      "rel_twoyear_undefined_replicates": 0,
+      "rel_year_95": [
+        -0.21467994652147757,
+        -0.02412485166277209
+      ],
+      "rel_year_undefined_replicates": 0,
+      "relative_point_status": "defined",
+      "seed_diffs": [
+        -0.16938192008428454,
+        -0.2317617807341228,
+        -0.3195822754362063
+      ],
+      "seeds_agree_neg": true,
+      "twoyear_95": [
+        -0.4539439750099335,
+        -0.08823408646055181
+      ],
+      "year_95": [
+        -0.5297886955102484,
+        -0.04811314034930075
+      ]
+    },
+    "O-S_raw_minus_interpolation_corrected": {
+      "baseline": "interpolation_corrected",
+      "baseline_fixed_models": 1,
+      "baseline_mean": 2.3928404874972697,
+      "descriptive_gates": {
+        "both_difference_intervals_below_zero": true,
+        "observed_improvement_at_least_2_percent": true,
+        "strict_relative_equivalence_within_2_percent_both_intervals": false
+      },
+      "estimand": "validation_selected_procedures",
+      "family": "exploratory_control_comparison",
+      "mean_diff": -0.5079391419270517,
+      "method": "O-S_raw",
+      "method_fixed_models": 3,
+      "method_mean": 1.8849013455702182,
+      "rel_mean_vs_base": -0.21227455176434165,
+      "rel_twoyear_95": [
+        -0.2771220607671227,
+        -0.1445198729664631
+      ],
+      "rel_twoyear_undefined_replicates": 0,
+      "rel_year_95": [
+        -0.30157516214700386,
+        -0.13146431632641997
+      ],
+      "rel_year_undefined_replicates": 0,
+      "relative_point_status": "defined",
+      "seed_diffs": [
+        -0.43707906992646506,
+        -0.4994589305763033,
+        -0.5872794252783868
+      ],
+      "seeds_agree_neg": true,
+      "twoyear_95": [
+        -0.8000691737067764,
+        -0.3004436422407678
+      ],
+      "year_95": [
+        -0.8554348183113434,
+        -0.2769697745000763
+      ]
+    },
+    "O-S_raw_minus_interpolation_raw": {
+      "baseline": "interpolation_raw",
+      "baseline_fixed_models": 1,
+      "baseline_mean": 2.3928404874972697,
+      "descriptive_gates": {
+        "both_difference_intervals_below_zero": true,
+        "observed_improvement_at_least_2_percent": true,
+        "strict_relative_equivalence_within_2_percent_both_intervals": false
+      },
+      "estimand": "validation_selected_procedures",
+      "family": "exploratory_control_comparison",
+      "mean_diff": -0.5079391419270517,
+      "method": "O-S_raw",
+      "method_fixed_models": 3,
+      "method_mean": 1.8849013455702182,
+      "rel_mean_vs_base": -0.21227455176434165,
+      "rel_twoyear_95": [
+        -0.2771220607671227,
+        -0.1445198729664631
+      ],
+      "rel_twoyear_undefined_replicates": 0,
+      "rel_year_95": [
+        -0.30157516214700386,
+        -0.13146431632641997
+      ],
+      "rel_year_undefined_replicates": 0,
+      "relative_point_status": "defined",
+      "seed_diffs": [
+        -0.43707906992646506,
+        -0.4994589305763033,
+        -0.5872794252783868
+      ],
+      "seeds_agree_neg": true,
+      "twoyear_95": [
+        -0.8000691737067764,
+        -0.3004436422407678
+      ],
+      "year_95": [
+        -0.8554348183113434,
+        -0.2769697745000763
+      ]
+    },
+    "O-S_raw_minus_persistence_corrected": {
+      "baseline": "persistence_corrected",
+      "baseline_fixed_models": 1,
+      "baseline_mean": 3.0665280175338063,
+      "descriptive_gates": {
+        "both_difference_intervals_below_zero": true,
+        "observed_improvement_at_least_2_percent": true,
+        "strict_relative_equivalence_within_2_percent_both_intervals": false
+      },
+      "estimand": "validation_selected_procedures",
+      "family": "exploratory_control_comparison",
+      "mean_diff": -1.1816266719635882,
+      "method": "O-S_raw",
+      "method_fixed_models": 3,
+      "method_mean": 1.8849013455702182,
+      "rel_mean_vs_base": -0.38533046664086495,
+      "rel_twoyear_95": [
+        -0.4091205809958865,
+        -0.36038039892004586
+      ],
+      "rel_twoyear_undefined_replicates": 0,
+      "rel_year_95": [
+        -0.40837153646230095,
+        -0.3622525754101503
+      ],
+      "rel_year_undefined_replicates": 0,
+      "relative_point_status": "defined",
+      "seed_diffs": [
+        -1.1107665999630016,
+        -1.17314646061284,
+        -1.2609669553149234
+      ],
+      "seeds_agree_neg": true,
+      "twoyear_95": [
+        -1.3888820429124586,
+        -1.010210134940894
+      ],
+      "year_95": [
+        -1.3633479453288597,
+        -1.0088103035135976
+      ]
+    },
+    "O-S_raw_minus_persistence_raw": {
+      "baseline": "persistence_raw",
+      "baseline_fixed_models": 1,
+      "baseline_mean": 3.0665280175338063,
+      "descriptive_gates": {
+        "both_difference_intervals_below_zero": true,
+        "observed_improvement_at_least_2_percent": true,
+        "strict_relative_equivalence_within_2_percent_both_intervals": false
+      },
+      "estimand": "validation_selected_procedures",
+      "family": "exploratory_control_comparison",
+      "mean_diff": -1.1816266719635882,
+      "method": "O-S_raw",
+      "method_fixed_models": 3,
+      "method_mean": 1.8849013455702182,
+      "rel_mean_vs_base": -0.38533046664086495,
+      "rel_twoyear_95": [
+        -0.4091205809958865,
+        -0.36038039892004586
+      ],
+      "rel_twoyear_undefined_replicates": 0,
+      "rel_year_95": [
+        -0.40837153646230095,
+        -0.3622525754101503
+      ],
+      "rel_year_undefined_replicates": 0,
+      "relative_point_status": "defined",
+      "seed_diffs": [
+        -1.1107665999630016,
+        -1.17314646061284,
+        -1.2609669553149234
+      ],
+      "seeds_agree_neg": true,
+      "twoyear_95": [
+        -1.3888820429124586,
+        -1.010210134940894
+      ],
+      "year_95": [
+        -1.3633479453288597,
+        -1.0088103035135976
+      ]
+    },
+    "gaussian_corrected_minus_gaussian_raw": {
+      "baseline": "gaussian_raw",
+      "baseline_fixed_models": 1,
+      "baseline_mean": 2.1251433376550892,
+      "descriptive_gates": {
+        "both_difference_intervals_below_zero": false,
+        "observed_improvement_at_least_2_percent": false,
+        "strict_relative_equivalence_within_2_percent_both_intervals": false
+      },
+      "estimand": "support_correction_minus_raw_same_control_ensemble",
+      "family": "exploratory_control_correction",
+      "mean_diff": 0.10421960798937846,
+      "method": "gaussian_corrected",
+      "method_fixed_models": 1,
+      "method_mean": 2.2293629456444677,
+      "rel_mean_vs_base": 0.0490412134291025,
+      "rel_twoyear_95": [
+        0.038973767411941175,
+        0.061442851609124445
+      ],
+      "rel_twoyear_undefined_replicates": 0,
+      "rel_year_95": [
+        0.038921399057307494,
+        0.06078977072037621
+      ],
+      "rel_year_undefined_replicates": 0,
+      "relative_point_status": "defined",
+      "seed_diffs": [
+        0.10421960798937846
+      ],
+      "seeds_agree_neg": false,
+      "twoyear_95": [
+        0.09741936830261634,
+        0.11361291385790086
+      ],
+      "year_95": [
+        0.09653419741820093,
+        0.11235251424960468
+      ]
+    },
+    "interpolation_corrected_minus_interpolation_raw": {
+      "baseline": "interpolation_raw",
+      "baseline_fixed_models": 1,
+      "baseline_mean": 2.3928404874972697,
+      "descriptive_gates": {
+        "both_difference_intervals_below_zero": false,
+        "observed_improvement_at_least_2_percent": false,
+        "strict_relative_equivalence_within_2_percent_both_intervals": true
+      },
+      "estimand": "support_correction_minus_raw_same_control_ensemble",
+      "family": "exploratory_control_correction",
+      "mean_diff": 0.0,
+      "method": "interpolation_corrected",
+      "method_fixed_models": 1,
+      "method_mean": 2.3928404874972697,
+      "rel_mean_vs_base": 0.0,
+      "rel_twoyear_95": [
+        0.0,
+        0.0
+      ],
+      "rel_twoyear_undefined_replicates": 0,
+      "rel_year_95": [
+        0.0,
+        0.0
+      ],
+      "rel_year_undefined_replicates": 0,
+      "relative_point_status": "defined",
+      "seed_diffs": [
+        0.0
+      ],
+      "seeds_agree_neg": false,
+      "twoyear_95": [
+        0.0,
+        0.0
+      ],
+      "year_95": [
+        0.0,
+        0.0
+      ]
+    },
+    "persistence_corrected_minus_persistence_raw": {
+      "baseline": "persistence_raw",
+      "baseline_fixed_models": 1,
+      "baseline_mean": 3.0665280175338063,
+      "descriptive_gates": {
+        "both_difference_intervals_below_zero": false,
+        "observed_improvement_at_least_2_percent": false,
+        "strict_relative_equivalence_within_2_percent_both_intervals": true
+      },
+      "estimand": "support_correction_minus_raw_same_control_ensemble",
+      "family": "exploratory_control_correction",
+      "mean_diff": 0.0,
+      "method": "persistence_corrected",
+      "method_fixed_models": 1,
+      "method_mean": 3.0665280175338063,
+      "rel_mean_vs_base": 0.0,
+      "rel_twoyear_95": [
+        0.0,
+        0.0
+      ],
+      "rel_twoyear_undefined_replicates": 0,
+      "rel_year_95": [
+        0.0,
+        0.0
+      ],
+      "rel_year_undefined_replicates": 0,
+      "relative_point_status": "defined",
+      "seed_diffs": [
+        0.0
+      ],
+      "seeds_agree_neg": false,
+      "twoyear_95": [
+        0.0,
+        0.0
+      ],
+      "year_95": [
+        0.0,
+        0.0
+      ]
+    }
+  },
+  "exposure": "historical_test_exposed",
+  "fixed_training_seeds": [
+    7,
+    13,
+    42
+  ],
+  "ids": [
+    "2005-08-2005-08-01T10:15-s71",
+    "2005-08-2005-08-05T06:15-s71",
+    "2005-08-2005-08-08T10:05-s71",
+    "2005-08-2005-08-10T15:20-s71",
+    "2005-08-2005-08-12T08:35-s52",
+    "2005-08-2005-08-13T20:55-s71",
+    "2005-08-2005-08-16T12:20-s71",
+    "2005-08-2005-08-18T06:35-s71",
+    "2005-08-2005-08-19T10:45-s71",
+    "2005-08-2005-08-24T04:35-s71",
+    "2005-08-2005-08-26T11:10-s71",
+    "2005-08-2005-08-29T11:35-s71",
+    "2005-09-2005-09-01T13:10-s71",
+    "2005-09-2005-09-02T20:35-s71",
+    "2005-09-2005-09-05T06:05-s71",
+    "2005-09-2005-09-06T14:50-s71",
+    "2005-09-2005-09-09T17:40-s71",
+    "2005-09-2005-09-12T17:45-s71",
+    "2005-09-2005-09-13T09:45-s71",
+    "2005-09-2005-09-15T17:10-s71",
+    "2005-09-2005-09-21T17:55-s71",
+    "2005-09-2005-09-26T16:20-s52",
+    "2005-09-2005-09-27T16:35-s52",
+    "2005-09-2005-09-30T11:50-s52",
+    "2006-08-2006-08-02T02:40-s71",
+    "2006-08-2006-08-03T11:35-s71",
+    "2006-08-2006-08-04T09:25-s71",
+    "2006-08-2006-08-07T20:10-s71",
+    "2006-08-2006-08-09T17:30-s71",
+    "2006-08-2006-08-11T17:55-s71",
+    "2006-08-2006-08-14T06:10-s52",
+    "2006-08-2006-08-20T09:20-s71",
+    "2006-08-2006-08-21T07:15-s71",
+    "2006-08-2006-08-22T13:25-s71",
+    "2006-08-2006-08-30T01:40-s71",
+    "2006-08-2006-08-31T08:05-s71",
+    "2006-09-2006-09-01T23:50-s71",
+    "2006-09-2006-09-06T13:55-s71",
+    "2006-09-2006-09-10T11:40-s52",
+    "2006-09-2006-09-16T01:00-s52",
+    "2006-09-2006-09-18T11:35-s52",
+    "2006-09-2006-09-20T07:35-s52",
+    "2006-09-2006-09-22T18:55-s52",
+    "2006-09-2006-09-24T19:45-s52",
+    "2006-09-2006-09-26T08:35-s52",
+    "2006-09-2006-09-27T14:05-s52",
+    "2006-09-2006-09-29T11:20-s52",
+    "2006-09-2006-09-30T03:20-s52",
+    "2007-08-2007-08-02T14:00-s71",
+    "2007-08-2007-08-04T06:10-s52",
+    "2007-08-2007-08-06T05:05-s52",
+    "2007-08-2007-08-07T10:15-s71",
+    "2007-08-2007-08-08T15:20-s71",
+    "2007-08-2007-08-10T08:30-s52",
+    "2007-08-2007-08-11T19:25-s71",
+    "2007-08-2007-08-13T15:45-s71",
+    "2007-08-2007-08-18T12:35-s71",
+    "2007-08-2007-08-21T04:10-s71",
+    "2007-08-2007-08-26T05:00-s71",
+    "2007-08-2007-08-28T18:45-s71",
+    "2007-09-2007-09-02T21:35-s52",
+    "2007-09-2007-09-06T13:20-s52",
+    "2007-09-2007-09-09T01:05-s52",
+    "2007-09-2007-09-11T02:35-s52",
+    "2007-09-2007-09-14T15:20-s52",
+    "2007-09-2007-09-16T22:00-s52",
+    "2007-09-2007-09-20T03:50-s52",
+    "2007-09-2007-09-22T06:05-s52",
+    "2007-09-2007-09-23T08:15-s52",
+    "2007-09-2007-09-24T19:40-s52",
+    "2007-09-2007-09-26T20:00-s52",
+    "2007-09-2007-09-29T13:25-s52",
+    "2008-08-2008-08-04T22:35-s52",
+    "2008-08-2008-08-07T06:30-s52",
+    "2008-08-2008-08-11T03:20-s71",
+    "2008-08-2008-08-14T05:30-s71",
+    "2008-08-2008-08-17T00:00-s71",
+    "2008-08-2008-08-20T07:55-s52",
+    "2008-08-2008-08-24T19:40-s52",
+    "2008-08-2008-08-26T00:45-s52",
+    "2008-08-2008-08-28T01:55-s52",
+    "2008-08-2008-08-29T05:25-s52",
+    "2008-08-2008-08-30T04:25-s52",
+    "2008-08-2008-08-30T19:35-s52",
+    "2008-09-2008-09-03T03:40-s52",
+    "2008-09-2008-09-04T10:35-s52",
+    "2008-09-2008-09-06T05:15-s52",
+    "2008-09-2008-09-07T18:35-s52",
+    "2008-09-2008-09-11T13:30-s52",
+    "2008-09-2008-09-13T04:10-s52",
+    "2008-09-2008-09-14T19:45-s52",
+    "2008-09-2008-09-16T16:50-s52",
+    "2008-09-2008-09-18T02:25-s52",
+    "2008-09-2008-09-21T10:20-s52",
+    "2008-09-2008-09-24T23:00-s52",
+    "2008-09-2008-09-27T18:20-s71",
+    "2009-08-2009-08-01T07:30-s71",
+    "2009-08-2009-08-04T08:20-s71",
+    "2009-08-2009-08-06T14:50-s71",
+    "2009-08-2009-08-10T06:55-s71",
+    "2009-08-2009-08-15T15:20-s52",
+    "2009-08-2009-08-18T13:15-s52",
+    "2009-08-2009-08-20T08:35-s52",
+    "2009-08-2009-08-22T22:20-s52",
+    "2009-08-2009-08-25T13:50-s52",
+    "2009-08-2009-08-26T12:45-s52",
+    "2009-08-2009-08-29T01:20-s52",
+    "2009-08-2009-08-30T14:00-s71",
+    "2009-09-2009-09-01T04:00-s52",
+    "2009-09-2009-09-04T13:10-s52",
+    "2009-09-2009-09-05T18:30-s52",
+    "2009-09-2009-09-06T23:45-s52",
+    "2009-09-2009-09-08T04:00-s52",
+    "2009-09-2009-09-10T00:35-s52",
+    "2009-09-2009-09-11T23:50-s52",
+    "2009-09-2009-09-14T14:35-s71",
+    "2009-09-2009-09-17T04:25-s71",
+    "2009-09-2009-09-18T21:20-s52",
+    "2009-09-2009-09-22T06:10-s71",
+    "2009-09-2009-09-24T05:40-s52",
+    "2010-08-2010-08-03T12:00-s71",
+    "2010-08-2010-08-05T02:00-s52",
+    "2010-08-2010-08-09T15:20-s52",
+    "2010-08-2010-08-11T12:05-s52",
+    "2010-08-2010-08-13T21:00-s52",
+    "2010-08-2010-08-15T20:30-s52",
+    "2010-08-2010-08-17T21:55-s52",
+    "2010-08-2010-08-21T06:30-s52",
+    "2010-08-2010-08-24T21:30-s52",
+    "2010-08-2010-08-27T08:40-s71",
+    "2010-08-2010-08-29T23:05-s71",
+    "2010-08-2010-08-30T21:35-s52",
+    "2010-09-2010-09-03T11:25-s52",
+    "2010-09-2010-09-04T11:50-s52",
+    "2010-09-2010-09-06T00:10-s52",
+    "2010-09-2010-09-06T22:15-s52",
+    "2010-09-2010-09-08T02:10-s71",
+    "2010-09-2010-09-08T20:00-s52",
+    "2010-09-2010-09-09T17:40-s52",
+    "2010-09-2010-09-17T14:25-s52",
+    "2010-09-2010-09-25T23:20-s71",
+    "2010-09-2010-09-26T03:20-s71",
+    "2010-09-2010-09-29T20:35-s52",
+    "2010-09-2010-09-30T01:45-s52",
+    "2011-08-2011-08-03T17:55-s52",
+    "2011-08-2011-08-05T21:25-s52",
+    "2011-08-2011-08-07T08:25-s52",
+    "2011-08-2011-08-08T01:00-s52",
+    "2011-08-2011-08-09T15:05-s52",
+    "2011-08-2011-08-10T16:55-s52",
+    "2011-08-2011-08-12T11:05-s52",
+    "2011-08-2011-08-15T11:20-s52",
+    "2011-08-2011-08-17T09:15-s52",
+    "2011-08-2011-08-20T07:00-s52",
+    "2011-08-2011-08-25T14:55-s52",
+    "2011-08-2011-08-29T18:05-s52",
+    "2011-09-2011-09-03T11:35-s52",
+    "2011-09-2011-09-04T22:25-s52",
+    "2011-09-2011-09-07T05:10-s52",
+    "2011-09-2011-09-07T22:05-s52",
+    "2011-09-2011-09-13T11:20-s52",
+    "2011-09-2011-09-14T08:25-s52",
+    "2011-09-2011-09-17T06:45-s52",
+    "2011-09-2011-09-18T07:45-s71",
+    "2011-09-2011-09-22T00:50-s52",
+    "2011-09-2011-09-26T22:00-s52",
+    "2011-09-2011-09-27T07:45-s52",
+    "2011-09-2011-09-29T05:35-s52",
+    "2012-08-2012-08-03T01:30-s71",
+    "2012-08-2012-08-04T07:45-s52",
+    "2012-08-2012-08-04T15:45-s52",
+    "2012-08-2012-08-05T01:20-s52",
+    "2012-08-2012-08-09T04:45-s52",
+    "2012-08-2012-08-09T23:20-s52",
+    "2012-08-2012-08-16T08:55-s52",
+    "2012-08-2012-08-19T13:45-s52",
+    "2012-08-2012-08-23T14:55-s52",
+    "2012-08-2012-08-29T02:10-s52",
+    "2012-08-2012-08-30T23:55-s52",
+    "2012-08-2012-08-31T12:55-s52",
+    "2012-09-2012-09-01T14:45-s52",
+    "2012-09-2012-09-03T12:20-s71",
+    "2012-09-2012-09-05T10:15-s52",
+    "2012-09-2012-09-06T05:40-s52",
+    "2012-09-2012-09-10T15:00-s52",
+    "2012-09-2012-09-14T13:35-s52",
+    "2012-09-2012-09-16T21:00-s52",
+    "2012-09-2012-09-17T16:40-s52",
+    "2012-09-2012-09-22T11:10-s52",
+    "2012-09-2012-09-23T00:00-s71",
+    "2012-09-2012-09-23T06:25-s71",
+    "2012-09-2012-09-29T05:05-s52",
+    "2013-08-2013-08-03T17:00-s52",
+    "2013-08-2013-08-07T13:05-s52",
+    "2013-08-2013-08-08T22:15-s52",
+    "2013-08-2013-08-11T14:30-s52",
+    "2013-08-2013-08-16T00:40-s52",
+    "2013-08-2013-08-18T16:45-s52",
+    "2013-08-2013-08-20T10:10-s71",
+    "2013-08-2013-08-24T00:10-s71",
+    "2013-08-2013-08-24T16:25-s71",
+    "2013-08-2013-08-25T03:50-s71",
+    "2013-08-2013-08-26T05:45-s71",
+    "2013-08-2013-08-27T07:05-s71",
+    "2013-09-2013-09-02T20:40-s71",
+    "2013-09-2013-09-06T03:50-s71",
+    "2013-09-2013-09-07T20:30-s71",
+    "2013-09-2013-09-15T04:00-s71",
+    "2013-09-2013-09-15T21:40-s71",
+    "2013-09-2013-09-16T16:15-s71",
+    "2013-09-2013-09-17T07:50-s71",
+    "2013-09-2013-09-19T10:35-s71",
+    "2013-09-2013-09-21T00:15-s71",
+    "2013-09-2013-09-23T06:50-s71",
+    "2013-09-2013-09-26T17:15-s52",
+    "2013-09-2013-09-28T23:05-s52",
+    "2014-08-2014-08-03T07:30-s71",
+    "2014-08-2014-08-04T07:25-s71",
+    "2014-08-2014-08-04T23:35-s71",
+    "2014-08-2014-08-05T07:35-s71",
+    "2014-08-2014-08-10T21:30-s71",
+    "2014-08-2014-08-14T03:00-s71",
+    "2014-08-2014-08-20T01:35-s71",
+    "2014-08-2014-08-20T17:55-s71",
+    "2014-08-2014-08-22T15:20-s71",
+    "2014-08-2014-08-25T17:50-s52",
+    "2014-08-2014-08-30T01:40-s71",
+    "2014-08-2014-08-31T07:30-s71",
+    "2014-09-2014-09-03T06:30-s71",
+    "2014-09-2014-09-05T00:40-s71",
+    "2014-09-2014-09-06T17:10-s71",
+    "2014-09-2014-09-12T08:55-s71",
+    "2014-09-2014-09-14T07:30-s71",
+    "2014-09-2014-09-16T07:15-s71",
+    "2014-09-2014-09-17T04:40-s71",
+    "2014-09-2014-09-18T10:45-s71",
+    "2014-09-2014-09-19T13:55-s71",
+    "2014-09-2014-09-22T16:55-s71",
+    "2014-09-2014-09-25T16:30-s71",
+    "2014-09-2014-09-30T01:40-s71",
+    "2015-08-2015-08-03T14:25-s71",
+    "2015-08-2015-08-08T04:05-s71",
+    "2015-08-2015-08-10T03:00-s71",
+    "2015-08-2015-08-11T09:15-s71",
+    "2015-08-2015-08-14T22:05-s71",
+    "2015-08-2015-08-17T16:40-s71",
+    "2015-08-2015-08-18T14:00-s71",
+    "2015-08-2015-08-21T22:50-s71",
+    "2015-08-2015-08-24T01:55-s71",
+    "2015-08-2015-08-26T21:10-s71",
+    "2015-08-2015-08-27T15:40-s71",
+    "2015-08-2015-08-30T17:35-s71",
+    "2015-09-2015-09-02T13:05-s71",
+    "2015-09-2015-09-05T03:40-s71",
+    "2015-09-2015-09-07T13:55-s71",
+    "2015-09-2015-09-09T01:00-s71",
+    "2015-09-2015-09-09T20:50-s71",
+    "2015-09-2015-09-17T11:30-s71",
+    "2015-09-2015-09-19T14:10-s71",
+    "2015-09-2015-09-21T15:15-s71",
+    "2015-09-2015-09-22T11:35-s71",
+    "2015-09-2015-09-24T09:10-s71",
+    "2015-09-2015-09-26T17:45-s71",
+    "2015-09-2015-09-28T05:35-s71",
+    "2016-08-2016-08-02T21:20-s52",
+    "2016-08-2016-08-05T19:45-s71",
+    "2016-08-2016-08-09T05:10-s71",
+    "2016-08-2016-08-14T14:30-s71",
+    "2016-08-2016-08-15T12:40-s52",
+    "2016-08-2016-08-16T05:05-s52",
+    "2016-08-2016-08-16T18:10-s52",
+    "2016-08-2016-08-17T11:35-s71",
+    "2016-08-2016-08-20T17:00-s52",
+    "2016-08-2016-08-22T04:35-s71",
+    "2016-08-2016-08-26T23:15-s71",
+    "2016-08-2016-08-28T03:10-s71",
+    "2016-09-2016-09-04T09:40-s71",
+    "2016-09-2016-09-08T12:00-s71",
+    "2016-09-2016-09-14T02:25-s52",
+    "2016-09-2016-09-17T05:15-s52",
+    "2016-09-2016-09-19T18:15-s52",
+    "2016-09-2016-09-21T04:00-s52",
+    "2016-09-2016-09-23T05:00-s52",
+    "2016-09-2016-09-24T13:10-s52",
+    "2016-09-2016-09-25T13:35-s52",
+    "2016-09-2016-09-26T15:25-s52",
+    "2016-09-2016-09-28T01:05-s52",
+    "2016-09-2016-09-29T13:40-s52",
+    "2017-08-2017-08-02T00:55-s52",
+    "2017-08-2017-08-05T13:05-s52",
+    "2017-08-2017-08-08T16:45-s52",
+    "2017-08-2017-08-11T10:20-s52",
+    "2017-08-2017-08-14T00:30-s52",
+    "2017-08-2017-08-15T00:20-s52",
+    "2017-08-2017-08-16T15:40-s52",
+    "2017-08-2017-08-20T21:50-s52",
+    "2017-08-2017-08-23T00:40-s52",
+    "2017-08-2017-08-24T08:45-s52",
+    "2017-08-2017-08-26T10:00-s52",
+    "2017-08-2017-08-30T23:05-s71",
+    "2017-09-2017-09-03T10:25-s71",
+    "2017-09-2017-09-07T16:45-s52",
+    "2017-09-2017-09-11T12:45-s52",
+    "2017-09-2017-09-14T17:55-s52",
+    "2017-09-2017-09-15T23:15-s52",
+    "2017-09-2017-09-17T03:50-s52",
+    "2017-09-2017-09-18T08:15-s52",
+    "2017-09-2017-09-19T17:15-s52",
+    "2017-09-2017-09-21T05:55-s52",
+    "2017-09-2017-09-23T15:25-s52",
+    "2017-09-2017-09-25T22:05-s52",
+    "2017-09-2017-09-28T16:45-s52",
+    "2018-08-2018-08-02T14:35-s71",
+    "2018-08-2018-08-09T03:20-s71",
+    "2018-08-2018-08-12T21:15-s71",
+    "2018-08-2018-08-15T01:35-s52",
+    "2018-08-2018-08-18T04:00-s71",
+    "2018-08-2018-08-21T18:10-s52",
+    "2018-08-2018-08-23T23:25-s52",
+    "2018-08-2018-08-25T16:05-s52",
+    "2018-08-2018-08-27T08:05-s52",
+    "2018-08-2018-08-28T11:20-s52",
+    "2018-08-2018-08-29T11:30-s52",
+    "2018-08-2018-08-31T03:10-s52",
+    "2018-09-2018-09-02T07:40-s52",
+    "2018-09-2018-09-03T18:40-s52",
+    "2018-09-2018-09-05T00:45-s52",
+    "2018-09-2018-09-08T05:30-s52",
+    "2018-09-2018-09-09T17:00-s52",
+    "2018-09-2018-09-11T19:05-s52",
+    "2018-09-2018-09-14T00:20-s52",
+    "2018-09-2018-09-15T12:25-s52",
+    "2018-09-2018-09-19T08:35-s52",
+    "2018-09-2018-09-21T15:50-s52",
+    "2018-09-2018-09-27T16:35-s52",
+    "2018-09-2018-09-29T07:25-s52",
+    "2019-08-2019-08-02T10:05-s52",
+    "2019-08-2019-08-06T07:55-s52",
+    "2019-08-2019-08-08T23:35-s71",
+    "2019-08-2019-08-11T11:40-s52",
+    "2019-08-2019-08-16T11:05-s52",
+    "2019-08-2019-08-19T15:40-s52",
+    "2019-08-2019-08-24T05:55-s52",
+    "2019-08-2019-08-25T23:45-s52",
+    "2019-08-2019-08-26T21:10-s52",
+    "2019-08-2019-08-29T01:05-s52",
+    "2019-08-2019-08-30T11:15-s52",
+    "2019-08-2019-08-31T05:30-s52",
+    "2019-09-2019-09-01T18:50-s52",
+    "2019-09-2019-09-03T00:00-s52",
+    "2019-09-2019-09-04T05:05-s52",
+    "2019-09-2019-09-06T07:50-s52",
+    "2019-09-2019-09-08T23:10-s52",
+    "2019-09-2019-09-11T14:45-s52",
+    "2019-09-2019-09-16T10:30-s52",
+    "2019-09-2019-09-17T21:00-s52",
+    "2019-09-2019-09-19T19:55-s52",
+    "2019-09-2019-09-22T04:40-s52",
+    "2019-09-2019-09-23T08:25-s52",
+    "2019-09-2019-09-28T21:35-s52",
+    "2020-08-2020-08-04T17:00-s52",
+    "2020-08-2020-08-10T09:45-s52",
+    "2020-08-2020-08-12T08:15-s52",
+    "2020-08-2020-08-14T13:40-s52",
+    "2020-08-2020-08-16T11:05-s52",
+    "2020-08-2020-08-17T21:10-s52",
+    "2020-08-2020-08-19T13:20-s52",
+    "2020-08-2020-08-21T06:25-s52",
+    "2020-08-2020-08-22T22:05-s52",
+    "2020-08-2020-08-24T04:25-s52",
+    "2020-08-2020-08-26T00:25-s52",
+    "2020-08-2020-08-29T21:25-s52",
+    "2020-09-2020-09-01T09:10-s52",
+    "2020-09-2020-09-01T17:10-s52",
+    "2020-09-2020-09-04T22:10-s52",
+    "2020-09-2020-09-05T23:20-s52",
+    "2020-09-2020-09-08T03:00-s52",
+    "2020-09-2020-09-08T20:30-s52",
+    "2020-09-2020-09-11T23:50-s52",
+    "2020-09-2020-09-13T10:25-s52",
+    "2020-09-2020-09-18T07:50-s52",
+    "2020-09-2020-09-21T07:05-s52",
+    "2020-09-2020-09-27T18:00-s52",
+    "2020-09-2020-09-29T03:00-s71",
+    "2021-08-2021-08-01T19:50-s52",
+    "2021-08-2021-08-03T19:25-s52",
+    "2021-08-2021-08-05T08:20-s52",
+    "2021-08-2021-08-07T13:50-s52",
+    "2021-08-2021-08-10T06:05-s52",
+    "2021-08-2021-08-11T14:35-s52",
+    "2021-08-2021-08-13T11:15-s52",
+    "2021-08-2021-08-15T15:50-s52",
+    "2021-08-2021-08-18T14:55-s52",
+    "2021-08-2021-08-21T09:50-s52",
+    "2021-08-2021-08-25T05:30-s52",
+    "2021-08-2021-08-28T10:50-s52",
+    "2021-09-2021-09-02T03:00-s52",
+    "2021-09-2021-09-03T01:20-s52",
+    "2021-09-2021-09-06T10:30-s52",
+    "2021-09-2021-09-07T07:20-s52",
+    "2021-09-2021-09-10T05:50-s52",
+    "2021-09-2021-09-10T20:10-s52",
+    "2021-09-2021-09-12T16:15-s52",
+    "2021-09-2021-09-16T03:45-s52",
+    "2021-09-2021-09-21T01:45-s52",
+    "2021-09-2021-09-22T23:15-s52",
+    "2021-09-2021-09-27T03:55-s52",
+    "2021-09-2021-09-29T18:55-s52",
+    "2022-08-2022-08-01T13:25-s52",
+    "2022-08-2022-08-02T13:40-s52",
+    "2022-08-2022-08-03T13:35-s52",
+    "2022-08-2022-08-04T23:20-s52",
+    "2022-08-2022-08-06T14:50-s52",
+    "2022-08-2022-08-08T16:55-s52",
+    "2022-08-2022-08-11T03:00-s52",
+    "2022-08-2022-08-13T01:10-s52",
+    "2022-08-2022-08-17T02:25-s52",
+    "2022-08-2022-08-20T20:30-s52",
+    "2022-08-2022-08-25T18:25-s52",
+    "2022-08-2022-08-30T11:15-s52",
+    "2022-09-2022-09-03T10:15-s52",
+    "2022-09-2022-09-05T05:45-s52",
+    "2022-09-2022-09-07T03:10-s52",
+    "2022-09-2022-09-10T21:25-s52",
+    "2022-09-2022-09-12T13:40-s52",
+    "2022-09-2022-09-15T17:45-s52",
+    "2022-09-2022-09-18T04:30-s52",
+    "2022-09-2022-09-24T23:25-s52",
+    "2022-09-2022-09-25T18:50-s52",
+    "2022-09-2022-09-28T00:40-s52",
+    "2022-09-2022-09-29T10:40-s52",
+    "2022-09-2022-09-30T11:25-s52",
+    "2023-08-2023-08-01T07:15-s52",
+    "2023-08-2023-08-02T08:10-s52",
+    "2023-08-2023-08-05T09:40-s52",
+    "2023-08-2023-08-08T10:25-s52",
+    "2023-08-2023-08-09T20:55-s52",
+    "2023-08-2023-08-12T08:45-s52",
+    "2023-08-2023-08-20T06:45-s52",
+    "2023-08-2023-08-21T20:50-s52",
+    "2023-08-2023-08-24T03:45-s52",
+    "2023-08-2023-08-27T01:20-s52",
+    "2023-08-2023-08-27T18:55-s52",
+    "2023-08-2023-08-30T01:00-s52",
+    "2023-09-2023-09-01T17:45-s52",
+    "2023-09-2023-09-04T23:30-s52",
+    "2023-09-2023-09-06T19:50-s52",
+    "2023-09-2023-09-10T09:20-s52",
+    "2023-09-2023-09-12T14:10-s52",
+    "2023-09-2023-09-13T09:10-s52",
+    "2023-09-2023-09-18T04:15-s52",
+    "2023-09-2023-09-19T07:25-s52",
+    "2023-09-2023-09-23T23:20-s52",
+    "2023-09-2023-09-25T11:05-s52",
+    "2023-09-2023-09-26T12:20-s52",
+    "2023-09-2023-09-28T01:20-s52",
+    "2024-08-2024-08-01T04:00-s52",
+    "2024-08-2024-08-04T18:10-s52",
+    "2024-08-2024-08-10T19:05-s52",
+    "2024-08-2024-08-11T08:35-s52",
+    "2024-08-2024-08-13T00:10-s52",
+    "2024-08-2024-08-14T16:30-s52",
+    "2024-08-2024-08-16T18:10-s52",
+    "2024-08-2024-08-18T16:05-s52",
+    "2024-08-2024-08-23T18:40-s52",
+    "2024-08-2024-08-27T18:05-s52",
+    "2024-08-2024-08-28T22:25-s52",
+    "2024-08-2024-08-30T21:05-s52",
+    "2024-09-2024-09-03T16:10-s52",
+    "2024-09-2024-09-09T09:35-s52",
+    "2024-09-2024-09-12T09:35-s52",
+    "2024-09-2024-09-16T01:55-s52",
+    "2024-09-2024-09-17T14:20-s52",
+    "2024-09-2024-09-20T16:30-s52",
+    "2024-09-2024-09-23T11:20-s52",
+    "2024-09-2024-09-24T09:40-s52",
+    "2024-09-2024-09-25T16:15-s52",
+    "2024-09-2024-09-27T01:00-s52",
+    "2024-09-2024-09-27T21:00-s52",
+    "2024-09-2024-09-29T04:15-s52"
+  ],
+  "interpretation": "Lower primary energy score is better; contrasts are method minus baseline. Relative intervals use each replicate's baseline mean. Two-percent gates are descriptive, not causal verdicts or universal negative claims. Failure to show superiority is not equivalence; the optional equivalence criterion requires both relative intervals strictly inside [-0.02, 0.02]. No p-value establishes equivalence. Block lengths are temporal-dependence sensitivity checks, not a guarantee under solar-cycle nonstationarity.",
+  "methods": {
+    "D_corrected": {
+      "fixed_model_seeds": [
+        7,
+        13,
+        42
+      ],
+      "generations": {
+        "13": 9560,
+        "42": 16252,
+        "7": 29636
+      },
+      "procedure": "diffusion",
+      "score_files": {
+        "13": "artifacts/test/D_s13-g9560/score-corrected.json",
+        "42": "artifacts/test/D_s42-g16252/score-corrected.json",
+        "7": "artifacts/test/D_s7-g29636/score-corrected.json"
+      },
+      "scoring_kind": "corrected",
+      "selection_kind": "corrected"
+    },
+    "D_corrected_at_raw_checkpoint": {
+      "fixed_model_seeds": [
+        7,
+        13,
+        42
+      ],
+      "generations": {
+        "13": 9560,
+        "42": 16252,
+        "7": 9560
+      },
+      "procedure": "diffusion",
+      "score_files": {
+        "13": "artifacts/test/D_s13-g9560/score-corrected.json",
+        "42": "artifacts/test/D_s42-g16252/score-corrected.json",
+        "7": "artifacts/test/D_s7-g9560/score-corrected.json"
+      },
+      "scoring_kind": "corrected",
+      "selection_kind": "raw"
+    },
+    "D_raw": {
+      "fixed_model_seeds": [
+        7,
+        13,
+        42
+      ],
+      "generations": {
+        "13": 9560,
+        "42": 16252,
+        "7": 9560
+      },
+      "procedure": "diffusion",
+      "score_files": {
+        "13": "artifacts/test/D_s13-g9560/score-raw.json",
+        "42": "artifacts/test/D_s42-g16252/score-raw.json",
+        "7": "artifacts/test/D_s7-g9560/score-raw.json"
+      },
+      "scoring_kind": "raw",
+      "selection_kind": "raw"
+    },
+    "G5_corrected": {
+      "fixed_model_seeds": [
+        7,
+        13,
+        42
+      ],
+      "generations": {
+        "13": 29636,
+        "42": 16252,
+        "7": 29636
+      },
+      "procedure": "diffusion",
+      "score_files": {
+        "13": "artifacts/test/G5_s13-g29636/score-corrected.json",
+        "42": "artifacts/test/G5_s42-g16252/score-corrected.json",
+        "7": "artifacts/test/G5_s7-g29636/score-corrected.json"
+      },
+      "scoring_kind": "corrected",
+      "selection_kind": "corrected"
+    },
+    "G5_corrected_at_raw_checkpoint": {
+      "fixed_model_seeds": [
+        7,
+        13,
+        42
+      ],
+      "generations": {
+        "13": 29636,
+        "42": 16252,
+        "7": 29636
+      },
+      "procedure": "diffusion",
+      "score_files": {
+        "13": "artifacts/test/G5_s13-g29636/score-corrected.json",
+        "42": "artifacts/test/G5_s42-g16252/score-corrected.json",
+        "7": "artifacts/test/G5_s7-g29636/score-corrected.json"
+      },
+      "scoring_kind": "corrected",
+      "selection_kind": "raw"
+    },
+    "G5_raw": {
+      "fixed_model_seeds": [
+        7,
+        13,
+        42
+      ],
+      "generations": {
+        "13": 29636,
+        "42": 16252,
+        "7": 29636
+      },
+      "procedure": "diffusion",
+      "score_files": {
+        "13": "artifacts/test/G5_s13-g29636/score-raw.json",
+        "42": "artifacts/test/G5_s42-g16252/score-raw.json",
+        "7": "artifacts/test/G5_s7-g29636/score-raw.json"
+      },
+      "scoring_kind": "raw",
+      "selection_kind": "raw"
+    },
+    "I-S_corrected": {
+      "fixed_model_seeds": [
+        7,
+        13,
+        42
+      ],
+      "generations": {
+        "13": 22944,
+        "42": 16252,
+        "7": 9560
+      },
+      "procedure": "diffusion",
+      "score_files": {
+        "13": "artifacts/test/I-S_s13-g22944/score-corrected.json",
+        "42": "artifacts/test/I-S_s42-g16252/score-corrected.json",
+        "7": "artifacts/test/I-S_s7-g9560/score-corrected.json"
+      },
+      "scoring_kind": "corrected",
+      "selection_kind": "corrected"
+    },
+    "I-S_corrected_at_raw_checkpoint": {
+      "fixed_model_seeds": [
+        7,
+        13,
+        42
+      ],
+      "generations": {
+        "13": 22944,
+        "42": 16252,
+        "7": 9560
+      },
+      "procedure": "diffusion",
+      "score_files": {
+        "13": "artifacts/test/I-S_s13-g22944/score-corrected.json",
+        "42": "artifacts/test/I-S_s42-g16252/score-corrected.json",
+        "7": "artifacts/test/I-S_s7-g9560/score-corrected.json"
+      },
+      "scoring_kind": "corrected",
+      "selection_kind": "raw"
+    },
+    "I-S_raw": {
+      "fixed_model_seeds": [
+        7,
+        13,
+        42
+      ],
+      "generations": {
+        "13": 22944,
+        "42": 16252,
+        "7": 9560
+      },
+      "procedure": "diffusion",
+      "score_files": {
+        "13": "artifacts/test/I-S_s13-g22944/score-raw.json",
+        "42": "artifacts/test/I-S_s42-g16252/score-raw.json",
+        "7": "artifacts/test/I-S_s7-g9560/score-raw.json"
+      },
+      "scoring_kind": "raw",
+      "selection_kind": "raw"
+    },
+    "O-S_corrected": {
+      "fixed_model_seeds": [
+        7,
+        13,
+        42
+      ],
+      "generations": {
+        "13": 29636,
+        "42": 16252,
+        "7": 29636
+      },
+      "procedure": "diffusion",
+      "score_files": {
+        "13": "artifacts/test/O-S_s13-g29636/score-corrected.json",
+        "42": "artifacts/test/O-S_s42-g16252/score-corrected.json",
+        "7": "artifacts/test/O-S_s7-g29636/score-corrected.json"
+      },
+      "scoring_kind": "corrected",
+      "selection_kind": "corrected"
+    },
+    "O-S_corrected_at_raw_checkpoint": {
+      "fixed_model_seeds": [
+        7,
+        13,
+        42
+      ],
+      "generations": {
+        "13": 29636,
+        "42": 16252,
+        "7": 29636
+      },
+      "procedure": "diffusion",
+      "score_files": {
+        "13": "artifacts/test/O-S_s13-g29636/score-corrected.json",
+        "42": "artifacts/test/O-S_s42-g16252/score-corrected.json",
+        "7": "artifacts/test/O-S_s7-g29636/score-corrected.json"
+      },
+      "scoring_kind": "corrected",
+      "selection_kind": "raw"
+    },
+    "O-S_raw": {
+      "fixed_model_seeds": [
+        7,
+        13,
+        42
+      ],
+      "generations": {
+        "13": 29636,
+        "42": 16252,
+        "7": 29636
+      },
+      "procedure": "diffusion",
+      "score_files": {
+        "13": "artifacts/test/O-S_s13-g29636/score-raw.json",
+        "42": "artifacts/test/O-S_s42-g16252/score-raw.json",
+        "7": "artifacts/test/O-S_s7-g29636/score-raw.json"
+      },
+      "scoring_kind": "raw",
+      "selection_kind": "raw"
+    },
+    "gaussian_corrected": {
+      "fixed_model_seeds": [],
+      "n_baseline_realizations": 1,
+      "procedure": "gaussian",
+      "score_files": {
+        "shared": "artifacts/controls_test/gaussian/score-corrected.json"
+      },
+      "scoring_kind": "corrected"
+    },
+    "gaussian_raw": {
+      "fixed_model_seeds": [],
+      "n_baseline_realizations": 1,
+      "procedure": "gaussian",
+      "score_files": {
+        "shared": "artifacts/controls_test/gaussian/score-raw.json"
+      },
+      "scoring_kind": "raw"
+    },
+    "interpolation_corrected": {
+      "fixed_model_seeds": [],
+      "n_baseline_realizations": 1,
+      "procedure": "interpolation",
+      "score_files": {
+        "shared": "artifacts/controls_test/interpolation/score-corrected.json"
+      },
+      "scoring_kind": "corrected"
+    },
+    "interpolation_raw": {
+      "fixed_model_seeds": [],
+      "n_baseline_realizations": 1,
+      "procedure": "interpolation",
+      "score_files": {
+        "shared": "artifacts/controls_test/interpolation/score-raw.json"
+      },
+      "scoring_kind": "raw"
+    },
+    "persistence_corrected": {
+      "fixed_model_seeds": [],
+      "n_baseline_realizations": 1,
+      "procedure": "persistence",
+      "score_files": {
+        "shared": "artifacts/controls_test/persistence/score-corrected.json"
+      },
+      "scoring_kind": "corrected"
+    },
+    "persistence_raw": {
+      "fixed_model_seeds": [],
+      "n_baseline_realizations": 1,
+      "procedure": "persistence",
+      "score_files": {
+        "shared": "artifacts/controls_test/persistence/score-raw.json"
+      },
+      "scoring_kind": "raw"
+    }
+  },
+  "month_counts": {
+    "200508": 12,
+    "200509": 12,
+    "200608": 12,
+    "200609": 12,
+    "200708": 12,
+    "200709": 12,
+    "200808": 12,
+    "200809": 12,
+    "200908": 12,
+    "200909": 12,
+    "201008": 12,
+    "201009": 12,
+    "201108": 12,
+    "201109": 12,
+    "201208": 12,
+    "201209": 12,
+    "201308": 12,
+    "201309": 12,
+    "201408": 12,
+    "201409": 12,
+    "201508": 12,
+    "201509": 12,
+    "201608": 12,
+    "201609": 12,
+    "201708": 12,
+    "201709": 12,
+    "201808": 12,
+    "201809": 12,
+    "201908": 12,
+    "201909": 12,
+    "202008": 12,
+    "202009": 12,
+    "202108": 12,
+    "202109": 12,
+    "202208": 12,
+    "202209": 12,
+    "202308": 12,
+    "202309": 12,
+    "202408": 12,
+    "202409": 12
+  },
+  "months": [
+    200508,
+    200508,
+    200508,
+    200508,
+    200508,
+    200508,
+    200508,
+    200508,
+    200508,
+    200508,
+    200508,
+    200508,
+    200509,
+    200509,
+    200509,
+    200509,
+    200509,
+    200509,
+    200509,
+    200509,
+    200509,
+    200509,
+    200509,
+    200509,
+    200608,
+    200608,
+    200608,
+    200608,
+    200608,
+    200608,
+    200608,
+    200608,
+    200608,
+    200608,
+    200608,
+    200608,
+    200609,
+    200609,
+    200609,
+    200609,
+    200609,
+    200609,
+    200609,
+    200609,
+    200609,
+    200609,
+    200609,
+    200609,
+    200708,
+    200708,
+    200708,
+    200708,
+    200708,
+    200708,
+    200708,
+    200708,
+    200708,
+    200708,
+    200708,
+    200708,
+    200709,
+    200709,
+    200709,
+    200709,
+    200709,
+    200709,
+    200709,
+    200709,
+    200709,
+    200709,
+    200709,
+    200709,
+    200808,
+    200808,
+    200808,
+    200808,
+    200808,
+    200808,
+    200808,
+    200808,
+    200808,
+    200808,
+    200808,
+    200808,
+    200809,
+    200809,
+    200809,
+    200809,
+    200809,
+    200809,
+    200809,
+    200809,
+    200809,
+    200809,
+    200809,
+    200809,
+    200908,
+    200908,
+    200908,
+    200908,
+    200908,
+    200908,
+    200908,
+    200908,
+    200908,
+    200908,
+    200908,
+    200908,
+    200909,
+    200909,
+    200909,
+    200909,
+    200909,
+    200909,
+    200909,
+    200909,
+    200909,
+    200909,
+    200909,
+    200909,
+    201008,
+    201008,
+    201008,
+    201008,
+    201008,
+    201008,
+    201008,
+    201008,
+    201008,
+    201008,
+    201008,
+    201008,
+    201009,
+    201009,
+    201009,
+    201009,
+    201009,
+    201009,
+    201009,
+    201009,
+    201009,
+    201009,
+    201009,
+    201009,
+    201108,
+    201108,
+    201108,
+    201108,
+    201108,
+    201108,
+    201108,
+    201108,
+    201108,
+    201108,
+    201108,
+    201108,
+    201109,
+    201109,
+    201109,
+    201109,
+    201109,
+    201109,
+    201109,
+    201109,
+    201109,
+    201109,
+    201109,
+    201109,
+    201208,
+    201208,
+    201208,
+    201208,
+    201208,
+    201208,
+    201208,
+    201208,
+    201208,
+    201208,
+    201208,
+    201208,
+    201209,
+    201209,
+    201209,
+    201209,
+    201209,
+    201209,
+    201209,
+    201209,
+    201209,
+    201209,
+    201209,
+    201209,
+    201308,
+    201308,
+    201308,
+    201308,
+    201308,
+    201308,
+    201308,
+    201308,
+    201308,
+    201308,
+    201308,
+    201308,
+    201309,
+    201309,
+    201309,
+    201309,
+    201309,
+    201309,
+    201309,
+    201309,
+    201309,
+    201309,
+    201309,
+    201309,
+    201408,
+    201408,
+    201408,
+    201408,
+    201408,
+    201408,
+    201408,
+    201408,
+    201408,
+    201408,
+    201408,
+    201408,
+    201409,
+    201409,
+    201409,
+    201409,
+    201409,
+    201409,
+    201409,
+    201409,
+    201409,
+    201409,
+    201409,
+    201409,
+    201508,
+    201508,
+    201508,
+    201508,
+    201508,
+    201508,
+    201508,
+    201508,
+    201508,
+    201508,
+    201508,
+    201508,
+    201509,
+    201509,
+    201509,
+    201509,
+    201509,
+    201509,
+    201509,
+    201509,
+    201509,
+    201509,
+    201509,
+    201509,
+    201608,
+    201608,
+    201608,
+    201608,
+    201608,
+    201608,
+    201608,
+    201608,
+    201608,
+    201608,
+    201608,
+    201608,
+    201609,
+    201609,
+    201609,
+    201609,
+    201609,
+    201609,
+    201609,
+    201609,
+    201609,
+    201609,
+    201609,
+    201609,
+    201708,
+    201708,
+    201708,
+    201708,
+    201708,
+    201708,
+    201708,
+    201708,
+    201708,
+    201708,
+    201708,
+    201708,
+    201709,
+    201709,
+    201709,
+    201709,
+    201709,
+    201709,
+    201709,
+    201709,
+    201709,
+    201709,
+    201709,
+    201709,
+    201808,
+    201808,
+    201808,
+    201808,
+    201808,
+    201808,
+    201808,
+    201808,
+    201808,
+    201808,
+    201808,
+    201808,
+    201809,
+    201809,
+    201809,
+    201809,
+    201809,
+    201809,
+    201809,
+    201809,
+    201809,
+    201809,
+    201809,
+    201809,
+    201908,
+    201908,
+    201908,
+    201908,
+    201908,
+    201908,
+    201908,
+    201908,
+    201908,
+    201908,
+    201908,
+    201908,
+    201909,
+    201909,
+    201909,
+    201909,
+    201909,
+    201909,
+    201909,
+    201909,
+    201909,
+    201909,
+    201909,
+    201909,
+    202008,
+    202008,
+    202008,
+    202008,
+    202008,
+    202008,
+    202008,
+    202008,
+    202008,
+    202008,
+    202008,
+    202008,
+    202009,
+    202009,
+    202009,
+    202009,
+    202009,
+    202009,
+    202009,
+    202009,
+    202009,
+    202009,
+    202009,
+    202009,
+    202108,
+    202108,
+    202108,
+    202108,
+    202108,
+    202108,
+    202108,
+    202108,
+    202108,
+    202108,
+    202108,
+    202108,
+    202109,
+    202109,
+    202109,
+    202109,
+    202109,
+    202109,
+    202109,
+    202109,
+    202109,
+    202109,
+    202109,
+    202109,
+    202208,
+    202208,
+    202208,
+    202208,
+    202208,
+    202208,
+    202208,
+    202208,
+    202208,
+    202208,
+    202208,
+    202208,
+    202209,
+    202209,
+    202209,
+    202209,
+    202209,
+    202209,
+    202209,
+    202209,
+    202209,
+    202209,
+    202209,
+    202209,
+    202308,
+    202308,
+    202308,
+    202308,
+    202308,
+    202308,
+    202308,
+    202308,
+    202308,
+    202308,
+    202308,
+    202308,
+    202309,
+    202309,
+    202309,
+    202309,
+    202309,
+    202309,
+    202309,
+    202309,
+    202309,
+    202309,
+    202309,
+    202309,
+    202408,
+    202408,
+    202408,
+    202408,
+    202408,
+    202408,
+    202408,
+    202408,
+    202408,
+    202408,
+    202408,
+    202408,
+    202409,
+    202409,
+    202409,
+    202409,
+    202409,
+    202409,
+    202409,
+    202409,
+    202409,
+    202409,
+    202409,
+    202409
+  ],
+  "multiplicity": "with_replacement_year_blocks",
+  "n_replicates": 10000,
+  "protocol_sha256": "25d0cdefdd5dbb160c32c7b5f4a6053bab99e4a9f64832d9eb6502232bf24e6b",
+  "schema_version": 2,
+  "seed": 7003,
+  "seed_means": {
+    "D_corrected": {
+      "13": 1.8212977373673263,
+      "42": 1.872445107028187,
+      "7": 1.9147232772917744
+    },
+    "D_corrected_at_raw_checkpoint": {
+      "13": 1.8212977373673263,
+      "42": 1.872445107028187,
+      "7": 1.9502216250039865
+    },
+    "D_raw": {
+      "13": 1.829731165770156,
+      "42": 1.8758054397314914,
+      "7": 1.9575229938859366
+    },
+    "G5_corrected": {
+      "13": 1.7889184155801832,
+      "42": 1.8403621327341646,
+      "7": 1.723893058699732
+    },
+    "G5_corrected_at_raw_checkpoint": {
+      "13": 1.7889184155801832,
+      "42": 1.8403621327341646,
+      "7": 1.723893058699732
+    },
+    "G5_raw": {
+      "13": 1.785336720341172,
+      "42": 1.8453290704517429,
+      "7": 1.7235714460997755
+    },
+    "I-S_corrected": {
+      "13": 1.882628247572309,
+      "42": 1.8071383624120372,
+      "7": 1.9385187399969688
+    },
+    "I-S_corrected_at_raw_checkpoint": {
+      "13": 1.882628247572309,
+      "42": 1.8071383624120372,
+      "7": 1.9385187399969688
+    },
+    "I-S_raw": {
+      "13": 1.8953661202079695,
+      "42": 1.8070187471966679,
+      "7": 1.9422982067727326
+    },
+    "O-S_corrected": {
+      "13": 1.8824484622933233,
+      "42": 1.8045257575832288,
+      "7": 1.9115534988020975
+    },
+    "O-S_corrected_at_raw_checkpoint": {
+      "13": 1.8824484622933233,
+      "42": 1.8045257575832288,
+      "7": 1.9115534988020975
+    },
+    "O-S_raw": {
+      "13": 1.8933815569209664,
+      "42": 1.805561062218883,
+      "7": 1.9557614175708047
+    },
+    "gaussian_corrected": {
+      "shared": 2.2293629456444677
+    },
+    "gaussian_raw": {
+      "shared": 2.1251433376550892
+    },
+    "interpolation_corrected": {
+      "shared": 2.3928404874972697
+    },
+    "interpolation_raw": {
+      "shared": 2.3928404874972697
+    },
+    "persistence_corrected": {
+      "shared": 3.0665280175338063
+    },
+    "persistence_raw": {
+      "shared": 3.0665280175338063
+    }
+  },
+  "selected": {
+    "D_s13": {
+      "corrected": {
+        "checkpoint_sha256": "fc03ae02bd94a5eeadf384b813911c70a7bcb31f593eda8e0deebef1793c1c83",
+        "generation": 9560,
+        "score": 1.5892134414069097
+      },
+      "raw": {
+        "checkpoint_sha256": "fc03ae02bd94a5eeadf384b813911c70a7bcb31f593eda8e0deebef1793c1c83",
+        "generation": 9560,
+        "score": 1.5925232276351668
+      }
+    },
+    "D_s42": {
+      "corrected": {
+        "checkpoint_sha256": "2a4e33233aaf3a445696991e6c86dd95524cc78bb35d3cc74fecd6c820b43a29",
+        "generation": 16252,
+        "score": 1.6231075633440515
+      },
+      "raw": {
+        "checkpoint_sha256": "2a4e33233aaf3a445696991e6c86dd95524cc78bb35d3cc74fecd6c820b43a29",
+        "generation": 16252,
+        "score": 1.6267037977181622
+      }
+    },
+    "D_s7": {
+      "corrected": {
+        "checkpoint_sha256": "39f7576c2ca23bae1ed6fa4d7b39da612204747c09422f7897dc2017f2d26d14",
+        "generation": 29636,
+        "score": 1.665873230418758
+      },
+      "raw": {
+        "checkpoint_sha256": "ed815ec4db1ca60d2eefde03f605932c7a39b1b6dea12f86548ae4f08e5336be",
+        "generation": 9560,
+        "score": 1.7170802163650278
+      }
+    },
+    "G5_s13": {
+      "corrected": {
+        "checkpoint_sha256": "21dc4d8a4b214b0413aaea365bdedfeae051a9b9345b8275a3f1bcc358a1ef20",
+        "generation": 29636,
+        "score": 1.5591249332288597
+      },
+      "raw": {
+        "checkpoint_sha256": "21dc4d8a4b214b0413aaea365bdedfeae051a9b9345b8275a3f1bcc358a1ef20",
+        "generation": 29636,
+        "score": 1.555633895337598
+      }
+    },
+    "G5_s42": {
+      "corrected": {
+        "checkpoint_sha256": "d5f6cdbf52a5089a08d0dbe82fe5b3746626acdfa0126a42728c58fd174c227a",
+        "generation": 16252,
+        "score": 1.598548388222195
+      },
+      "raw": {
+        "checkpoint_sha256": "d5f6cdbf52a5089a08d0dbe82fe5b3746626acdfa0126a42728c58fd174c227a",
+        "generation": 16252,
+        "score": 1.6022954132022569
+      }
+    },
+    "G5_s7": {
+      "corrected": {
+        "checkpoint_sha256": "687ffc93c80462d89476a6b7cfe6670c735f1d330559557c9fd79a1f4a23cf85",
+        "generation": 29636,
+        "score": 1.5235166086081013
+      },
+      "raw": {
+        "checkpoint_sha256": "687ffc93c80462d89476a6b7cfe6670c735f1d330559557c9fd79a1f4a23cf85",
+        "generation": 29636,
+        "score": 1.5220034752948948
+      }
+    },
+    "I-S_s13": {
+      "corrected": {
+        "checkpoint_sha256": "22e2a16a72c02324fabb61ef42e93fb162d49ef811446d2a2f25fb6458eca636",
+        "generation": 22944,
+        "score": 1.6546022203903523
+      },
+      "raw": {
+        "checkpoint_sha256": "22e2a16a72c02324fabb61ef42e93fb162d49ef811446d2a2f25fb6458eca636",
+        "generation": 22944,
+        "score": 1.6610865483221258
+      }
+    },
+    "I-S_s42": {
+      "corrected": {
+        "checkpoint_sha256": "058f08976ed8199cbb9e449c7a98a491c4c15e4194efe0e8f7faee6715596a64",
+        "generation": 16252,
+        "score": 1.5735098307625641
+      },
+      "raw": {
+        "checkpoint_sha256": "058f08976ed8199cbb9e449c7a98a491c4c15e4194efe0e8f7faee6715596a64",
+        "generation": 16252,
+        "score": 1.5712901087944526
+      }
+    },
+    "I-S_s7": {
+      "corrected": {
+        "checkpoint_sha256": "a4538df36d6fdfaaf367c5d6afadcb438db7e6a0c0f40dd19411d5c21078f456",
+        "generation": 9560,
+        "score": 1.7262258278281153
+      },
+      "raw": {
+        "checkpoint_sha256": "a4538df36d6fdfaaf367c5d6afadcb438db7e6a0c0f40dd19411d5c21078f456",
+        "generation": 9560,
+        "score": 1.7302608334559526
+      }
+    },
+    "O-S_s13": {
+      "corrected": {
+        "checkpoint_sha256": "67d340254578ff64dd6e57a7e2bc22fd271ef719079d1284ae47b5047c0275ad",
+        "generation": 29636,
+        "score": 1.6555522328426768
+      },
+      "raw": {
+        "checkpoint_sha256": "67d340254578ff64dd6e57a7e2bc22fd271ef719079d1284ae47b5047c0275ad",
+        "generation": 29636,
+        "score": 1.6598635366353318
+      }
+    },
+    "O-S_s42": {
+      "corrected": {
+        "checkpoint_sha256": "6b262e26d888aab90fbc94fd960f434a287bd914094ede2192f960ba9c76d43f",
+        "generation": 16252,
+        "score": 1.5834307405629442
+      },
+      "raw": {
+        "checkpoint_sha256": "6b262e26d888aab90fbc94fd960f434a287bd914094ede2192f960ba9c76d43f",
+        "generation": 16252,
+        "score": 1.583617733418031
+      }
+    },
+    "O-S_s7": {
+      "corrected": {
+        "checkpoint_sha256": "fb605a5c11aae6ffcccd09b21b66b98608e3ebe3850c5b81eccdae77b6084439",
+        "generation": 29636,
+        "score": 1.6556515924986528
+      },
+      "raw": {
+        "checkpoint_sha256": "fb605a5c11aae6ffcccd09b21b66b98608e3ebe3850c5b81eccdae77b6084439",
+        "generation": 29636,
+        "score": 1.6942118178709102
+      }
+    }
+  },
+  "selection_sha256": "b2fa1d9233b94c9db22472e644de1fc84f217baaa3d7385faaab2208e0a9c351",
+  "source_comparison_sha256": "391201bc0b237a68241604599a07ab9342f9a2a79c8990f15b4618191dfa5740",
+  "test_started_sha256": "060d72b3f4c68b485993a5163983825c16d15d6620ae8e2bbb3362111b07d984",
+  "two_year_blocks": [
+    [
+      2005,
+      2006
+    ],
+    [
+      2007,
+      2008
+    ],
+    [
+      2009,
+      2010
+    ],
+    [
+      2011,
+      2012
+    ],
+    [
+      2013,
+      2014
+    ],
+    [
+      2015,
+      2016
+    ],
+    [
+      2017,
+      2018
+    ],
+    [
+      2019,
+      2020
+    ],
+    [
+      2021,
+      2022
+    ],
+    [
+      2023,
+      2024
+    ]
+  ],
+  "uncertainty_scope": "Paired test-year uncertainty averaged over three fixed trained models; identical year draws for every model and comparison. Not training-seed, refitting or selection uncertainty. Each non-neural control is one shared realization, not three independent baselines.",
+  "year_blocks": [
+    2005,
+    2006,
+    2007,
+    2008,
+    2009,
+    2010,
+    2011,
+    2012,
+    2013,
+    2014,
+    2015,
+    2016,
+    2017,
+    2018,
+    2019,
+    2020,
+    2021,
+    2022,
+    2023,
+    2024
+  ]
+}

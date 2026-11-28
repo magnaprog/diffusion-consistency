@@ -1,0 +1,16 @@
+{
+  "schema_version": 1,
+  "scope": "Exploratory cancellation and context sensitivities of the fixed, historically exposed TEST ensembles. The original TRAIN-window rules were implemented after inspection of the primary results. TRAIN-fitted cutoffs do not make target-defined groups confirmatory or observable from the flanks.",
+  "source_protocol_sha256": "25d0cdefdd5dbb160c32c7b5f4a6053bab99e4a9f64832d9eb6502232bf24e6b",
+  "transformation": "None. training-strata.json is byte-identical to its original completed record. No model was fitted, sampled or selected for this copy, and no primary endpoint was changed.",
+  "validation": "Independent checks verified all 45 recorded source hashes and 76 input hashes, then recomputed all eight cutoff values from 122309 TRAIN windows, with maximum absolute difference 5.551115123125783e-17. Direct formulas on the public TEST array reproduced all five feature vectors exactly after matching contiguous reduction layout, all 21 ordered group memberships, and all 18 full-test primary means within 2e-15. These checks do not rerun training, inference or the original raw OMNI reconstruction.",
+  "records": {
+    "training-strata.json": {
+      "source_record": "artifacts/training-strata-01.json",
+      "source_sha256": "146fe475fee3458294ad743057645d1609b7e793468671eb3afee20b28a863d9"
+    }
+  },
+  "files": {
+    "training-strata.json": "146fe475fee3458294ad743057645d1609b7e793468671eb3afee20b28a863d9"
+  }
+}

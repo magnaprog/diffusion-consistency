@@ -1,0 +1,225 @@
+{
+  "policies": {
+    "D_s13": {
+      "F": 29636,
+      "P25": 9560,
+      "P50": 9560
+    },
+    "D_s42": {
+      "F": 29636,
+      "P25": 16252,
+      "P50": 16252
+    },
+    "D_s7": {
+      "F": 29636,
+      "P25": 9560,
+      "P50": 9560
+    },
+    "O-S_s13": {
+      "F": 29636,
+      "P25": 29636,
+      "P50": 29636
+    },
+    "O-S_s42": {
+      "F": 29636,
+      "P25": 16252,
+      "P50": 16252
+    },
+    "O-S_s7": {
+      "F": 29636,
+      "P25": 29636,
+      "P50": 29636
+    }
+  },
+  "protocol_sha256": "eeca7c2e14d982f0b3e972256cc9acf7a5aaa8dc03da6a9299a708c78a7b5946",
+  "reuse_authentication_sha256": "776458f389a464340dd19c7bb73d38be854af4e676a569931288efb3f9cda11e",
+  "schema_version": 2,
+  "scope_sha256": "5210fbe5432aec70433ed9d7c10a1ba61503e5c7c15e43cc2fa37bfac478674a",
+  "selection": "P50 solely complete raw VAL50; TEST covers complete predetermined grid",
+  "test_checkpoint_hashes": [
+    "0af439ed3c558ea0b668d6a8aedda467f9cf1a2fefbe45700b99ebbc7a28a40a",
+    "0d4f9d922e47a729ee5aa595f0f8221fdfd8f34a9b500f1f243ade7058a74a28",
+    "184a007e599f9d049ed2dcb505da262b6f84560c1d9f9b243767215d1b282710",
+    "1d14a32fa28fac8206391addf976408cd5214f293b146ef20ec642ebb30273a4",
+    "1f55d4fbcc1e6c354eb49d66b043f12a9cc8d7da67e60ff481858f48c9eb1b05",
+    "2a4e33233aaf3a445696991e6c86dd95524cc78bb35d3cc74fecd6c820b43a29",
+    "391853493b2d1db4c328aa7be425b51a003e030a5ec16a68b1da30c3e1d56b9a",
+    "39f7576c2ca23bae1ed6fa4d7b39da612204747c09422f7897dc2017f2d26d14",
+    "3aabfd9c2f579034fe8545c9c5e88fbf81feb84f31fbbc529325a0da26c2dac4",
+    "433a209588195797c7dda1cc4545cd93508d2c012cf722a935440462a7bebaec",
+    "47a7e7e459cac56d0814fd3151636b0b66121f5200209426c630dd5aa85e6479",
+    "5e39bf7abaf8205d4bbba7bc02c15398ecd2eb9ab8331c3bfd386b509ed1e7cf",
+    "67d340254578ff64dd6e57a7e2bc22fd271ef719079d1284ae47b5047c0275ad",
+    "6a3f64fa4442b1f91d946a286419cf8997eeabe62d3cd63e46bfb9a69ef8f985",
+    "6b262e26d888aab90fbc94fd960f434a287bd914094ede2192f960ba9c76d43f",
+    "7ecba7820aea8b9e3071e64f8348100edc2cc53d4e9b86b267cfa69911727f33",
+    "8056a466e7808bbec92acedad3557399bd5c5a90dcf321da3cadb0a9d2897117",
+    "9e07c4f06f46d3b5e372634463dc008f5e8e241bf04aec880c6ea2ddfb1399cb",
+    "a559fc57197bb193ae7e3a311c4588f1804d01bc75fee5e02bdb2da12f56d3f4",
+    "a70800146350632c50bae043ad7189b178c756a5f3dd8fa5e5e3c47a1d58b09d",
+    "b2e21a0d84096a0bbaca90920b51e64cb078d3517ef93cdfbdf757073fbd96df",
+    "be885d20683aff0fb23d2fa6a23556b0cd88a77bf2acc255680156be700fd267",
+    "ca8763fd759325cad72c59d9040323e3755ef2f1ff5bab419c2d7b6dd5dcc81a",
+    "d92b6be83f256b0142a24ba9b677d253cd3c543108da334e36c5e1f89329807f",
+    "e9f043c918f39b01ae8e9943a86ae7519d3e672f57b409b95bd0b70191049e5d",
+    "ed815ec4db1ca60d2eefde03f605932c7a39b1b6dea12f86548ae4f08e5336be",
+    "f2a428b3986c185e9bc79e5fd0b4051f1a4b0d4f2f38d008c954e6be3384a064",
+    "f9f47726997945708e7561664bcc6af106b9b0233643fb5d32100db9df7ebf85",
+    "fb605a5c11aae6ffcccd09b21b66b98608e3ebe3850c5b81eccdae77b6084439",
+    "fc03ae02bd94a5eeadf384b813911c70a7bcb31f593eda8e0deebef1793c1c83"
+  ],
+  "test_jobs": [
+    [
+      "D_s7",
+      2868
+    ],
+    [
+      "D_s7",
+      9560
+    ],
+    [
+      "D_s7",
+      16252
+    ],
+    [
+      "D_s7",
+      22944
+    ],
+    [
+      "D_s7",
+      29636
+    ],
+    [
+      "D_s13",
+      2868
+    ],
+    [
+      "D_s13",
+      9560
+    ],
+    [
+      "D_s13",
+      16252
+    ],
+    [
+      "D_s13",
+      22944
+    ],
+    [
+      "D_s13",
+      29636
+    ],
+    [
+      "D_s42",
+      2868
+    ],
+    [
+      "D_s42",
+      9560
+    ],
+    [
+      "D_s42",
+      16252
+    ],
+    [
+      "D_s42",
+      22944
+    ],
+    [
+      "D_s42",
+      29636
+    ],
+    [
+      "O-S_s7",
+      2868
+    ],
+    [
+      "O-S_s7",
+      9560
+    ],
+    [
+      "O-S_s7",
+      16252
+    ],
+    [
+      "O-S_s7",
+      22944
+    ],
+    [
+      "O-S_s7",
+      29636
+    ],
+    [
+      "O-S_s13",
+      2868
+    ],
+    [
+      "O-S_s13",
+      9560
+    ],
+    [
+      "O-S_s13",
+      16252
+    ],
+    [
+      "O-S_s13",
+      22944
+    ],
+    [
+      "O-S_s13",
+      29636
+    ],
+    [
+      "O-S_s42",
+      2868
+    ],
+    [
+      "O-S_s42",
+      9560
+    ],
+    [
+      "O-S_s42",
+      16252
+    ],
+    [
+      "O-S_s42",
+      22944
+    ],
+    [
+      "O-S_s42",
+      29636
+    ]
+  ],
+  "validation_score_sha256": {
+    "checkpoint-study/artifacts/val/D_s13-g16252/score-raw.json": "1053e61c13bb18346504683b60a62523c3c6eeac3cdb9359e0cebdc40fa8cfc3",
+    "checkpoint-study/artifacts/val/D_s13-g22944/score-raw.json": "255493e9a2785d75952311ae1395787396d13d3e40868bf99b3e550929db4440",
+    "checkpoint-study/artifacts/val/D_s13-g2868/score-raw.json": "b4a806f768200060896388be387d4c778af8281de04625a4ce4df9a29e0114c6",
+    "checkpoint-study/artifacts/val/D_s13-g29636/score-raw.json": "f1c846196da9285fd6a488d5bf966b2381f09be1b9e3350ca4fafe465f279eda",
+    "checkpoint-study/artifacts/val/D_s13-g9560/score-raw.json": "7a923d423995797914d9eaa0d29abd65fefae9c201250248727abdc4ae12eaa1",
+    "checkpoint-study/artifacts/val/D_s42-g16252/score-raw.json": "e8e104a3208674d2bf5f389415ab0437437593691dfe07109013293df1a52c37",
+    "checkpoint-study/artifacts/val/D_s42-g22944/score-raw.json": "c81cb4350a1430e153908b2ce9fbc695e9969acce85c25e06bcb99024e3a8701",
+    "checkpoint-study/artifacts/val/D_s42-g2868/score-raw.json": "9288caf477eaeab73e885b4abebf10aad91d1a41db0dc2e1b457bcf36cbeb92d",
+    "checkpoint-study/artifacts/val/D_s42-g29636/score-raw.json": "7d9fcf99d08a8d3925245cd0393e1b8f25703c589f8838eb0a77f2fe7f17aa52",
+    "checkpoint-study/artifacts/val/D_s42-g9560/score-raw.json": "1d7ca950d4dc1e95e3d6971f61a8e42325e3220f05d5254c0ab3a59ead38ef22",
+    "checkpoint-study/artifacts/val/D_s7-g16252/score-raw.json": "ea7a62a57b536e6436173a594c43998653dd4f5a670c2a4fb7316785bebfe7e1",
+    "checkpoint-study/artifacts/val/D_s7-g22944/score-raw.json": "55b3d8c3fbae0cd464ae3e44617ddf9074d2ad1257a12649d5d77dbcbec01deb",
+    "checkpoint-study/artifacts/val/D_s7-g2868/score-raw.json": "520be550abe4deedb21b7ebfdca16191a2739da37c96e3e4893da4e70a56a6ed",
+    "checkpoint-study/artifacts/val/D_s7-g29636/score-raw.json": "0a6830d255ecde5cb578b63956aa19a0a7052c33688caee58b80569e18f6f1e7",
+    "checkpoint-study/artifacts/val/D_s7-g9560/score-raw.json": "889fb00e34bf07554536284597ef3775a8f16f577eb99568811e14228419d9c4",
+    "checkpoint-study/artifacts/val/O-S_s13-g16252/score-raw.json": "234860f57eac7f4f1f22a052aaba95af270b0c967f9e2eaa7250f9ec2635d428",
+    "checkpoint-study/artifacts/val/O-S_s13-g22944/score-raw.json": "dc1c2c79d4f1d17a158c7cafa87ba18df0db2c0f976c9e811a5928a8dbaf6663",
+    "checkpoint-study/artifacts/val/O-S_s13-g2868/score-raw.json": "853db7db56247c8c607c97f6324d0a5dc44e9c100d220ed09b5b9e4a3791ce9d",
+    "checkpoint-study/artifacts/val/O-S_s13-g29636/score-raw.json": "881bac0911641dcadf9d0121ade97b3492d5d3f227946b681089a98dcbae4ae9",
+    "checkpoint-study/artifacts/val/O-S_s13-g9560/score-raw.json": "c667fc68ab2c013c86310ba9fe693714eed1c3ad90cef0bd8b6a0f56a8472f18",
+    "checkpoint-study/artifacts/val/O-S_s42-g16252/score-raw.json": "f96f0c92e7e2b702dc031c3f02b173745f3874a8c50f9bef3b506cc9a1b62b8e",
+    "checkpoint-study/artifacts/val/O-S_s42-g22944/score-raw.json": "1be5c7c185d07a21257f6f2dab0b21d42376bed73acbaada05dec48046422489",
+    "checkpoint-study/artifacts/val/O-S_s42-g2868/score-raw.json": "f992624e38d48bd31691e5e767cf498c3b0e90ff71969dadb9958cb11502ba7e",
+    "checkpoint-study/artifacts/val/O-S_s42-g29636/score-raw.json": "270706244d015a95831e123504dd1743cb85c059504b9b13b82640582bcd4b4d",
+    "checkpoint-study/artifacts/val/O-S_s42-g9560/score-raw.json": "ca1142907c7d3935257608b0267f7eca4cd764e4802790d751920a2481bcea65",
+    "checkpoint-study/artifacts/val/O-S_s7-g16252/score-raw.json": "f36f260d0456964f99dbbebcd0fcd2e14c39e825b4904b9ac9d0feb6fe351861",
+    "checkpoint-study/artifacts/val/O-S_s7-g22944/score-raw.json": "79d89771e262f9c19e864ec5e049dd160e92923f7ca4b1b8954c9feb3359d7a2",
+    "checkpoint-study/artifacts/val/O-S_s7-g2868/score-raw.json": "11cd28ef4af0769156cdc314637d4de9f8b6b42789d6bff62c4ca8896567dfcc",
+    "checkpoint-study/artifacts/val/O-S_s7-g29636/score-raw.json": "772f1a03dae8fe330a3b845e487001d7a51ea5649eaf1b5c3e4918c906061f25",
+    "checkpoint-study/artifacts/val/O-S_s7-g9560/score-raw.json": "416517fe36a57e15ed140e6f4e0e2a995d9e531f0d0c06a1743163f621176df3"
+  }
+}

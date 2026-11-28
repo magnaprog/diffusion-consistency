@@ -1,0 +1,87 @@
+{
+  "arms": [
+    "D",
+    "I-S",
+    "O-S",
+    "G5"
+  ],
+  "arrays": {
+    "TEST": {
+      "ids_sha256": "959f350174ad87972f98d4ff27777ea385e01b5c095a0a2b24371ceebbabccc6",
+      "n_windows": 480,
+      "normalization_sha256": "2e1479739e82cc6cd4764fedbb4d7bb856b2c8f8ed7b28efe6f69fe3c135d364",
+      "sha256": "2cbe75399a190d1522379701cced5c74718aaced251bdf4179f246b72b46c1c7",
+      "split": "TEST"
+    },
+    "TRAIN": {
+      "ids_sha256": "405ecfb75878e9eeab0755642d168434715f71863361e927d6e261c7a89b5e46",
+      "n_windows": 122309,
+      "normalization_sha256": "2e1479739e82cc6cd4764fedbb4d7bb856b2c8f8ed7b28efe6f69fe3c135d364",
+      "sha256": "23df2e95daa7e0e24cb5602ed722bb9649b16bd47cb7b127f51929611d619e8a",
+      "split": "TRAIN"
+    },
+    "VAL": {
+      "ids_sha256": "b275dc3dcdc25fa59b2cd9ae57905a5286ae1e9df15a341eabfa7e4c7a5ec2e7",
+      "n_windows": 319,
+      "normalization_sha256": "2e1479739e82cc6cd4764fedbb4d7bb856b2c8f8ed7b28efe6f69fe3c135d364",
+      "sha256": "5729ffb163f9bf485fa679f7027b5c61f1d15c8da1438d369aede9fc5804e3a6",
+      "split": "VAL"
+    }
+  },
+  "batch_size": 128,
+  "budget_updates": 29636,
+  "c_r": {
+    "D": 0.0,
+    "G5": 0.0,
+    "I-S": 0.0005,
+    "O-S": 0.0005
+  },
+  "claim_scope": "post-exposure corrected procedure; no restored blindness or new coefficient search",
+  "controls": {
+    "gaussian": {
+      "jitter": 1e-06,
+      "rho": 0.0,
+      "seed": 13
+    },
+    "interpolation": {
+      "conditioning": "two_boundaries"
+    },
+    "persistence": {
+      "conditioning": "left_boundary"
+    }
+  },
+  "exposure": "historical_test_exposed",
+  "milestones": [
+    2868,
+    9560,
+    16252,
+    22944,
+    29636
+  ],
+  "samplers": {
+    "TEST": {
+      "eval_seed": 7,
+      "n_draws": 39,
+      "n_eval": 50
+    },
+    "VAL": {
+      "eval_seed": 7,
+      "n_draws": 39,
+      "n_eval": 25
+    }
+  },
+  "sampling_chunk_windows": 8,
+  "schema_version": 1,
+  "scope": "Reduced anonymous numeric evidence from a historically test-exposed study. Not the original execution protocol, a resumable study, or restored blind confirmation. Primary statistics and full diagnostics are recomputed from loader-validated inputs. Gradient receipts and their payload hashes are checked, not gradient calculations. Raw OMNI, training, selection and ensemble generation are not rerun. Original records remain unchanged and are identified by their byte hashes.",
+  "seeds": [
+    7,
+    13,
+    42
+  ],
+  "selection": "minimum validation month-balanced primary energy, earlier milestone on exact tie; raw and support-corrected selected independently",
+  "source_protocol_sha256": "25d0cdefdd5dbb160c32c7b5f4a6053bab99e4a9f64832d9eb6502232bf24e6b",
+  "study": "fixed_recipe_corrected_sampling_followup",
+  "training_data_hashes": {
+    "arrays_sha256": "23df2e95daa7e0e24cb5602ed722bb9649b16bd47cb7b127f51929611d619e8a"
+  }
+}

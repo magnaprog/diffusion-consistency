@@ -1,0 +1,15 @@
+{
+  "extension_protocol_sha256": "8456fdae42a086fa9cb11dbc4bc4da9d54d5a3fe233aff6ed6d4bb30d25d0090",
+  "fit_payload": "FIT.npz",
+  "fit_payload_sha256": "53e7b28d0fecc03c1fcf37d13179c8a438fbfa3e3b3a6dd9da88c5d8c6600487",
+  "n_covariance_configurations": 9,
+  "n_mean_fits": 3,
+  "schema_version": 1,
+  "training_arrays": {
+    "ids_sha256": "405ecfb75878e9eeab0755642d168434715f71863361e927d6e261c7a89b5e46",
+    "n_windows": 122309,
+    "normalization_sha256": "2e1479739e82cc6cd4764fedbb4d7bb856b2c8f8ed7b28efe6f69fe3c135d364",
+    "sha256": "23df2e95daa7e0e24cb5602ed722bb9649b16bd47cb7b127f51929611d619e8a",
+    "split": "TRAIN"
+  }
+}

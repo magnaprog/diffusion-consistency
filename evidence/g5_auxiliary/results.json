@@ -1,0 +1,673 @@
+{
+  "protocol_sha256": "81ca6a46d4a16ef97dce5031b98dceef20718879a950d71289dd1b4e2b8e9d57",
+  "source_sha256": "340ed0f43d60a2718250b441c52ee1b19486f0d935e7a505f793f919de9fcc1f",
+  "evaluation_year": 2025,
+  "windows_per_month": {
+    "1": 12,
+    "2": 12,
+    "3": 12,
+    "4": 12,
+    "5": 12,
+    "6": 12,
+    "7": 12,
+    "8": 12,
+    "9": 12,
+    "10": 12,
+    "11": 12,
+    "12": 12
+  },
+  "fits": {
+    "G5_71": {
+      "validation_energy_by_epoch": {
+        "3": 2.0406095525518837,
+        "10": 1.9557145237336144,
+        "17": 1.7148074162497817,
+        "24": 1.7075036112987754,
+        "31": 1.7208370619732942
+      },
+      "selected_epoch": 24,
+      "checkpoint": "9fc32c4fb9c9132523e2c43fe744273e79b4d14f5ba580e5d5ba499b7763b102",
+      "forecast_archive": "e6ec86c09eb36ad6cb2d59d56e479ee0c10bf09dd1b65aab7693c1466ddb0f05",
+      "mean": {
+        "energy": 2.890167375554752,
+        "variance_crps": 2.6156565659529534,
+        "variance_coverage": 0.6886574074074073,
+        "variance_width": 11.140423105626285
+      },
+      "by_month": {
+        "2025-01": {
+          "energy": 2.5100575945917156,
+          "variance_crps": 2.2766642181551564,
+          "variance_coverage": 0.7569444444444445,
+          "variance_width": 13.053295384614517
+        },
+        "2025-02": {
+          "energy": 3.7465226862874084,
+          "variance_crps": 2.4900204961679253,
+          "variance_coverage": 0.8402777777777778,
+          "variance_width": 14.440540369586103
+        },
+        "2025-03": {
+          "energy": 2.7286134482572684,
+          "variance_crps": 2.704436570566839,
+          "variance_coverage": 0.5694444444444443,
+          "variance_width": 11.222793702179295
+        },
+        "2025-04": {
+          "energy": 3.3821125820388596,
+          "variance_crps": 3.6684934195732235,
+          "variance_coverage": 0.6527777777777778,
+          "variance_width": 14.526399950540787
+        },
+        "2025-05": {
+          "energy": 1.9568489429561973,
+          "variance_crps": 1.5364525482000202,
+          "variance_coverage": 0.7222222222222223,
+          "variance_width": 6.44017714894855
+        },
+        "2025-06": {
+          "energy": 4.002875963468688,
+          "variance_crps": 2.5063436397956234,
+          "variance_coverage": 0.7083333333333334,
+          "variance_width": 13.995441203989174
+        },
+        "2025-07": {
+          "energy": 3.1041675730953417,
+          "variance_crps": 2.0715936384098406,
+          "variance_coverage": 0.8055555555555554,
+          "variance_width": 11.998375146409353
+        },
+        "2025-08": {
+          "energy": 3.7667523244010837,
+          "variance_crps": 2.169921151256444,
+          "variance_coverage": 0.625,
+          "variance_width": 8.906465258305362
+        },
+        "2025-09": {
+          "energy": 2.2422003361304506,
+          "variance_crps": 2.8991866091241447,
+          "variance_coverage": 0.5902777777777778,
+          "variance_width": 9.103380546571474
+        },
+        "2025-10": {
+          "energy": 1.7529778392734583,
+          "variance_crps": 1.2937179996621766,
+          "variance_coverage": 0.7291666666666666,
+          "variance_width": 6.4544154504000995
+        },
+        "2025-11": {
+          "energy": 2.5718588860549905,
+          "variance_crps": 5.032176222352076,
+          "variance_coverage": 0.48611111111111116,
+          "variance_width": 11.683648241430317
+        },
+        "2025-12": {
+          "energy": 2.9170203301015643,
+          "variance_crps": 2.738872278171969,
+          "variance_coverage": 0.7777777777777778,
+          "variance_width": 11.86014486454039
+        }
+      }
+    },
+    "G5aux_71": {
+      "validation_energy_by_epoch": {
+        "3": 2.360046765698436,
+        "10": 2.0757172685141407,
+        "17": 1.7978859202137945,
+        "24": 1.7614472509409471,
+        "31": 1.6495316318005766
+      },
+      "selected_epoch": 31,
+      "checkpoint": "18def94d1b27152911a3dc0b5d5bd827616a705bed1b5d6edfe1672af27fdcfe",
+      "forecast_archive": "c5454a9057a0d75ccef7e10c029bb782e7b12d67017fb258949e0b1f60730231",
+      "mean": {
+        "energy": 2.823986586355801,
+        "variance_crps": 1.8809798830180993,
+        "variance_coverage": 0.7557870370370371,
+        "variance_width": 9.216902212554748
+      },
+      "by_month": {
+        "2025-01": {
+          "energy": 2.4810585555319173,
+          "variance_crps": 1.191068055758654,
+          "variance_coverage": 0.7430555555555555,
+          "variance_width": 10.466661062616756
+        },
+        "2025-02": {
+          "energy": 3.4464468875798278,
+          "variance_crps": 2.116174440980351,
+          "variance_coverage": 0.7569444444444445,
+          "variance_width": 12.397663984983915
+        },
+        "2025-03": {
+          "energy": 2.6806587879465784,
+          "variance_crps": 1.7830070194991032,
+          "variance_coverage": 0.8402777777777778,
+          "variance_width": 7.859301540315095
+        },
+        "2025-04": {
+          "energy": 3.68208716172967,
+          "variance_crps": 2.5982657552238475,
+          "variance_coverage": 0.7291666666666666,
+          "variance_width": 11.625706377103384
+        },
+        "2025-05": {
+          "energy": 1.9217035007099972,
+          "variance_crps": 1.3265660394136376,
+          "variance_coverage": 0.7291666666666666,
+          "variance_width": 4.888741207496195
+        },
+        "2025-06": {
+          "energy": 3.940118005892476,
+          "variance_crps": 2.140312273486505,
+          "variance_coverage": 0.7361111111111112,
+          "variance_width": 8.52291479477553
+        },
+        "2025-07": {
+          "energy": 2.896385027961934,
+          "variance_crps": 1.63322113294078,
+          "variance_coverage": 0.8194444444444445,
+          "variance_width": 10.739167543681711
+        },
+        "2025-08": {
+          "energy": 3.3053105087565537,
+          "variance_crps": 1.212371214604709,
+          "variance_coverage": 0.8125,
+          "variance_width": 7.6143877556262405
+        },
+        "2025-09": {
+          "energy": 2.311076838897385,
+          "variance_crps": 1.2964360366315435,
+          "variance_coverage": 0.6666666666666666,
+          "variance_width": 9.201533004597179
+        },
+        "2025-10": {
+          "energy": 1.6324124261271062,
+          "variance_crps": 0.8517688339348141,
+          "variance_coverage": 0.798611111111111,
+          "variance_width": 5.271605154627761
+        },
+        "2025-11": {
+          "energy": 2.7998881964816698,
+          "variance_crps": 4.292409793597462,
+          "variance_coverage": 0.7361111111111112,
+          "variance_width": 11.750219898943358
+        },
+        "2025-12": {
+          "energy": 2.7906931386544946,
+          "variance_crps": 2.1301580001457876,
+          "variance_coverage": 0.7013888888888888,
+          "variance_width": 10.264924225889843
+        }
+      }
+    },
+    "G5_73": {
+      "validation_energy_by_epoch": {
+        "3": 2.2158055217863457,
+        "10": 1.743713777175412,
+        "17": 1.7054161834865376,
+        "24": 1.6101968007461303,
+        "31": 1.6999250274455104
+      },
+      "selected_epoch": 24,
+      "checkpoint": "37dbb7766352d943db3a2741937c6a27bed45864d9ccc3dcc67be8148ef6d0e3",
+      "forecast_archive": "4749b9e4e8b10618279c7560f9f0128cceb632d198c4b9b1a79b71048e64d256",
+      "mean": {
+        "energy": 2.7702682122380007,
+        "variance_crps": 3.487840469637801,
+        "variance_coverage": 0.8136574074074073,
+        "variance_width": 18.14049126491295
+      },
+      "by_month": {
+        "2025-01": {
+          "energy": 2.728974991174821,
+          "variance_crps": 4.019078054588797,
+          "variance_coverage": 0.7569444444444445,
+          "variance_width": 24.683528266746535
+        },
+        "2025-02": {
+          "energy": 3.612962465486064,
+          "variance_crps": 4.713406576910459,
+          "variance_coverage": 0.7430555555555557,
+          "variance_width": 24.526614895356584
+        },
+        "2025-03": {
+          "energy": 2.7841291307870915,
+          "variance_crps": 3.0935169552574933,
+          "variance_coverage": 0.7847222222222222,
+          "variance_width": 16.412600386708938
+        },
+        "2025-04": {
+          "energy": 3.3503714562359495,
+          "variance_crps": 4.225659763258787,
+          "variance_coverage": 0.7777777777777778,
+          "variance_width": 21.8107673034669
+        },
+        "2025-05": {
+          "energy": 1.8679190266990142,
+          "variance_crps": 2.0923666185356464,
+          "variance_coverage": 0.8472222222222222,
+          "variance_width": 11.117009643834036
+        },
+        "2025-06": {
+          "energy": 3.7693137178257103,
+          "variance_crps": 3.592495724192755,
+          "variance_coverage": 0.7430555555555555,
+          "variance_width": 21.284388772100147
+        },
+        "2025-07": {
+          "energy": 2.8799121234049934,
+          "variance_crps": 3.735697708269868,
+          "variance_coverage": 0.8680555555555557,
+          "variance_width": 18.71319390382165
+        },
+        "2025-08": {
+          "energy": 3.4328082206958968,
+          "variance_crps": 2.269760711744023,
+          "variance_coverage": 0.861111111111111,
+          "variance_width": 14.637440512531747
+        },
+        "2025-09": {
+          "energy": 2.1319021406529224,
+          "variance_crps": 2.553149378551885,
+          "variance_coverage": 0.8333333333333334,
+          "variance_width": 14.52054224623838
+        },
+        "2025-10": {
+          "energy": 1.7378801295609065,
+          "variance_crps": 1.9461761495094303,
+          "variance_coverage": 0.8333333333333334,
+          "variance_width": 8.643323227739758
+        },
+        "2025-11": {
+          "energy": 2.391206449842952,
+          "variance_crps": 5.613968098081934,
+          "variance_coverage": 0.8472222222222223,
+          "variance_width": 23.335574663769233
+        },
+        "2025-12": {
+          "energy": 2.555838694489689,
+          "variance_crps": 3.998809896752531,
+          "variance_coverage": 0.8680555555555555,
+          "variance_width": 18.000911356641467
+        }
+      }
+    },
+    "G5aux_73": {
+      "validation_energy_by_epoch": {
+        "3": 2.48234685997236,
+        "10": 1.9823969633474587,
+        "17": 1.7855398832095613,
+        "24": 1.7778514529977225,
+        "31": 1.6499027739253023
+      },
+      "selected_epoch": 31,
+      "checkpoint": "72d6615cfa7757d0c647bbace38178cdec7fb112793ba4e824bf2976ff50bd6e",
+      "forecast_archive": "9903833bd3c315641500e03fcb997321d7fd22777e9e278023099a2a43abab4c",
+      "mean": {
+        "energy": 2.9203542377739087,
+        "variance_crps": 1.8751600134714757,
+        "variance_coverage": 0.8078703703703702,
+        "variance_width": 6.531027081781116
+      },
+      "by_month": {
+        "2025-01": {
+          "energy": 2.6833830016221043,
+          "variance_crps": 0.8155520929391633,
+          "variance_coverage": 0.8888888888888888,
+          "variance_width": 7.078062587195628
+        },
+        "2025-02": {
+          "energy": 3.885501642480088,
+          "variance_crps": 2.317812657530574,
+          "variance_coverage": 0.861111111111111,
+          "variance_width": 7.531413834319779
+        },
+        "2025-03": {
+          "energy": 2.7587957410355237,
+          "variance_crps": 2.4656435566444306,
+          "variance_coverage": 0.7291666666666669,
+          "variance_width": 6.60340638743482
+        },
+        "2025-04": {
+          "energy": 3.674225327104168,
+          "variance_crps": 2.0934344538086456,
+          "variance_coverage": 0.798611111111111,
+          "variance_width": 7.984288018714294
+        },
+        "2025-05": {
+          "energy": 1.9035581313726624,
+          "variance_crps": 1.5513377786096176,
+          "variance_coverage": 0.7986111111111112,
+          "variance_width": 4.975044950165892
+        },
+        "2025-06": {
+          "energy": 4.0262810467879815,
+          "variance_crps": 2.1307200108754096,
+          "variance_coverage": 0.7500000000000001,
+          "variance_width": 7.588231682348106
+        },
+        "2025-07": {
+          "energy": 2.909803100085935,
+          "variance_crps": 1.6513384925500783,
+          "variance_coverage": 0.7986111111111112,
+          "variance_width": 6.991887419375672
+        },
+        "2025-08": {
+          "energy": 3.4796441668651052,
+          "variance_crps": 1.3147765731068153,
+          "variance_coverage": 0.7847222222222223,
+          "variance_width": 5.287328333565558
+        },
+        "2025-09": {
+          "energy": 2.400924595867732,
+          "variance_crps": 0.9219842000593204,
+          "variance_coverage": 0.8680555555555555,
+          "variance_width": 5.995371132546
+        },
+        "2025-10": {
+          "energy": 1.7106233646394593,
+          "variance_crps": 0.8788137425481888,
+          "variance_coverage": 0.8888888888888887,
+          "variance_width": 5.020393786165987
+        },
+        "2025-11": {
+          "energy": 2.723201429092878,
+          "variance_crps": 4.691959650474258,
+          "variance_coverage": 0.6736111111111112,
+          "variance_width": 5.613815745784417
+        },
+        "2025-12": {
+          "energy": 2.8883093063332663,
+          "variance_crps": 1.6685469525112058,
+          "variance_coverage": 0.8541666666666666,
+          "variance_width": 7.7030811037572375
+        }
+      }
+    },
+    "G5_79": {
+      "validation_energy_by_epoch": {
+        "3": 1.9779489898392737,
+        "10": 1.642377478570237,
+        "17": 1.688896151872708,
+        "24": 1.821849513013433,
+        "31": 1.8118311085620498
+      },
+      "selected_epoch": 10,
+      "checkpoint": "9315ed71313b1fe6c1f09de9e274c1bc3ce389a36fc916327643e31a9bff444d",
+      "forecast_archive": "91ac1bf481aca29213ddfa422c0e073fde44db94d9d5fd908a9604a56d62d009",
+      "mean": {
+        "energy": 2.7315515573524345,
+        "variance_crps": 4.1771002877682335,
+        "variance_coverage": 0.7598379629629629,
+        "variance_width": 20.08026155812891
+      },
+      "by_month": {
+        "2025-01": {
+          "energy": 2.484239402657943,
+          "variance_crps": 5.056945649956669,
+          "variance_coverage": 0.7013888888888888,
+          "variance_width": 30.35251619215913
+        },
+        "2025-02": {
+          "energy": 3.551649202236366,
+          "variance_crps": 4.004418312019364,
+          "variance_coverage": 0.7013888888888888,
+          "variance_width": 24.479781301302776
+        },
+        "2025-03": {
+          "energy": 2.912404560928541,
+          "variance_crps": 2.523518024218174,
+          "variance_coverage": 0.7916666666666666,
+          "variance_width": 18.71394958521194
+        },
+        "2025-04": {
+          "energy": 3.350322914922277,
+          "variance_crps": 8.264541755897914,
+          "variance_coverage": 0.6736111111111112,
+          "variance_width": 22.22601300860816
+        },
+        "2025-05": {
+          "energy": 1.941081646775966,
+          "variance_crps": 1.8098875789472413,
+          "variance_coverage": 0.7708333333333334,
+          "variance_width": 10.900537727447551
+        },
+        "2025-06": {
+          "energy": 3.370142223326832,
+          "variance_crps": 8.184690169653747,
+          "variance_coverage": 0.7638888888888888,
+          "variance_width": 26.623634326629826
+        },
+        "2025-07": {
+          "energy": 2.7676278084607873,
+          "variance_crps": 3.1010302522881035,
+          "variance_coverage": 0.8402777777777778,
+          "variance_width": 19.43333068174196
+        },
+        "2025-08": {
+          "energy": 3.4538038294747597,
+          "variance_crps": 3.3757741019728438,
+          "variance_coverage": 0.7291666666666666,
+          "variance_width": 16.920266238749132
+        },
+        "2025-09": {
+          "energy": 1.977749929928027,
+          "variance_crps": 2.8101406697142415,
+          "variance_coverage": 0.7847222222222223,
+          "variance_width": 16.203402365738363
+        },
+        "2025-10": {
+          "energy": 1.6165409829609747,
+          "variance_crps": 1.9032734757384617,
+          "variance_coverage": 0.736111111111111,
+          "variance_width": 8.186128117978873
+        },
+        "2025-11": {
+          "energy": 2.679216331769742,
+          "variance_crps": 5.020995819793451,
+          "variance_coverage": 0.8194444444444445,
+          "variance_width": 27.484266207822994
+        },
+        "2025-12": {
+          "energy": 2.6738398547870044,
+          "variance_crps": 4.0699876430185835,
+          "variance_coverage": 0.8055555555555557,
+          "variance_width": 19.439312944156203
+        }
+      }
+    },
+    "G5aux_79": {
+      "validation_energy_by_epoch": {
+        "3": 2.313380690670336,
+        "10": 1.9585674709104168,
+        "17": 1.7738542710810647,
+        "24": 1.681530307012404,
+        "31": 1.6146804984021954
+      },
+      "selected_epoch": 31,
+      "checkpoint": "cbd755453afe89293008098a68f5868a0dc3dc0d6404b1d95ad30863505de7d8",
+      "forecast_archive": "3662a15761aa79dbc20564c57079cafa64c91553f745229f5521829c5dd29906",
+      "mean": {
+        "energy": 2.7738275949670292,
+        "variance_crps": 1.8600669470053421,
+        "variance_coverage": 0.6753472222222223,
+        "variance_width": 7.95515806756968
+      },
+      "by_month": {
+        "2025-01": {
+          "energy": 2.555439160281153,
+          "variance_crps": 1.3635422764502858,
+          "variance_coverage": 0.5416666666666667,
+          "variance_width": 9.541429493578347
+        },
+        "2025-02": {
+          "energy": 3.4036205533374364,
+          "variance_crps": 2.069228800500644,
+          "variance_coverage": 0.5972222222222222,
+          "variance_width": 10.041822864156845
+        },
+        "2025-03": {
+          "energy": 2.63214981881514,
+          "variance_crps": 1.7113125069311748,
+          "variance_coverage": 0.7430555555555555,
+          "variance_width": 7.310323195508897
+        },
+        "2025-04": {
+          "energy": 3.3408864248371124,
+          "variance_crps": 2.9232879785999697,
+          "variance_coverage": 0.6736111111111112,
+          "variance_width": 10.281336961594391
+        },
+        "2025-05": {
+          "energy": 2.0221892306883036,
+          "variance_crps": 1.0155467474023614,
+          "variance_coverage": 0.7569444444444445,
+          "variance_width": 4.800401146895934
+        },
+        "2025-06": {
+          "energy": 3.727892888939199,
+          "variance_crps": 2.338688764952094,
+          "variance_coverage": 0.6944444444444445,
+          "variance_width": 8.576424647500643
+        },
+        "2025-07": {
+          "energy": 2.855323624222074,
+          "variance_crps": 1.6340515406607172,
+          "variance_coverage": 0.7222222222222222,
+          "variance_width": 8.952512279828005
+        },
+        "2025-08": {
+          "energy": 3.473933462145233,
+          "variance_crps": 1.071082299594754,
+          "variance_coverage": 0.7291666666666666,
+          "variance_width": 6.578362774701954
+        },
+        "2025-09": {
+          "energy": 2.12167234054645,
+          "variance_crps": 1.20702833972713,
+          "variance_coverage": 0.6597222222222222,
+          "variance_width": 7.263687861138891
+        },
+        "2025-10": {
+          "energy": 1.5643045083230653,
+          "variance_crps": 1.1462379125889142,
+          "variance_coverage": 0.5555555555555557,
+          "variance_width": 4.071487994883044
+        },
+        "2025-11": {
+          "energy": 2.80829731837267,
+          "variance_crps": 3.8973630363738816,
+          "variance_coverage": 0.75,
+          "variance_width": 9.19278291734136
+        },
+        "2025-12": {
+          "energy": 2.7802218090965187,
+          "variance_crps": 1.9434331602821782,
+          "variance_coverage": 0.6805555555555555,
+          "variance_width": 8.851324673707834
+        }
+      }
+    }
+  },
+  "difference_by_seed": {
+    "71": {
+      "energy": -0.06618078919895137,
+      "variance_crps": -0.7346766829348536,
+      "variance_coverage": 0.06712962962962964,
+      "variance_width": -1.9235208930715373
+    },
+    "73": {
+      "energy": 0.15008602553590775,
+      "variance_crps": -1.6126804561663253,
+      "variance_coverage": -0.005787037037037053,
+      "variance_width": -11.609464183131832
+    },
+    "79": {
+      "energy": 0.042276037614594586,
+      "variance_crps": -2.317033340762891,
+      "variance_coverage": -0.08449074074074074,
+      "variance_width": -12.125103490559228
+    }
+  },
+  "difference_by_month": {
+    "2025-01": {
+      "energy": -0.0011304236631016391,
+      "variance_crps": -2.6608418325175065,
+      "variance_coverage": -0.01388888888888895,
+      "variance_width": -13.66772890004315
+    },
+    "2025-02": {
+      "energy": -0.0585217568708288,
+      "variance_crps": -1.5682098286953934,
+      "variance_coverage": -0.023148148148148178,
+      "variance_width": -11.158678627594975
+    },
+    "2025-03": {
+      "energy": -0.11784759739188615,
+      "variance_crps": -0.7871694889892659,
+      "variance_coverage": 0.05555555555555566,
+      "variance_width": -8.192104183613788
+    },
+    "2025-04": {
+      "energy": 0.20479732015795493,
+      "variance_crps": -2.8479022503658213,
+      "variance_coverage": 0.032407407407407364,
+      "variance_width": -9.557282968401259
+    },
+    "2025-05": {
+      "energy": 0.02720041544659524,
+      "variance_crps": -0.5150853934190971,
+      "variance_coverage": -0.018518518518518528,
+      "variance_width": -4.597845738557372
+    },
+    "2025-06": {
+      "energy": 0.18398667899947516,
+      "variance_crps": -2.5579361614427056,
+      "variance_coverage": -0.011574074074073959,
+      "variance_width": -12.405297726031622
+    },
+    "2025-07": {
+      "energy": -0.030065250897059876,
+      "variance_crps": -1.3299034776054122,
+      "variance_coverage": -0.057870370370370315,
+      "variance_width": -7.820444163029191
+    },
+    "2025-08": {
+      "energy": -0.1314920789349494,
+      "variance_crps": -1.4057419592223441,
+      "variance_coverage": 0.03703703703703709,
+      "variance_width": -6.994697715230829
+    },
+    "2025-09": {
+      "energy": 0.1606071228667222,
+      "variance_crps": -1.6123426936574257,
+      "variance_coverage": -0.004629629629629724,
+      "variance_width": -5.788911053422049
+    },
+    "2025-10": {
+      "energy": -0.06668621756856956,
+      "variance_crps": -0.7554490452793838,
+      "variance_coverage": -0.018518518518518528,
+      "variance_width": -2.973459953480646
+    },
+    "2025-11": {
+      "energy": 0.22970175875984436,
+      "variance_crps": -0.9284692199272867,
+      "variance_coverage": 0.0023148148148147696,
+      "variance_width": -11.98222351698447
+    },
+    "2025-12": {
+      "energy": 0.10417512490200738,
+      "variance_crps": -1.6885105683346373,
+      "variance_coverage": -0.07175925925925934,
+      "variance_width": -7.493679720661048
+    }
+  },
+  "difference": {
+    "energy": 0.04206042465051699,
+    "variance_crps": -1.5547968266213568,
+    "variance_coverage": -0.007716049382716053,
+    "variance_width": -8.552696188920867
+  }
+}

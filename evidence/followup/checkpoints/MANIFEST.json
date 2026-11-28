@@ -1,0 +1,54 @@
+{
+  "analysis": "checkpoint_followup_public_export",
+  "files": {
+    "PROTOCOL.json": "af4d29ba91a088725669115a9f35d89dda2be7be4da764d3fe992ef5f4ecc670",
+    "SAVED_VAL25.json": "b8252f106557590cd1c055c6c07d22fe8a6449a7c167b5b55e1626ca2ac8445f",
+    "SCOPE.json": "49627ce438c813ae41c7a3220a1c9a08bb018d0f3bb224efa90fd302ca5a4426",
+    "SELECTION.json": "cec06beb2a6313d049526620a43856c9973a4caa11dac91ab68beba229c5cd2f",
+    "SUMMARY.json": "abbf1b9e629c3ae61dd99c4c78d59fa0a78d5807ef51b83067e165c0fb7dd4fa"
+  },
+  "original_sha256": {
+    "PROTOCOL.json": "eeca7c2e14d982f0b3e972256cc9acf7a5aaa8dc03da6a9299a708c78a7b5946",
+    "SAVED_VAL25.json": "3d8c4b835fd3156490d75db877c675ec8f6a85c61c2bfb9fb0e6dc4a6d27f0b4",
+    "SCOPE.json": "5210fbe5432aec70433ed9d7c10a1ba61503e5c7c15e43cc2fa37bfac478674a",
+    "SELECTION.json": "7381e01b15b5a9f6965fcc1d5083183301ca166d2607abc2e13eea276bf137e7",
+    "SUMMARY.json": "f835ec62257ba143c707cf89c43e705180db5eee29b0ef1b05a041596fbd3d0c"
+  },
+  "schema_version": 1,
+  "source": {
+    "path": "fig_checkpoints.py",
+    "sha256": "ec574515f3738141a6efeaa84cb63ccaeccc72fbdf07770ffea091741cf8fc9d"
+  },
+  "source_protocol_sha256": "eeca7c2e14d982f0b3e972256cc9acf7a5aaa8dc03da6a9299a708c78a7b5946",
+  "source_scope_sha256": "5210fbe5432aec70433ed9d7c10a1ba61503e5c7c15e43cc2fa37bfac478674a",
+  "transformations": {
+    "field_replacements": [
+      {
+        "field": "environment.executable",
+        "file": "PROTOCOL.json",
+        "original_value_sha256": "ee61369350fc49050ec2567d7059d3d2a08b785345ae2520a642be4e414437ec",
+        "public_value": "environment-python"
+      },
+      {
+        "field": "environment.hostname",
+        "file": "PROTOCOL.json",
+        "original_value_sha256": "1d89613a2fc46113db94ff98ea1bdc9a46633a468af73be846f25d0860a39f82",
+        "public_value": "execution-host"
+      }
+    ],
+    "root_replacements": [
+      {
+        "original_root_sha256": "44e6b25d1c5a15811fb194c78d66ce7aeba038ef7746389d63a600f80e5596f9",
+        "public_root": "checkpoint-study"
+      },
+      {
+        "original_root_sha256": "8e857f1b0249ae7de1cffc0d20707b31214b04bf3ca9a657a18bfa1af2c2173a",
+        "public_root": "fixed-final-study"
+      },
+      {
+        "original_root_sha256": "4f279d008a3f69b4f3cdfe24cdf0b4cd7f0451450918ae4acdd2aa1007110c4a",
+        "public_root": "original-study"
+      }
+    ]
+  }
+}

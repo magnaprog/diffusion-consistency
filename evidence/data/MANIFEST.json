@@ -1,0 +1,25 @@
+{
+  "schema_version": 1,
+  "scope": "Anonymous copies of the complete reconstruction, data-quality and raw-vector aggregation records. No numerical values, populations or raw-year hashes were changed. The original records remain preserved separately.",
+  "transformation": "For quality.json and q15.json only, replace each of the twenty raw_inputs[year].path values with its file basename. All other parsed content is identical. inventory.json is byte-identical to its source record.",
+  "validation": "All twenty raw-year hashes agree across the three records; summed year counts reproduce eligible starts, candidate starts and all eligible Q15 blocks. This packaging check does not reread raw OMNI files or recreate their original execution provenance.",
+  "records": {
+    "quality.json": {
+      "source_record": "quality-01.json",
+      "source_sha256": "d253db995f9352e78bff7abf5912246a5b522e8c6f06ff39aeb92ab01c0dcb2a"
+    },
+    "q15.json": {
+      "source_record": "q15-raw-01.json",
+      "source_sha256": "9203de4da603cd1ccabe174cf5d756f16640e00761cd0ccac00985d828709d45"
+    },
+    "inventory.json": {
+      "source_record": "reconstructed_summary.json",
+      "source_sha256": "a034a2e4b03419b6e200014951d6fd6de47f1761b48649589b8f87df5631226c"
+    }
+  },
+  "files": {
+    "quality.json": "ed61d3566d6ac91f7629018373122d5e6c5ef06768751071d2006cc15e3877e2",
+    "q15.json": "2c685ac2adbc9ba28454f78924948871a9a6ed8486389e73df28b92866e1c595",
+    "inventory.json": "a034a2e4b03419b6e200014951d6fd6de47f1761b48649589b8f87df5631226c"
+  }
+}
